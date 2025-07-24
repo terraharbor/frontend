@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/terraharbor/frontend/compare/v0.1.1...v0.1.2) (2025-07-24)
+
+
+### Continuous Integration
+
+* add/edit docker-build.yaml ([95220bc](https://github.com/terraharbor/frontend/commit/95220bcee4ebc8f2243ecc6710d23da0fc51daee))
+
 ## [0.1.1](https://github.com/terraharbor/frontend/compare/v0.1.0...v0.1.1) (2025-07-24)
 
 
