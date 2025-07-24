@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.4](https://github.com/terraharbor/frontend/compare/v0.1.3...v0.1.4) (2025-07-24)
+
+
+### Miscellaneous Chores
+
+* **deps:** update traefik/whoami docker tag to v1.11.0 ([#8](https://github.com/terraharbor/frontend/issues/8)) ([8ae639d](https://github.com/terraharbor/frontend/commit/8ae639da821e7c6a28d4e03f8ba13a5a49dfa251))
+* trigger release ([39658c9](https://github.com/terraharbor/frontend/commit/39658c926b3d651a6b536ef9cd8c024c78ecf01b))
+
+
+### Continuous Integration
+
+* add/edit docker-build.yaml ([8ff29d2](https://github.com/terraharbor/frontend/commit/8ff29d2071847e3905f328efa2c7d438634246c7))
+
 ## [0.1.3](https://github.com/terraharbor/frontend/compare/v0.1.2...v0.1.3) (2025-07-24)
 
 
