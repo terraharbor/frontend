@@ -4,3 +4,7 @@ dist
 coverage
 .lock
 .github/
+release-please-config.json
+.release-please-manifest.json
+.renovaterc.json
+CHANGELOG.md
