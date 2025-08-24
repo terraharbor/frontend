@@ -1,15 +1,15 @@
 ---
-name: "pr-issues-project"
+name: 'pr-issues-project'
 
 on:
   issues:
     types:
-    - opened
-    - reopened
+      - opened
+      - reopened
   pull_request:
     types:
-    - opened
-    - reopened
+      - opened
+      - reopened
 
 jobs:
   pr-issues-project:
