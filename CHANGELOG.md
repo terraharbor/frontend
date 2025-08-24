@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.5](https://github.com/terraharbor/frontend/compare/v0.1.4...v0.1.5) (2025-08-24)
+
+
+### Features
+
+* exclude .github/ from formatting ([f875cc6](https://github.com/terraharbor/frontend/commit/f875cc6d4705f206ea5b0e95d69fe8577777ce4b))
+* exclude files from formatting ([4a9f722](https://github.com/terraharbor/frontend/commit/4a9f7225079a42e7302b59a46ac030fc9bc78565))
+* setup frontend project ([562431b](https://github.com/terraharbor/frontend/commit/562431bf293dcac2387139309252c619167eb27a))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#44](https://github.com/terraharbor/frontend/issues/44) from terraharbor/feat/setup-frontend-project ([340561c](https://github.com/terraharbor/frontend/commit/340561c9e2bf5115d2fe81692d2956a07716e27e))
+
 ## [0.1.4](https://github.com/terraharbor/frontend/compare/v0.1.3...v0.1.4) (2025-07-24)
 
 ### Miscellaneous Chores
