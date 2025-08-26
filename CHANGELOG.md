@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/terraharbor/frontend/compare/v0.1.6...v0.1.7) (2025-08-26)
+
+
+### Features
+
+* merge pull request [#51](https://github.com/terraharbor/frontend/issues/51) from terraharbor/feat/page-header ([f9d8f54](https://github.com/terraharbor/frontend/commit/f9d8f544b55383789a417e763d22157b358fef11))
+* page header ([f9d8f54](https://github.com/terraharbor/frontend/commit/f9d8f544b55383789a417e763d22157b358fef11))
+
 ## [0.1.6](https://github.com/terraharbor/frontend/compare/v0.1.5...v0.1.6) (2025-08-26)
 
 
