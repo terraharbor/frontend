@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.6](https://github.com/terraharbor/frontend/compare/v0.1.5...v0.1.6) (2025-08-26)
+
+
+### Features
+
+* merge pull request [#50](https://github.com/terraharbor/frontend/issues/50) from terraharbor/feat/mui-theme ([c3d0f59](https://github.com/terraharbor/frontend/commit/c3d0f59eebdd159e55890e460236d0bcb3b9e9b4))
+* MUI theme ([c3d0f59](https://github.com/terraharbor/frontend/commit/c3d0f59eebdd159e55890e460236d0bcb3b9e9b4))
+* mui theme corresponding to mockup ([509a230](https://github.com/terraharbor/frontend/commit/509a230f607c4560d31c5c115c64c9fecd19fbc6))
+
 ## [0.1.5](https://github.com/terraharbor/frontend/compare/v0.1.4...v0.1.5) (2025-08-24)
 
 
