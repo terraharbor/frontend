@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.8](https://github.com/terraharbor/frontend/compare/v0.1.7...v0.1.8) (2025-08-28)
+
+
+### Features
+
+* implement summary cards for team/project ([0d91aa0](https://github.com/terraharbor/frontend/commit/0d91aa0bc5684b37b945d01a3d4a7a3adba7332a))
+* merge pull request [#52](https://github.com/terraharbor/frontend/issues/52) from terraharbor/feat/summary-cards ([41e5712](https://github.com/terraharbor/frontend/commit/41e57125080edc31f61c391e2ebba4340bd62e8f))
+* summary cards for team/project ([41e5712](https://github.com/terraharbor/frontend/commit/41e57125080edc31f61c391e2ebba4340bd62e8f))
+
+
+### Bug Fixes
+
+* correct imports ([c7283c8](https://github.com/terraharbor/frontend/commit/c7283c85dd490f21d38cbbfaa7e25072e3692d58))
+
+
+### Code Refactoring
+
+* remove pointless files ([a99ccbb](https://github.com/terraharbor/frontend/commit/a99ccbbb8de4ac89144c1678d43420945b25c59b))
+
 ## [0.1.7](https://github.com/terraharbor/frontend/compare/v0.1.6...v0.1.7) (2025-08-26)
 
 
