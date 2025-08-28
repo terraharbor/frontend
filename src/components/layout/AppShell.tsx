@@ -8,15 +8,15 @@ const AppShell: FC<PropsWithChildren> = ({ children }) => {
     <Stack
       direction="row"
       sx={{
-        minHeight: '100vh',
-        minWidth: '100vh',
+        height: '100vh',
+        width: '100%',
         bgcolor: 'background.default',
       }}
     >
       <Sidebar />
-      <Stack sx={{ width: '100%' }}>
+      <Stack>
         <Topbar />
-        <Stack sx={{ p: 2 }}>{children}</Stack>
+        <Stack sx={{ p: 2, overflowY: 'auto' }}>{children}</Stack>
       </Stack>
     </Stack>
   );

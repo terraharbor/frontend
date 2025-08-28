@@ -7,17 +7,11 @@ import {
   VpnKey as TokensIcon,
   People as UsersIcon,
 } from '@mui/icons-material';
-import {
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { FC, JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import theme from '../../theme';
 
 type NavItem = { label: string; to: string; icon: JSX.Element };
 
@@ -35,16 +29,14 @@ const Sidebar: FC = () => {
   const { pathname } = useLocation();
 
   return (
-    <Stack
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column', border: '1px solid red' }}
-    >
-      <Stack sx={{ px: 2, py: 3 }}>
-        <Typography variant="h6" fontWeight={800} color="secondary.main">
+    <Stack sx={{ height: '100%', width: '600px', bgcolor: 'secondary.main' }}>
+      <Stack sx={{ height: 64, p: 2 }}>
+        <Typography variant="h3" sx={{ color: 'neutral.white', fontWeight: 'bold' }}>
           TerraHarbor
         </Typography>
       </Stack>
-      <Divider />
-      <List sx={{ flex: 1, mt: 1 }}>
+
+      <List>
         {NAV_ITEMS.map((item) => {
           const selected = item.to === '/' ? pathname === '/' : pathname.startsWith(item.to);
           return (
@@ -54,26 +46,21 @@ const Sidebar: FC = () => {
               to={item.to}
               selected={selected}
               sx={{
-                mx: 1,
-                mb: 0.5,
-                borderRadius: 1.5,
-                '&.Mui-selected': {
-                  bgcolor: 'rgba(40,203,139,0.12)',
-                  '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                    color: 'primary.main',
-                  },
-                },
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) },
+                '&.Mui-selected': { bgcolor: 'primary.main' },
+                '&.Mui-selected:hover': { bgcolor: 'primary.main' },
               }}
             >
-              <ListItemIcon sx={{ minWidth: 36 }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
+              <ListItemIcon color="neutral.white" sx={{ minWidth: 32, color: 'neutral.white' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText color="neutral.white" sx={{ ml: 2 }}>
+                <Typography color="neutral.white">{item.label}</Typography>
+              </ListItemText>
             </ListItemButton>
           );
         })}
       </List>
-      <Stack sx={{ px: 2, py: 2, color: 'text.secondary', fontSize: 12 }}>
-        © {new Date().getFullYear()} TerraHarbor
-      </Stack>
     </Stack>
   );
 };
