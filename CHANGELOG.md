@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.9](https://github.com/terraharbor/frontend/compare/v0.1.8...v0.1.9) (2025-08-29)
+
+
+### Features
+
+* appshell ([dd7f74f](https://github.com/terraharbor/frontend/commit/dd7f74f47a9674ce47367034e77679200f18cbc4))
+* appshell (topbar + sidebar) ([753145a](https://github.com/terraharbor/frontend/commit/753145addbecc938f09e50be5ac2c5276c7f7c6c))
+* wip AppShell ([a713991](https://github.com/terraharbor/frontend/commit/a713991bd45f5f865436ca441a007699345d1af6))
+* wip AppShell ([486cbb4](https://github.com/terraharbor/frontend/commit/486cbb4022d2d4986f7d905b7d62e72e0c2fbe10))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#58](https://github.com/terraharbor/frontend/issues/58) from terraharbor/feat/appshell ([dd7f74f](https://github.com/terraharbor/frontend/commit/dd7f74f47a9674ce47367034e77679200f18cbc4))
+
 ## [0.1.8](https://github.com/terraharbor/frontend/compare/v0.1.7...v0.1.8) (2025-08-28)
 
 
