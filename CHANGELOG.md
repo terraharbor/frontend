@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.10](https://github.com/terraharbor/frontend/compare/v0.1.9...v0.1.10) (2025-08-29)
+
+
+### Features
+
+* fix appshell ([7623560](https://github.com/terraharbor/frontend/commit/762356061ab45684d2244e46c8a0196195d06819))
+* Routes ([6199a0a](https://github.com/terraharbor/frontend/commit/6199a0a3e867eade8edbf7cd338505fdf3133043))
+* wip routes ([f59c8c3](https://github.com/terraharbor/frontend/commit/f59c8c338b434d0c62e42481bf4f8986d027f129))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#59](https://github.com/terraharbor/frontend/issues/59) from terraharbor/feat/routes ([6199a0a](https://github.com/terraharbor/frontend/commit/6199a0a3e867eade8edbf7cd338505fdf3133043))
+
 ## [0.1.9](https://github.com/terraharbor/frontend/compare/v0.1.8...v0.1.9) (2025-08-29)
 
 
