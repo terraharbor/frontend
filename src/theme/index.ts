@@ -13,7 +13,7 @@ const neutral = {
 
 const greenShades = {
   shade1: '#43A046', // Lightest
-  shade2: '#388E3B', 
+  shade2: '#388E3B',
   shade3: '#2E7D31',
   shade4: '#1B5E1F',
   shade5: '#103E13', // Darkest
@@ -105,52 +105,52 @@ const typography = {
     'sans-serif',
   ].join(','),
   h1: {
-    fontSize: '2.5rem', 
+    fontSize: '2.5rem',
     fontWeight: 500,
     lineHeight: 1.2,
     letterSpacing: '-0.01562em',
   },
   h2: {
-    fontSize: '2rem', 
+    fontSize: '2rem',
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: '-0.00833em',
   },
   h3: {
-    fontSize: '1.75rem', 
+    fontSize: '1.75rem',
     fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: '0em',
   },
   h4: {
-    fontSize: '1.5rem', 
+    fontSize: '1.5rem',
     fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: '0.00735em',
     color: neutral.black,
   },
   h5: {
-    fontSize: '1.25rem', 
+    fontSize: '1.25rem',
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: '0em',
   },
   h6: {
-    fontSize: '1rem', 
+    fontSize: '1rem',
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: '0.0075em',
     color: neutral.black,
   },
   subtitle1: {
-    fontSize: '1rem', 
+    fontSize: '1rem',
     fontWeight: 400,
     lineHeight: 1.5,
     letterSpacing: '0.00938em',
     color: neutral.lightGrey,
   },
   subtitle2: {
-    fontSize: '0.875rem', 
+    fontSize: '0.875rem',
     fontWeight: 400,
     lineHeight: 1.43,
     letterSpacing: '0.00714em',
@@ -159,80 +159,80 @@ const typography = {
 
   // Body Regular
   body1: {
-    fontSize: '1.125rem', 
+    fontSize: '1.125rem',
     fontWeight: 400,
-    lineHeight: 1.56, 
+    lineHeight: 1.56,
     letterSpacing: '0.00938em',
     color: neutral.black,
   },
   body2: {
-    fontSize: '1rem', 
+    fontSize: '1rem',
     fontWeight: 400,
-    lineHeight: 1.5, 
+    lineHeight: 1.5,
     letterSpacing: '0.01071em',
     color: neutral.lightGrey,
   },
   body3: {
-    fontSize: '0.875rem', 
+    fontSize: '0.875rem',
     fontWeight: 400,
-    lineHeight: 1.43, 
+    lineHeight: 1.43,
     letterSpacing: '0.01071em',
     color: neutral.black,
   },
   body4: {
-    fontSize: '0.75rem', 
+    fontSize: '0.75rem',
     fontWeight: 400,
-    lineHeight: 1.33, 
+    lineHeight: 1.33,
     letterSpacing: '0.03333em',
     color: neutral.black,
   },
 
   // Body Medium
   body1Medium: {
-    fontSize: '1.125rem', 
+    fontSize: '1.125rem',
     fontWeight: 600,
-    lineHeight: 1.56, 
+    lineHeight: 1.56,
     letterSpacing: '0.00938em',
     color: neutral.black,
   },
   body2Medium: {
-    fontSize: '1rem', 
+    fontSize: '1rem',
     fontWeight: 600,
-    lineHeight: 1.5, 
+    lineHeight: 1.5,
     letterSpacing: '0.01071em',
     color: neutral.black,
   },
   body3Medium: {
-    fontSize: '0.875rem', 
+    fontSize: '0.875rem',
     fontWeight: 600,
-    lineHeight: 1.43, 
+    lineHeight: 1.43,
     letterSpacing: '0.01071em',
     color: neutral.black,
   },
   body4Medium: {
-    fontSize: '0.75rem', 
+    fontSize: '0.75rem',
     fontWeight: 600,
-    lineHeight: 1.33, 
+    lineHeight: 1.33,
     letterSpacing: '0.03333em',
     color: neutral.black,
   },
   // Other typography
   button: {
-    fontSize: '0.875rem', 
+    fontSize: '0.875rem',
     fontWeight: 500,
     lineHeight: 1.25,
     letterSpacing: '0.5px',
     textTransform: 'uppercase' as const,
   },
   caption: {
-    fontSize: '0.75rem', 
+    fontSize: '0.75rem',
     fontWeight: 400,
     lineHeight: 1.5,
     letterSpacing: '0.03333em',
     color: neutral.grey,
   },
   overline: {
-    fontSize: '0.75rem', 
+    fontSize: '0.75rem',
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: '0.08333em',
@@ -241,22 +241,22 @@ const typography = {
   },
 };
 
-// Create the theme  
+// Create the theme
 
-export { neutral, greenShades, greenTints };
+export { greenShades, greenTints, neutral };
 
 export const theme = createTheme({
   palette,
   typography,
   shape: {
-    borderRadius: 8, 
+    borderRadius: 8,
   },
   components: {
-    // TerraHarbor component styles 
+    // TerraHarbor component styles
     MuiButton: {
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: 5, 
+          borderRadius: 5,
           textTransform: 'uppercase',
           fontWeight: 500,
           padding: '8px 20px',
@@ -273,7 +273,7 @@ export const theme = createTheme({
           },
         },
         containedPrimary: ({ theme }) => ({
-          backgroundColor: theme.palette.primary.main, 
+          backgroundColor: theme.palette.primary.main,
           color: theme.palette.primary.contrastText,
           '&:hover': {
             backgroundColor: theme.palette.primary.dark,
