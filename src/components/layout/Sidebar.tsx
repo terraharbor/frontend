@@ -29,7 +29,7 @@ const Sidebar: FC = () => {
   const { pathname } = useLocation();
 
   return (
-    <Stack sx={{ height: '100%', width: '600px', bgcolor: 'secondary.main' }}>
+    <Stack sx={{ height: '100%', width: '300px', bgcolor: 'secondary.main' }}>
       <Stack sx={{ height: 64, p: 2 }}>
         <Typography variant="h3" sx={{ color: 'neutral.white', fontWeight: 'bold' }}>
           TerraHarbor

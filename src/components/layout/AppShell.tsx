@@ -14,7 +14,7 @@ const AppShell: FC<PropsWithChildren> = ({ children }) => {
       }}
     >
       <Sidebar />
-      <Stack>
+      <Stack sx={{ width: '100%' }}>
         <Topbar />
         <Stack sx={{ p: 2, overflowY: 'auto' }}>{children}</Stack>
       </Stack>
