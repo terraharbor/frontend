@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.13](https://github.com/terraharbor/frontend/compare/v0.1.12...v0.1.13) (2025-08-30)
+
+
+### Features
+
+* Dashboard ([58c6098](https://github.com/terraharbor/frontend/commit/58c60982bd4b68e72c90e050f2976ba9853db7db))
+* dashboard page ([e9bdb11](https://github.com/terraharbor/frontend/commit/e9bdb11a0e4e4292fc6e77ef4ac57979d1736e08))
+* merge pull request [#65](https://github.com/terraharbor/frontend/issues/65) from terraharbor/feat/dashboard ([58c6098](https://github.com/terraharbor/frontend/commit/58c60982bd4b68e72c90e050f2976ba9853db7db))
+* projects page updated ([94cedfa](https://github.com/terraharbor/frontend/commit/94cedfaaefa817e546f40e4efca3ebab60cb0801))
+* sample data + test page ([6249e23](https://github.com/terraharbor/frontend/commit/6249e230d08f733fdcc892a526f1c37e07d0f553))
+
 ## [0.1.12](https://github.com/terraharbor/frontend/compare/v0.1.11...v0.1.12) (2025-08-30)
 
 
