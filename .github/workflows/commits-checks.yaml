@@ -1,5 +1,5 @@
 ---
-name: 'commits-checks'
+name: "commits-checks"
 
 on:
   pull_request:
