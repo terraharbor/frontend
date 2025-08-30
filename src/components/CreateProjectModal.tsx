@@ -16,11 +16,7 @@ export interface CreateProjectModalProps {
   onSubmit: (projectData: Omit<ProjectData, 'id' | 'teamCount' | 'lastUpdated'>) => void;
 }
 
-export const CreateProjectModal: FC<CreateProjectModalProps> = ({
-  open,
-  onClose,
-  onSubmit,
-}) => {
+export const CreateProjectModal: FC<CreateProjectModalProps> = ({ open, onClose, onSubmit }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<{ name?: string; description?: string }>({});
@@ -29,11 +25,11 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
     setErrors({});
 
     const newErrors: { name?: string; description?: string } = {};
-    
+
     if (!name.trim()) {
       newErrors.name = 'Le nom du projet est requis';
     }
-    
+
     if (!description.trim()) {
       newErrors.description = 'La description du projet est requise';
     }
@@ -106,4 +102,4 @@ export const CreateProjectModal: FC<CreateProjectModalProps> = ({
   );
 };
 
-export default CreateProjectModal; 
+export default CreateProjectModal;

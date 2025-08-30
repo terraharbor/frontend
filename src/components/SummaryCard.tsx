@@ -1,12 +1,5 @@
 import { FC } from 'react';
-import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, CardActions, Typography, Button, Stack } from '@mui/material';
 
 export interface SummaryCardProps {
   title: string;
@@ -40,7 +33,7 @@ export const SummaryCard: FC<SummaryCardProps> = ({
       <Typography variant="h6" component="h2" sx={(theme) => ({ mb: theme.spacing(1) })}>
         {title}
       </Typography>
-      
+
       {description && (
         <Typography variant="body2" sx={(theme) => ({ mb: theme.spacing(2) })}>
           {description}

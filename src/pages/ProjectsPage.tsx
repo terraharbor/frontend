@@ -18,9 +18,11 @@ export const ProjectsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmitProject = (projectData: Omit<ProjectData, 'id' | 'teamCount' | 'lastUpdated'>) => {
+  const handleSubmitProject = (
+    projectData: Omit<ProjectData, 'id' | 'teamCount' | 'lastUpdated'>,
+  ) => {
     const newProject: ProjectData = {
-      id: '0',     //todo generate unique id? or in backend?
+      id: '0', //todo generate unique id? or in backend?
       name: projectData.name,
       description: projectData.description,
       teamCount: 0,

@@ -1,14 +1,9 @@
 import React, { FC } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-} from '@mui/material';
+import { Box, Typography, Button, Stack } from '@mui/material';
 
 export interface PageHeaderProps {
   title: string;
-  
+
   action?: {
     label: string;
     onClick: () => void;
@@ -20,30 +15,18 @@ export interface PageHeaderProps {
   };
 }
 
-
-export const PageHeader: FC<PageHeaderProps> = ({
-  title,
-  action,
-}) => {
+export const PageHeader: FC<PageHeaderProps> = ({ title, action }) => {
   return (
     <Box
       sx={{
         mb: 3,
       }}
     >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={2}
-      >
-        <Typography
-          variant="h4"
-          component="h1"
-        >
+      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
+        <Typography variant="h4" component="h1">
           {title}
         </Typography>
-        
+
         {action && (
           <Box sx={{ flexShrink: 0 }}>
             <Button
