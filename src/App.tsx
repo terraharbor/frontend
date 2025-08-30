@@ -7,9 +7,10 @@ import { PageHeader } from './components/PageHeader';
 import { ProjectCard, ProjectData } from './components/ProjectCard';
 import { TeamCard, TeamData } from './components/TeamCard';
 import AppShell from './components/layout/AppShell';
+import DashboardPage from './pages/DashboardPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 
-const Dashboard: FC = () => {
+const TestPage: FC = () => {
   // Sample project data matching TerraHarbor mockup
   const sampleProjects: ProjectData[] = [
     {
@@ -198,7 +199,7 @@ const Projects: FC = () => {
       lastUpdated: '15.04.2025 12:02',
     },
   ];
-  
+
   const handleCreateProject = () => {
     console.log('Create new project clicked from projects page');
   };
@@ -208,7 +209,7 @@ const Projects: FC = () => {
   };
 
   return (
-    <ProjectsPage 
+    <ProjectsPage
       projects={projects}
       onCreateProject={handleCreateProject}
       onOpenProject={handleOpenProject}
@@ -225,13 +226,14 @@ const App: FC = () => {
   return (
     <AppShell>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<DashboardPage />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/teams" element={<Teams />} />
         <Route path="/users" element={<Users />} />
         <Route path="/tokens" element={<Tokens />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/test" element={<TestPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
