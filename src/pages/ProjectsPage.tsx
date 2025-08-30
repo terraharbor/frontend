@@ -43,7 +43,7 @@ export const ProjectsPage: FC<ProjectsPageProps> = ({
           onClick: handleCreateProject,
           startIcon: <AddIcon />,
           variant: 'contained',
-          color: 'success',
+          color: 'primary',
         }}
       />
 

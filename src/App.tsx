@@ -7,6 +7,7 @@ import { PageHeader } from './components/PageHeader';
 import { ProjectCard, ProjectData } from './components/ProjectCard';
 import { TeamCard, TeamData } from './components/TeamCard';
 import AppShell from './components/layout/AppShell';
+import { ProjectsPage } from './pages/ProjectsPage';
 
 const Dashboard: FC = () => {
   // Sample project data matching TerraHarbor mockup
@@ -167,7 +168,53 @@ const Dashboard: FC = () => {
     </Stack>
   );
 };
-const Projects: FC = () => <Stack>Projects</Stack>;
+const Projects: FC = () => {
+  // Empty array to test "no projects available"
+  // const projects: ProjectData[] = [];
+
+  const projects: ProjectData[] = [
+    {
+      id: '1',
+      name: 'Project A',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      teamCount: 2,
+      lastUpdated: '21.04.2025 17:12',
+    },
+    {
+      id: '2',
+      name: 'Project B',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      teamCount: 1,
+      lastUpdated: '19.04.2025 13:10',
+    },
+    {
+      id: '3',
+      name: 'Project C',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      teamCount: 3,
+      lastUpdated: '15.04.2025 12:02',
+    },
+  ];
+  
+  const handleCreateProject = () => {
+    console.log('Create new project clicked from projects page');
+  };
+
+  const handleOpenProject = (project: ProjectData) => {
+    console.log('Open project:', project.name);
+  };
+
+  return (
+    <ProjectsPage 
+      projects={projects}
+      onCreateProject={handleCreateProject}
+      onOpenProject={handleOpenProject}
+    />
+  );
+};
 const Teams: FC = () => <Stack>Teams</Stack>;
 const Users: FC = () => <Stack>Users</Stack>;
 const Tokens: FC = () => <Stack>Tokens</Stack>;
