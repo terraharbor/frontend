@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.14](https://github.com/terraharbor/frontend/compare/v0.1.13...v0.1.14) (2025-08-30)
+
+
+### Features
+
+* create project modal ([ffb5808](https://github.com/terraharbor/frontend/commit/ffb5808164606117494fe73c04eea89b25319918))
+* implement modal for project creation ([a5161a6](https://github.com/terraharbor/frontend/commit/a5161a66a954dc7587db9ef2f6f75f2df3212fd2))
+* merge pull request [#67](https://github.com/terraharbor/frontend/issues/67) from terraharbor/feat/create-project-modal ([ffb5808](https://github.com/terraharbor/frontend/commit/ffb5808164606117494fe73c04eea89b25319918))
+
+
+### Code Refactoring
+
+* formatting ([baeee5c](https://github.com/terraharbor/frontend/commit/baeee5c86dfba19344a44104618c192d87858732))
+
 ## [0.1.13](https://github.com/terraharbor/frontend/compare/v0.1.12...v0.1.13) (2025-08-30)
 
 
