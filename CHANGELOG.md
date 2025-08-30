@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.11](https://github.com/terraharbor/frontend/compare/v0.1.10...v0.1.11) (2025-08-30)
+
+
+### Miscellaneous Chores
+
+* add/edit .renovaterc.json ([292d110](https://github.com/terraharbor/frontend/commit/292d110c423505000795b76d566c4c66c638f443))
+* add/edit release-please-config.json ([819aff1](https://github.com/terraharbor/frontend/commit/819aff10bc0166d7b9718e2acdda3407904f2832))
+
+
+### Continuous Integration
+
+* add/edit commits-checks.yaml ([b089181](https://github.com/terraharbor/frontend/commit/b089181b46cafc50dada876d016f15a6ead6b1e6))
+* add/edit docker-build.yaml ([04076a9](https://github.com/terraharbor/frontend/commit/04076a9f5e1999457990fdccd5af4b2028d2c442))
+* add/edit pr-issues-project.yaml ([302356f](https://github.com/terraharbor/frontend/commit/302356f85ec2930eb57b688c2a1f76b86518c288))
+* add/edit release-please.yaml ([0ccd42c](https://github.com/terraharbor/frontend/commit/0ccd42c1d3f0f536a4911d429e44a92b9fd62abe))
+
 ## [0.1.10](https://github.com/terraharbor/frontend/compare/v0.1.9...v0.1.10) (2025-08-29)
 
 
