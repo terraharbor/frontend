@@ -4,34 +4,17 @@ import Grid from '@mui/material/Grid';
 import { FC } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { ProjectCard, ProjectData } from '../components/ProjectCard';
+import { sampleProjects } from '../sampleData';
 
-export interface ProjectsPageProps {
-  projects?: ProjectData[];
-  onCreateProject?: () => void;
-  onOpenProject?: (project: ProjectData) => void;
-}
-
-export const ProjectsPage: FC<ProjectsPageProps> = ({
-  projects = [],
-  onCreateProject,
-  onOpenProject,
-}) => {
-
+export const ProjectsPage: FC = () => {
+  const projects: ProjectData[] = sampleProjects;
 
   const handleCreateProject = () => {
-    if (onCreateProject) {
-      onCreateProject();
-    } else {
-      console.log('Créer nouveau projet');
-    }
+    console.log('Créer nouveau projet');
   };
 
   const handleOpenProject = (project: ProjectData) => {
-    if (onOpenProject) {
-      onOpenProject(project);
-    } else {
-      console.log('Ouvrir projet:', project.name);
-    }
+    console.log('Ouvrir projet:', project.name);
   };
 
   return (
@@ -51,26 +34,19 @@ export const ProjectsPage: FC<ProjectsPageProps> = ({
         <Grid container spacing={3}>
           {projects.map((project) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={project.id}>
-              <ProjectCard 
-                project={project} 
-                onOpen={handleOpenProject}
-              />
+              <ProjectCard project={project} onOpen={handleOpenProject} />
             </Grid>
           ))}
         </Grid>
       ) : (
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
           minHeight="200px"
           sx={{ mt: 4 }}
         >
-          <Typography 
-            variant="h6" 
-            color="text.secondary"
-            textAlign="center"
-          >
+          <Typography variant="h6" color="text.secondary" textAlign="center">
             Aucun projet disponible
           </Typography>
         </Box>
