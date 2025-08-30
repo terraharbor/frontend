@@ -4,10 +4,11 @@ import { FC } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import ProjectCard, { ProjectData } from '../components/ProjectCard';
 import TeamCard, { TeamData } from '../components/TeamCard';
+import { sampleProjects, sampleTeams } from '../sampleData';
 
 const DashboardPage: FC = () => {
-  const myProjects: ProjectData[] = [];
-  const myTeams: TeamData[] = [];
+  const myProjects: ProjectData[] = sampleProjects;
+  const myTeams: TeamData[] = sampleTeams;
 
   return (
     <Stack>
