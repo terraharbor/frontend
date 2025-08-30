@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.12](https://github.com/terraharbor/frontend/compare/v0.1.11...v0.1.12) (2025-08-30)
+
+
+### Features
+
+* merge pull request [#63](https://github.com/terraharbor/frontend/issues/63) from terraharbor/feat/project-list ([41c4a95](https://github.com/terraharbor/frontend/commit/41c4a953173d878e01d64aa42f19d32d68777e0a))
+* project list page ([41c4a95](https://github.com/terraharbor/frontend/commit/41c4a953173d878e01d64aa42f19d32d68777e0a))
+
 ## [0.1.11](https://github.com/terraharbor/frontend/compare/v0.1.10...v0.1.11) (2025-08-30)
 
 
