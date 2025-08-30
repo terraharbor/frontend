@@ -1,16 +1,41 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { ProjectCard, ProjectData } from '../components/ProjectCard';
+import { CreateProjectModal } from '../components/CreateProjectModal';
 import { sampleProjects } from '../sampleData';
-
 export const ProjectsPage: FC = () => {
-  const projects: ProjectData[] = sampleProjects;
+  const [projects, setProjects] = useState<ProjectData[]>(sampleProjects);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreateProject = () => {
-    console.log('Créer nouveau projet');
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmitProject = (
+    projectData: Omit<ProjectData, 'id' | 'teamCount' | 'lastUpdated'>,
+  ) => {
+    const newProject: ProjectData = {
+      id: '0', //todo generate unique id? or in backend?
+      name: projectData.name,
+      description: projectData.description,
+      teamCount: 0,
+      lastUpdated: new Date().toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+
+    setProjects([newProject, ...projects]);
   };
 
   const handleOpenProject = (project: ProjectData) => {
@@ -51,6 +76,12 @@ export const ProjectsPage: FC = () => {
           </Typography>
         </Box>
       )}
+
+      <CreateProjectModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmitProject}
+      />
     </Box>
   );
 };
