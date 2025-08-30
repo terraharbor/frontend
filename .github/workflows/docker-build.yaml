@@ -1,12 +1,12 @@
 ---
-name: 'docker-build'
+name: "docker-build"
 
 on:
   workflow_dispatch:
   pull_request:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -17,8 +17,8 @@ jobs:
     uses: terraharbor/github-actions-workflows/.github/workflows/docker-build.yaml@main
     with:
       push_image: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-      build_context: '.'
-      dockerfile_path: 'Dockerfile'
+      build_context: "."
+      dockerfile_path: "Dockerfile"
     secrets:
       GITHUB_TOKEN_CALLER: ${{ secrets.GITHUB_TOKEN }}
       TERRAHARBOR_MAINTAINER_APP_ID: ${{ secrets.TERRAHARBOR_MAINTAINER_APP_ID }}
