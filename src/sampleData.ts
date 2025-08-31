@@ -1,5 +1,5 @@
-import { ProjectData } from './components/ProjectCard';
-import { TeamData } from './components/TeamCard';
+import { ProjectData } from './components/cards/ProjectCard';
+import { Team } from './types/team';
 
 export const sampleProjects: ProjectData[] = [
   {
@@ -28,15 +28,15 @@ export const sampleProjects: ProjectData[] = [
   },
 ];
 
-export const sampleTeams: TeamData[] = [
+export const sampleTeams: Team[] = [
   {
     id: '1',
     name: 'Dev Team',
-    memberCount: 5,
+    userIds: [],
   },
   {
     id: '2',
     name: 'Security Team',
-    memberCount: 4,
+    userIds: [],
   },
 ];

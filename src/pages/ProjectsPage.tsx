@@ -2,9 +2,9 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FC, useState } from 'react';
+import { ProjectCard, ProjectData } from '../components/cards/ProjectCard';
+import { CreateProjectModal } from '../components/modals/CreateProjectModal';
 import { PageHeader } from '../components/PageHeader';
-import { ProjectCard, ProjectData } from '../components/ProjectCard';
-import { CreateProjectModal } from '../components/CreateProjectModal';
 import { sampleProjects } from '../sampleData';
 export const ProjectsPage: FC = () => {
   const [projects, setProjects] = useState<ProjectData[]>(sampleProjects);

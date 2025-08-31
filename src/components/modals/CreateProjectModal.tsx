@@ -1,14 +1,14 @@
-import { FC, useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from '@mui/material';
-import { ProjectData } from './ProjectCard';
+import { FC, useState } from 'react';
+import { ProjectData } from '../cards/ProjectCard';
 
 export interface CreateProjectModalProps {
   open: boolean;

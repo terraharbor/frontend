@@ -4,9 +4,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { TeamsPage } from './pages/TeamsPage';
 import TestPage from './pages/TestPage';
 
-const Teams: FC = () => <Stack>Teams</Stack>;
 const Users: FC = () => <Stack>Users</Stack>;
 const Tokens: FC = () => <Stack>Tokens</Stack>;
 const Audit: FC = () => <Stack>Audit logs</Stack>;
@@ -18,7 +18,7 @@ const App: FC = () => {
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/teams" element={<Teams />} />
+        <Route path="/teams" element={<TeamsPage />} />
         <Route path="/users" element={<Users />} />
         <Route path="/tokens" element={<Tokens />} />
         <Route path="/audit" element={<Audit />} />

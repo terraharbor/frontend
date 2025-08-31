@@ -1,24 +1,18 @@
 import { FC } from 'react';
+import { Team } from '../../types/team';
 import { SummaryCard } from './SummaryCard';
 
-export interface TeamData {
-  id: string;
-  name: string;
-  description?: string;
-  memberCount: number;
-}
-
 export interface TeamCardProps {
-  team: TeamData;
-  onOpen: (team: TeamData) => void;
-  onCardClick?: (team: TeamData) => void;
+  team: Team;
+  onOpen: (team: Team) => void;
+  onCardClick?: (team: Team) => void;
 }
 
 export const TeamCard: FC<TeamCardProps> = ({ team, onOpen, onCardClick }) => (
   <SummaryCard
     title={team.name}
     description={team.description}
-    metadata={[`${team.memberCount} ${team.memberCount === 1 ? 'membre' : 'membres'}`]}
+    metadata={[`${team.userIds.length} ${team.userIds.length === 1 ? 'membre' : 'membres'}`]}
     action={{ onClick: () => onOpen(team) }}
     onClick={onCardClick ? () => onCardClick(team) : undefined}
   />
