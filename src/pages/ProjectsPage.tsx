@@ -2,12 +2,14 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FC, useState } from 'react';
+import { ProjectCard } from '../components/cards/ProjectCard';
+import { ProjectFormOutput } from '../components/forms/ProjectForm';
+import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
-import { ProjectCard, ProjectData } from '../components/ProjectCard';
-import { CreateProjectModal } from '../components/CreateProjectModal';
 import { sampleProjects } from '../sampleData';
+import { Project } from '../types/buisness';
 export const ProjectsPage: FC = () => {
-  const [projects, setProjects] = useState<ProjectData[]>(sampleProjects);
+  const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreateProject = () => {
@@ -18,15 +20,13 @@ export const ProjectsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmitProject = (
-    projectData: Omit<ProjectData, 'id' | 'teamCount' | 'lastUpdated'>,
-  ) => {
-    const newProject: ProjectData = {
-      id: '0', //todo generate unique id? or in backend?
-      name: projectData.name,
-      description: projectData.description,
-      teamCount: 0,
-      lastUpdated: new Date().toLocaleDateString('fr-FR', {
+  const handleSubmitProject = (values: ProjectFormOutput) => {
+    const newProject: Project = {
+      id: '0' /* TODO: A gérer avec backend */,
+      name: values.name,
+      description: values.description,
+      teamIds: [],
+      lastUpdated: new Date().toLocaleString('fr-FR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
@@ -35,10 +35,11 @@ export const ProjectsPage: FC = () => {
       }),
     };
 
-    setProjects([newProject, ...projects]);
+    setProjects((prev) => [newProject, ...prev]);
+    setIsModalOpen(false);
   };
 
-  const handleOpenProject = (project: ProjectData) => {
+  const handleOpenProject = (project: Project) => {
     console.log('Ouvrir projet:', project.name);
   };
 
@@ -77,8 +78,10 @@ export const ProjectsPage: FC = () => {
         </Box>
       )}
 
-      <CreateProjectModal
+      <ProjectModal
         open={isModalOpen}
+        mode="create"
+        initialValues={{}}
         onClose={handleCloseModal}
         onSubmit={handleSubmitProject}
       />

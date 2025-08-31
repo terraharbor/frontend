@@ -1,26 +1,17 @@
 import { FC } from 'react';
+import { Project } from '../../types/buisness';
 import { SummaryCard } from './SummaryCard';
 
-export interface ProjectData {
-  id: string;
-  name: string;
-  description?: string;
-  teamCount?: number;
-  lastUpdated?: string;
-}
-
 export interface ProjectCardProps {
-  project: ProjectData;
-  onOpen: (project: ProjectData) => void;
-  onCardClick?: (project: ProjectData) => void;
+  project: Project;
+  onOpen: (project: Project) => void;
+  onCardClick?: (project: Project) => void;
 }
 
 export const ProjectCard: FC<ProjectCardProps> = ({ project, onOpen, onCardClick }) => {
   const metadata = [];
 
-  if (project.teamCount !== undefined) {
-    metadata.push(`${project.teamCount} ${project.teamCount === 1 ? 'équipe' : 'équipes'}`);
-  }
+  metadata.push(`${project.teamIds.length} ${project.teamIds.length === 1 ? 'équipe' : 'équipes'}`);
 
   if (project.lastUpdated) {
     metadata.push(project.lastUpdated);
