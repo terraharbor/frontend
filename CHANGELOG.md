@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.16](https://github.com/terraharbor/frontend/compare/v0.1.15...v0.1.16) (2025-08-31)
+
+
+### Features
+
+* merge pull request [#71](https://github.com/terraharbor/frontend/issues/71) from terraharbor/feat/teams-page ([2a88748](https://github.com/terraharbor/frontend/commit/2a8874871c97cea87a0e08ecd75bdb3391c763a3))
+* projects modal updated ([9381c43](https://github.com/terraharbor/frontend/commit/9381c43d5d65b38e031bf306069feb6794ed05a9))
+* teams page + modal ([f6005f7](https://github.com/terraharbor/frontend/commit/f6005f74696259d277c67a8e1fde257e9d0bd762))
+* teams page + team modal + update project modal ([2a88748](https://github.com/terraharbor/frontend/commit/2a8874871c97cea87a0e08ecd75bdb3391c763a3))
+
 ## [0.1.15](https://github.com/terraharbor/frontend/compare/v0.1.14...v0.1.15) (2025-08-31)
 
 
