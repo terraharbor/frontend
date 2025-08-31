@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.15](https://github.com/terraharbor/frontend/compare/v0.1.14...v0.1.15) (2025-08-31)
+
+
+### Features
+
+* merge pull request [#69](https://github.com/terraharbor/frontend/issues/69) from terraharbor/feat/notification-system ([c9721de](https://github.com/terraharbor/frontend/commit/c9721ded036d8c8996f08531bed5e0ea19b45496))
+* notification system ([c9721de](https://github.com/terraharbor/frontend/commit/c9721ded036d8c8996f08531bed5e0ea19b45496))
+* notification system ([6af81e7](https://github.com/terraharbor/frontend/commit/6af81e77c0f6958ec09c8d44a0b711eb4dc7caa2))
+
 ## [0.1.14](https://github.com/terraharbor/frontend/compare/v0.1.13...v0.1.14) (2025-08-30)
 
 
