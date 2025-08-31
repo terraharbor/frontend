@@ -1,13 +1,12 @@
-import { ProjectData } from './components/cards/ProjectCard';
-import { Team } from './types/team';
+import { Project, Team } from './types/buisness';
 
-export const sampleProjects: ProjectData[] = [
+export const sampleProjects: Project[] = [
   {
     id: '1',
     name: 'Project A',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    teamCount: 2,
+    teamIds: [],
     lastUpdated: '21.04.2025 17:12',
   },
   {
@@ -15,7 +14,7 @@ export const sampleProjects: ProjectData[] = [
     name: 'Project B',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    teamCount: 1,
+    teamIds: ['1'],
     lastUpdated: '19.04.2025 13:10',
   },
   {
@@ -23,7 +22,7 @@ export const sampleProjects: ProjectData[] = [
     name: 'Project C',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    teamCount: 3,
+    teamIds: ['1', '2'],
     lastUpdated: '15.04.2025 12:02',
   },
 ];

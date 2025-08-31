@@ -3,11 +3,11 @@ import { Box, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FC } from 'react';
 import { PageHeader } from '../components/PageHeader';
-import { ProjectCard, ProjectData } from '../components/cards/ProjectCard';
+import { ProjectCard } from '../components/cards/ProjectCard';
 import { TeamCard } from '../components/cards/TeamCard';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleTeams } from '../sampleData';
-import { Team } from '../types/team';
+import { Project, Team } from '../types/buisness';
 
 const TestPage: FC = () => {
   const { showToast } = useToast();
@@ -17,7 +17,7 @@ const TestPage: FC = () => {
     console.log('Créer new project clicked');
   };
 
-  const handleProjectOpen = (project: ProjectData) => {
+  const handleProjectOpen = (project: Project) => {
     console.log('Ouvrir project:', project.name);
   };
 

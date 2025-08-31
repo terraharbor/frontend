@@ -2,12 +2,11 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Stack, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
-import { ProjectData } from '../components/cards/ProjectCard';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import TeamModal from '../components/modals/TeamModal';
 import { sampleTeams } from '../sampleData';
-import { Team } from '../types/team';
+import { Team } from '../types/buisness';
 
 export const TeamsPage: FC = () => {
   const [teams, setTeams] = useState<Team[]>(sampleTeams);
@@ -33,8 +32,8 @@ export const TeamsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenProject = (project: ProjectData) => {
-    console.log('Ouvrir projet:', project.name);
+  const handleOpenTeam = (project: Team) => {
+    console.log('Ouvrir équipe:', project.name);
   };
 
   return (
@@ -52,9 +51,7 @@ export const TeamsPage: FC = () => {
 
       {teams.length > 0 ? (
         <Stack spacing={1}>
-          {...teams.map((team) => (
-            <TeamCard key={team.id} team={team} onOpen={handleOpenProject} />
-          ))}
+          {...teams.map((team) => <TeamCard key={team.id} team={team} onOpen={handleOpenTeam} />)}
         </Stack>
       ) : (
         <Box

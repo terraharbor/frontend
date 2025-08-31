@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Team } from '../../types/team';
+import { Team } from '../../types/buisness';
 import { SummaryCard } from './SummaryCard';
 
 export interface TeamCardProps {

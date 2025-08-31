@@ -2,13 +2,13 @@ import { Alert, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FC } from 'react';
 import { PageHeader } from '../components/PageHeader';
-import ProjectCard, { ProjectData } from '../components/cards/ProjectCard';
+import ProjectCard from '../components/cards/ProjectCard';
 import TeamCard from '../components/cards/TeamCard';
 import { sampleProjects, sampleTeams } from '../sampleData';
-import { Team } from '../types/team';
+import { Project, Team } from '../types/buisness';
 
 const DashboardPage: FC = () => {
-  const myProjects: ProjectData[] = sampleProjects;
+  const myProjects: Project[] = sampleProjects;
   const myTeams: Team[] = sampleTeams;
 
   return (
