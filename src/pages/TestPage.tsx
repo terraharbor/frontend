@@ -4,10 +4,13 @@ import Grid from '@mui/material/Grid';
 import { FC } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import { ProjectCard, ProjectData } from '../components/ProjectCard';
+import { useToast } from '../components/providers/useToast';
 import { TeamCard, TeamData } from '../components/TeamCard';
 import { sampleProjects, sampleTeams } from '../sampleData';
 
 const TestPage: FC = () => {
+  const { showToast } = useToast();
+
   // Event handlers
   const handleCreateProject = () => {
     console.log('Créer new project clicked');
@@ -121,6 +124,16 @@ const TestPage: FC = () => {
           </Grid>
         ))}
       </Grid>
+
+      <PageHeader
+        title="Test notification"
+        action={{
+          label: 'NOTIFIER',
+          onClick: () => {
+            showToast({ message: 'Ceci est une notification de test', severity: 'error' });
+          },
+        }}
+      />
     </Stack>
   );
 };
