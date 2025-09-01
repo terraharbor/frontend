@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.17](https://github.com/terraharbor/frontend/compare/v0.1.16...v0.1.17) (2025-09-01)
+
+
+### Features
+
+* merge pull request [#74](https://github.com/terraharbor/frontend/issues/74) from terraharbor/feat/users-page ([5d3029a](https://github.com/terraharbor/frontend/commit/5d3029a9ed1fd99b69df516ad86c5434e891c6da))
+* users page + modal ([5d3029a](https://github.com/terraharbor/frontend/commit/5d3029a9ed1fd99b69df516ad86c5434e891c6da))
+* users page + modal ([fbc56de](https://github.com/terraharbor/frontend/commit/fbc56de2dcfd278dce6eddccadfc212757c66e26))
+
 ## [0.1.16](https://github.com/terraharbor/frontend/compare/v0.1.15...v0.1.16) (2025-08-31)
 
 
