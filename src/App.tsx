@@ -6,8 +6,8 @@ import DashboardPage from './pages/DashboardPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { TeamsPage } from './pages/TeamsPage';
 import TestPage from './pages/TestPage';
+import UsersPage from './pages/UsersPage';
 
-const Users: FC = () => <Stack>Users</Stack>;
 const Tokens: FC = () => <Stack>Tokens</Stack>;
 const Audit: FC = () => <Stack>Audit logs</Stack>;
 const Settings: FC = () => <Stack>Settings</Stack>;
@@ -19,7 +19,7 @@ const App: FC = () => {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
-        <Route path="/users" element={<Users />} />
+        <Route path="/users" element={<UsersPage />} />
         <Route path="/tokens" element={<Tokens />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="/settings" element={<Settings />} />

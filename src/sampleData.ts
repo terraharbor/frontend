@@ -1,4 +1,4 @@
-import { Project, Team } from './types/buisness';
+import { Project, Team, User } from './types/buisness';
 
 export const sampleProjects: Project[] = [
   {
@@ -37,5 +37,26 @@ export const sampleTeams: Team[] = [
     id: '2',
     name: 'Security Team',
     userIds: [],
+  },
+];
+
+export const sampleUsers: User[] = [
+  {
+    id: '1',
+    username: 'John Doe',
+    email: 'john.doe@test.ch',
+    role: 'Admin',
+  },
+  {
+    id: '2',
+    username: 'Marie Martin',
+    email: 'marie.martin@test.ch',
+    role: 'User',
+  },
+  {
+    id: '3',
+    username: 'Luc Bernard',
+    email: 'luc.bernard@test.ch',
+    role: 'User',
   },
 ];
