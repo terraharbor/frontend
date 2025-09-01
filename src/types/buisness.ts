@@ -26,7 +26,6 @@ export type User = {
   sha512_hash?: string;
   token?: string;
   token_validity?: number;
-  email: string;
   role: UserRole;
 };
 
