@@ -7,19 +7,28 @@ import { ProjectCard } from '../components/cards/ProjectCard';
 import { useToast } from '../components/providers/useToast';
 import { TeamCard} from '../components/cards/TeamCard';
 import { sampleProjects, sampleTeams } from '../sampleData';
-import { AuthService } from '../api/authService';
+import { useAuth } from '../hooks/useAuth';
 import { getAuthToken } from '../api/client';
-import { User, Project, Team } from '../types/buisness';
+import { Project, Team } from '../types/buisness';
+
 
 const TestPage: FC = () => {
   const { showToast } = useToast();
+  const { user, isAuthenticated, isLoading, login, register, logout, getCurrentUser } = useAuth();
 
   // API Testing State
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!getAuthToken());
-  const [loading, setLoading] = useState(false);
+  const [loginData, setLoginData] = useState({
+    username: '',
+    password: '',
+  });
+  
+  const [registerData, setRegisterData] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    password: '',
+  });
 
   // Event handlers
   const handleCreateProject = () => {
@@ -36,14 +45,13 @@ const TestPage: FC = () => {
 
   // API Test Functions
   const handleRegister = async () => {
-    if (!username || !password) {
-      showToast({ message: 'Username and password required', severity: 'error' });
+    if (!registerData.username || !registerData.password || !registerData.email || !registerData.firstName || !registerData.lastName) {
+      showToast({ message: 'All fields are required for registration', severity: 'error' });
       return;
     }
     
-    setLoading(true);
     try {
-      const result = await AuthService.register({ username, password });
+      const result = await register(registerData);
       showToast({ message: `User registered: ${result.user.username}`, severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
@@ -54,19 +62,16 @@ const TestPage: FC = () => {
         severity: 'error' 
       });
     }
-    setLoading(false);
   };
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!loginData.username || !loginData.password) {
       showToast({ message: 'Username and password required', severity: 'error' });
       return;
     }
     
-    setLoading(true);
     try {
-      const result = await AuthService.login({ username, password });
-      setIsLoggedIn(true);
+      const result = await login(loginData);
       showToast({ message: `Login successful! Token: ${result.access_token.substring(0, 10)}...`, severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
@@ -77,26 +82,20 @@ const TestPage: FC = () => {
         severity: 'error' 
       });
     }
-    setLoading(false);
   };
 
   const handleGetCurrentUser = async () => {
-    setLoading(true);
     try {
-      const user = await AuthService.getCurrentUser();
-      setCurrentUser(user);
-      showToast({ message: `Current user: ${user.username}`, severity: 'success' });
+      const currentUser = await getCurrentUser();
+      showToast({ message: `Current user: ${currentUser.username}`, severity: 'success' });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       showToast({ message: `Get user failed: ${errorMessage}`, severity: 'error' });
     }
-    setLoading(false);
   };
 
   const handleLogout = () => {
-    AuthService.logout();
-    setIsLoggedIn(false);
-    setCurrentUser(null);
+    logout();
     showToast({ message: 'Logged out successfully', severity: 'info' });
   };
 
@@ -105,9 +104,9 @@ const TestPage: FC = () => {
       {/* API Testing*/}
       <PageHeader title="API Client Testing" />
       
-      <Alert severity={isLoggedIn ? 'success' : 'info'}>
-        {isLoggedIn ? `Logged in with token: ${getAuthToken()?.substring(0, 20)}...` : 'Not logged in'}
-        {currentUser && ` | Current user: ${currentUser.username}`}
+      <Alert severity={isAuthenticated ? 'success' : 'info'}>
+        {isAuthenticated ? `Logged in with token: ${getAuthToken()?.substring(0, 20)}...` : 'Not logged in'}
+        {user && ` | Current user: ${user.username}`}
       </Alert>
 
       <Grid container spacing={3}>
@@ -117,17 +116,52 @@ const TestPage: FC = () => {
               <Typography variant="h6" sx={{ mb: 2 }}>Authentication Testing</Typography>
               
               <Stack spacing={2}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>Login Test</Typography>
                 <TextField
                   label="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={loginData.username}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
                   size="small"
                 />
                 <TextField
                   label="Password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={loginData.password}
+                  onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                  size="small"
+                />
+                
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Registration Test</Typography>
+                <TextField
+                  label="First Name"
+                  value={registerData.firstName}
+                  onChange={(e) => setRegisterData(prev => ({ ...prev, firstName: e.target.value }))}
+                  size="small"
+                />
+                <TextField
+                  label="Last Name"
+                  value={registerData.lastName}
+                  onChange={(e) => setRegisterData(prev => ({ ...prev, lastName: e.target.value }))}
+                  size="small"
+                />
+                <TextField
+                  label="Username"
+                  value={registerData.username}
+                  onChange={(e) => setRegisterData(prev => ({ ...prev, username: e.target.value }))}
+                  size="small"
+                />
+                <TextField
+                  label="Email"
+                  type="email"
+                  value={registerData.email}
+                  onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                  size="small"
+                />
+                <TextField
+                  label="Password"
+                  type="password"
+                  value={registerData.password}
+                  onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
                   size="small"
                 />
                 
@@ -135,7 +169,7 @@ const TestPage: FC = () => {
                   <Button
                     variant="outlined"
                     onClick={handleRegister}
-                    disabled={loading}
+                    disabled={isLoading}
                     size="small"
                   >
                     Register
@@ -143,7 +177,7 @@ const TestPage: FC = () => {
                   <Button
                     variant="contained"
                     onClick={handleLogin}
-                    disabled={loading}
+                    disabled={isLoading}
                     startIcon={<Login />}
                     size="small"
                   >
@@ -152,7 +186,7 @@ const TestPage: FC = () => {
                   <Button
                     variant="outlined"
                     onClick={handleGetCurrentUser}
-                    disabled={loading || !isLoggedIn}
+                    disabled={isLoading || !isAuthenticated}
                     size="small"
                   >
                     Get User
@@ -161,7 +195,7 @@ const TestPage: FC = () => {
                     variant="outlined"
                     color="error"
                     onClick={handleLogout}
-                    disabled={!isLoggedIn}
+                    disabled={!isAuthenticated}
                     startIcon={<Logout />}
                     size="small"
                   >

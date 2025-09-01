@@ -19,6 +19,9 @@ export type UserRole = 'Admin' | 'User';
 export type User = {
   id: string;
   username: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
   disabled?: boolean;
   sha512_hash?: string;
   token?: string;
@@ -34,6 +37,14 @@ export type UserLogin = {
   scope?: string;
   client_id?: string;
   client_secret?: string;
+};
+
+export type UserRegister = {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
 };
 
 export type AuthResponse = {

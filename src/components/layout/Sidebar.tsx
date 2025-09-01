@@ -7,11 +7,12 @@ import {
   VpnKey as TokensIcon,
   People as UsersIcon,
 } from '@mui/icons-material';
-import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography, Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { FC, JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import theme from '../../theme';
+import logoImage from '../../assets/logob.png';
 
 type NavItem = { label: string; to: string; icon: JSX.Element };
 
@@ -30,7 +31,22 @@ const Sidebar: FC = () => {
 
   return (
     <Stack sx={{ height: '100%', width: '300px', bgcolor: 'secondary.main' }}>
-      <Stack sx={{ height: 64, p: 2 }}>
+      <Stack 
+        direction="row" 
+        alignItems="center" 
+        spacing={2}
+        sx={{ height: 64, p: 2 }}
+      >
+        <Box
+          component="img"
+          src={logoImage}
+          alt="TerraHarbor Logo"
+          sx={{
+            height: 48,
+            width: 'auto',
+            filter: 'brightness(0) invert(1)',
+          }}
+        />
         <Typography variant="h3" sx={{ color: 'neutral.white', fontWeight: 'bold' }}>
           TerraHarbor
         </Typography>

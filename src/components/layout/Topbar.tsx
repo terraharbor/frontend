@@ -1,19 +1,12 @@
-import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography } from '@mui/material';
+import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography, MenuItem, Divider, ListItemIcon } from '@mui/material';
 import { FC, MouseEvent, useState } from 'react';
+import { Logout as LogoutIcon, Person as PersonIcon } from '@mui/icons-material';
+import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../providers/useToast';
 
-export type UserInfo = {
-  name: string;
-  email: string;
-  role: string;
-  initials?: string;
-};
-
-type UserMenuProps = {
-  user: UserInfo;
-  onLogout: () => void;
-};
-
-const UserMenu: FC<UserMenuProps> = ({ user, onLogout }) => {
+const UserMenu: FC = () => {
+  const { user, logout } = useAuth();
+  const { showToast } = useToast();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -25,50 +18,113 @@ const UserMenu: FC<UserMenuProps> = ({ user, onLogout }) => {
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    logout();
+    handleClose();
+    showToast({ 
+      message: 'Successfully logged out', 
+      severity: 'info' 
+    });
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  const initials = user.firstName && user.lastName 
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    : user.username.charAt(0).toUpperCase();
+
+  const displayName = user.firstName && user.lastName 
+    ? `${user.firstName} ${user.lastName}`
+    : user.username;
+
   return (
     <>
-      <Avatar
-        sx={{ width: 32, height: 32, bgcolor: 'secondary.main', cursor: 'pointer' }}
+      <Button
         onMouseEnter={handleOpen}
+        sx={{ 
+          minWidth: 'auto',
+          p: 0,
+          borderRadius: '50%',
+          '&:hover': {
+            bgcolor: 'action.hover',
+          }
+        }}
       >
-        {user.initials ?? 'A'}
-      </Avatar>
+        <Avatar
+          sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}
+        >
+          {initials}
+        </Avatar>
+      </Button>
+      
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{
+          paper: {
+            sx: { minWidth: 280, mt: 1 }
+          }
+        }}
       >
-        <Stack spacing={1} sx={{ p: 1, minWidth: 300 }}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <Avatar sx={{ width: 48, height: 48, bgcolor: 'secondary.main' }}>
-              {user.initials ?? 'A'}
+        <Stack sx={{ p: 2, pb: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+              {initials}
             </Avatar>
-            <Stack>
-              <Typography fontWeight="bold">{user.name}</Typography>
-              <Typography variant="body2">{user.email}</Typography>
+            <Stack spacing={0}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                {displayName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                @{user.username}
+              </Typography>
+              {user.email && (
+                <Typography variant="body2" color="text.secondary">
+                  {user.email}
+                </Typography>
+              )}
             </Stack>
           </Stack>
-
-          <Chip size="small" label={user.role} />
-          <Button variant="outlined" size="small" fullWidth onClick={onLogout}>
-            Déconnexion
-          </Button>
+          
+          <Chip 
+            size="small" 
+            label={user.disabled ? 'Inactive' : 'Active'} 
+            color={user.disabled ? 'error' : 'success'}
+            variant="outlined"
+            sx={{ alignSelf: 'flex-start', mt: 1 }}
+          />
         </Stack>
+
+        <Divider />
+
+        <MenuItem onClick={handleClose}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          Profile Settings
+        </MenuItem>
+        
+        <Divider />
+        
+        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
       </Menu>
     </>
   );
 };
 
-const mockUser: UserInfo = {
-  name: 'John Doe',
-  email: 'john.doe@test.com',
-  role: 'Administrateur',
-  initials: 'JD',
-};
-
 const Topbar: FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <Stack
       sx={{
@@ -79,7 +135,7 @@ const Topbar: FC = () => {
       }}
     >
       <Toolbar sx={{ justifyContent: 'flex-end', gap: 2 }}>
-        <UserMenu user={mockUser} onLogout={() => console.log('logout')} />
+        {isAuthenticated && <UserMenu />}
       </Toolbar>
     </Stack>
   );

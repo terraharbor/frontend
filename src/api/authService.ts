@@ -1,11 +1,14 @@
 import { apiClient, setAuthToken } from './client';
-import { User, UserLogin, AuthResponse } from '../types/buisness';
+import { User, UserLogin, UserRegister, AuthResponse } from '../types/buisness';
 
 export class AuthService {
-  static async register(credentials: UserLogin): Promise<{ message: string; user: User }> {
+  static async register(credentials: UserRegister): Promise<{ message: string; user: User }> {
     const formData = new URLSearchParams();
     formData.append('username', credentials.username);
+    formData.append('email', credentials.email);
     formData.append('password', credentials.password);
+    formData.append('firstName', credentials.firstName);
+    formData.append('lastName', credentials.lastName);
     formData.append('grant_type', 'password');
     
     const response = await apiClient.post('/register', formData, {
