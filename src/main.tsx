@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { ToastProvider } from './components/providers/ToastProvider';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './components/providers/AuthContext';
 import theme from './theme';
 
 createRoot(document.getElementById('root')!).render(

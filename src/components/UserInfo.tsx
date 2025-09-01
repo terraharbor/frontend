@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Chip, Avatar, Stack } from '@mui/material';
 import { Person, Login, Logout } from '@mui/icons-material';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from './providers/useAuth';
 
 interface UserInfoProps {
   showDetails?: boolean;

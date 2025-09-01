@@ -11,7 +11,7 @@ import {
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Login as LoginIcon } from '@mui/icons-material';
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 
 const LoginPage: React.FC = () => {

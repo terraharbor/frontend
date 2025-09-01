@@ -1,7 +1,7 @@
 import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography, MenuItem, Divider, ListItemIcon } from '@mui/material';
 import { FC, MouseEvent, useState } from 'react';
 import { Logout as LogoutIcon, Person as PersonIcon } from '@mui/icons-material';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../providers/useAuth';
 import { useToast } from '../providers/useToast';
 
 const UserMenu: FC = () => {

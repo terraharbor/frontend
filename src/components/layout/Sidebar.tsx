@@ -12,7 +12,6 @@ import { alpha } from '@mui/material/styles';
 import { FC, JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import theme from '../../theme';
-import logoImage from '../../assets/logob.png';
 
 type NavItem = { label: string; to: string; icon: JSX.Element };
 
@@ -39,7 +38,7 @@ const Sidebar: FC = () => {
       >
         <Box
           component="img"
-          src={logoImage}
+          src="/logob.png"
           alt="TerraHarbor Logo"
           sx={{
             height: 48,

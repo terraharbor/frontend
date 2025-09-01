@@ -9,7 +9,6 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import logoImage from '../../assets/logob.png';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -55,7 +54,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
             <Stack direction="row" alignItems="center" spacing={2}>
               <Box
                 component="img"
-                src={logoImage}
+                src="/logob.png"
                 alt="TerraHarbor Logo"
                 sx={{
                   height: 72,

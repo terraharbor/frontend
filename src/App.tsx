@@ -10,7 +10,7 @@ import { ProjectsPage } from './pages/ProjectsPage';
 import { TeamsPage } from './pages/TeamsPage';
 import TestPage from './pages/TestPage';
 import UsersPage from './pages/UsersPage';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './components/providers/useAuth';
 
 const Tokens: FC = () => <Stack>Tokens</Stack>;
 const Audit: FC = () => <Stack>Audit logs</Stack>;

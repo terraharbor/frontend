@@ -12,7 +12,7 @@ import Grid from '@mui/material/Grid';
 import { Link, useNavigate } from 'react-router-dom';
 import { PersonAdd as RegisterIcon } from '@mui/icons-material';
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 
 const RegisterPage: React.FC = () => {

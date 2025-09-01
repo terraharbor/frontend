@@ -7,7 +7,7 @@ import { ProjectCard } from '../components/cards/ProjectCard';
 import { useToast } from '../components/providers/useToast';
 import { TeamCard} from '../components/cards/TeamCard';
 import { sampleProjects, sampleTeams } from '../sampleData';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../components/providers/useAuth';
 import { getAuthToken } from '../api/client';
 import { Project, Team } from '../types/buisness';
 
