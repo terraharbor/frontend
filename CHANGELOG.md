@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.18](https://github.com/terraharbor/frontend/compare/v0.1.17...v0.1.18) (2025-09-01)
+
+
+### Features
+
+* client api ([ab61d55](https://github.com/terraharbor/frontend/commit/ab61d5558fbb949ef0402b303f78101517a6ac9a))
+* merge pull request [#76](https://github.com/terraharbor/frontend/issues/76) from terraharbor/feat/client-api ([ab61d55](https://github.com/terraharbor/frontend/commit/ab61d5558fbb949ef0402b303f78101517a6ac9a))
+
+
+### Code Refactoring
+
+* better organisation of folders ([239f0df](https://github.com/terraharbor/frontend/commit/239f0df21e00403d2e740b0f4f75ad8fc804ac45))
+
 ## [0.1.17](https://github.com/terraharbor/frontend/compare/v0.1.16...v0.1.17) (2025-09-01)
 
 
