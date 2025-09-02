@@ -5,6 +5,7 @@ import AppShell from './components/layout/AppShell';
 import { useAuth } from './components/providers/useAuth';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
+import ProjectPage from './pages/ProjectPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import RegisterPage from './pages/RegisterPage';
 import TeamPage from './pages/TeamPage';
@@ -38,6 +39,7 @@ const App: FC = () => {
             <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/projects/:id" element={<ProjectPage />} />
               <Route path="/teams" element={<TeamsPage />} />
               <Route path="/teams/:id" element={<TeamPage />} />
               <Route path="/users" element={<UsersPage />} />

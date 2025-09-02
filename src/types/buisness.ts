@@ -67,3 +67,12 @@ export type AuthToken = {
   ttl: string;
   createdAt: Date;
 };
+
+export type StateFileSnapshot = {
+  id: string;
+  projectId: string;
+  version: number;
+  content: string;
+  createdAt: Date;
+  createdBy: string;
+};
