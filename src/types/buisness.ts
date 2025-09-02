@@ -13,13 +13,12 @@ export type Team = {
   userIds: string[];
 };
 
-
 export type UserRole = 'Admin' | 'User';
 
 export type User = {
   id: string;
   username: string;
-  email?: string;
+  email: string;
   firstName?: string;
   lastName?: string;
   disabled?: boolean;
@@ -67,5 +66,4 @@ export type AuthToken = {
   token: string;
   ttl: string;
   createdAt: Date;
-
 };
