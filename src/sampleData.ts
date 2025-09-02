@@ -154,4 +154,23 @@ export const sampleStateFilesTerraform: StateFileSnapshot[] = [
     createdAt: new Date('2025-08-25T12:05:00Z'),
     createdBy: '1',
   },
+  {
+    id: 'state-006',
+    projectId: '3',
+    version: 6,
+    content: JSON.stringify(
+      {
+        version: 4,
+        terraform_version: '1.7.1',
+        resources: [
+          { type: 'google_compute_instance', name: 'vm-website', id: 'gce-555' },
+          { type: 'google_sql_database_instance', name: 'db-prod', id: 'sql-777' },
+        ],
+      },
+      null,
+      2,
+    ),
+    createdAt: new Date('2025-08-30T10:02:00Z'),
+    createdBy: '1',
+  },
 ];
