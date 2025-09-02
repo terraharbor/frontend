@@ -1,3 +1,4 @@
+import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Alert, IconButton, Stack, Typography } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
@@ -7,14 +8,18 @@ import TeamCard from '../components/cards/TeamCard';
 import JsonViewer from '../components/JsonViewer';
 import StateFileCompareModal from '../components/modals/StateFileCompareModal';
 import StateFileViewerModal from '../components/modals/StateFileViewerModal';
+import TeamsPickerModal from '../components/modals/TeamsPickerModal';
 import PageHeader from '../components/PageHeader';
+import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleStateFilesTerraform, sampleTeams, sampleUsers } from '../sampleData';
 import { Project, StateFileSnapshot, Team } from '../types/buisness';
 
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [viewerOpen, setViewerOpen] = useState(false);
-  const [compareOpen, setCompareOpen] = useState(false);
+  const { showToast } = useToast();
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [teamsModalOpen, setTeamsModalOpen] = useState(false);
   const [selectedSnapshot, setSelectedSnapshot] = useState<StateFileSnapshot | null>(null);
 
   const initialProject: Project | undefined = useMemo(
@@ -46,22 +51,40 @@ const ProjectPage: FC = () => {
 
   const handleOpenViewer = (s: StateFileSnapshot) => {
     setSelectedSnapshot(s);
-    setViewerOpen(true);
+    setViewerModalOpen(true);
   };
 
   const handleCloseViewer = () => {
     setSelectedSnapshot(null);
-    setViewerOpen(false);
+    setViewerModalOpen(false);
   };
 
   const handleOpenCompare = (s: StateFileSnapshot) => {
     setSelectedSnapshot(s);
-    setCompareOpen(true);
+    setCompareModalOpen(true);
   };
 
   const handleCloseCompare = () => {
-    setCompareOpen(false);
+    setCompareModalOpen(false);
     setSelectedSnapshot(null);
+  };
+
+  const openTeamsModal = () => setTeamsModalOpen(true);
+  const closeTeamsModal = () => setTeamsModalOpen(false);
+
+  const handleSaveTeams = (selectedTeamIds: string[]) => {
+    setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
+    showToast({ message: 'Équipes mises à jour.', severity: 'success' });
+    closeTeamsModal();
+  };
+
+  const handleRemoveTeam = (teamId: string) => {
+    setProject((prev) => {
+      if (!prev) return prev;
+      if (!prev.teamIds.includes(teamId)) return prev;
+      return { ...prev, teamIds: prev.teamIds.filter((id) => id !== teamId) };
+    });
+    showToast({ message: 'Équipe retirée du projet.', severity: 'success' });
   };
 
   if (!project) {
@@ -82,7 +105,18 @@ const ProjectPage: FC = () => {
         <Stack spacing={4}>
           <Stack direction="row" spacing={2}>
             <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Equipes</Typography>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography>Equipes</Typography>
+                <IconButton
+                  color="primary"
+                  onClick={openTeamsModal}
+                  title="Ajouter une équipe"
+                  sx={{ p: 0 }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Stack>
+
               {teams && teams.length > 0 ? (
                 <Stack spacing={1}>
                   {...teams.map((team) => <TeamCard key={team.id} team={team} onOpen={() => {}} />)}
@@ -168,20 +202,28 @@ const ProjectPage: FC = () => {
       </Stack>
 
       <StateFileViewerModal
-        open={viewerOpen}
+        open={viewerModalOpen}
         onClose={handleCloseViewer}
         snapshot={selectedSnapshot}
       />
 
       {currentState && (
         <StateFileCompareModal
-          open={compareOpen}
+          open={compareModalOpen}
           onClose={handleCloseCompare}
           current={currentState}
           previousSnapshots={previousStates}
           initialCompareId={selectedSnapshot?.id}
         />
       )}
+
+      <TeamsPickerModal
+        open={teamsModalOpen}
+        teams={sampleTeams}
+        selectedTeamIds={project.teamIds}
+        onClose={() => setTeamsModalOpen(false)}
+        onSubmit={handleSaveTeams}
+      />
     </>
   );
 };
