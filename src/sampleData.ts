@@ -160,11 +160,20 @@ export const sampleStateFilesTerraform: StateFileSnapshot[] = [
     version: 6,
     content: JSON.stringify(
       {
-        version: 4,
+        version: 5,
         terraform_version: '1.7.1',
         resources: [
           { type: 'google_compute_instance', name: 'vm-website', id: 'gce-555' },
-          { type: 'google_sql_database_instance', name: 'db-prod', id: 'sql-777' },
+          { type: 'google_sql_database_instance', name: 'db-prd', id: 'sql-777' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
+          { type: 'azurerm_storage_account', name: 'stapp', id: 'st-111' },
         ],
       },
       null,

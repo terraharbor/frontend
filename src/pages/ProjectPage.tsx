@@ -4,7 +4,8 @@ import { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StateFileCard from '../components/cards/StateFileCard';
 import TeamCard from '../components/cards/TeamCard';
-import JsonViewer from '../components/JSONViewer';
+import JsonViewer from '../components/JsonViewer';
+import StateFileCompareModal from '../components/modals/StateFileCompareModal';
 import StateFileViewerModal from '../components/modals/StateFileViewerModal';
 import PageHeader from '../components/PageHeader';
 import { sampleProjects, sampleStateFilesTerraform, sampleTeams, sampleUsers } from '../sampleData';
@@ -13,6 +14,7 @@ import { Project, StateFileSnapshot, Team } from '../types/buisness';
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
   const [selectedSnapshot, setSelectedSnapshot] = useState<StateFileSnapshot | null>(null);
 
   const initialProject: Project | undefined = useMemo(
@@ -42,14 +44,24 @@ const ProjectPage: FC = () => {
     [currentState],
   );
 
-  const handleOpenSnapshot = (s: StateFileSnapshot) => {
+  const handleOpenViewer = (s: StateFileSnapshot) => {
     setSelectedSnapshot(s);
     setViewerOpen(true);
   };
 
-  const handleCloseSnapshot = () => {
+  const handleCloseViewer = () => {
     setSelectedSnapshot(null);
     setViewerOpen(false);
+  };
+
+  const handleOpenCompare = (s: StateFileSnapshot) => {
+    setSelectedSnapshot(s);
+    setCompareOpen(true);
+  };
+
+  const handleCloseCompare = () => {
+    setCompareOpen(false);
+    setSelectedSnapshot(null);
   };
 
   if (!project) {
@@ -98,13 +110,30 @@ const ProjectPage: FC = () => {
 
           <Stack direction="row" spacing={2}>
             <Stack spacing={1} sx={{ flex: 1 }}>
+              <Typography>Versions précédentes</Typography>
+              <Stack spacing={1} sx={{ maxHeight: '60vh' }}>
+                {previousStates.length > 0 ? (
+                  previousStates.map((s) => (
+                    <StateFileCard
+                      stateFile={s}
+                      onCompare={handleOpenCompare}
+                      onRestore={() => {}}
+                      onView={handleOpenViewer}
+                    />
+                  ))
+                ) : (
+                  <Alert severity="info">Aucune version précédente</Alert>
+                )}
+              </Stack>
+            </Stack>
+
+            <Stack spacing={1} sx={{ flex: 1 }}>
               <Typography>State File Terraform</Typography>
               <Stack
                 sx={{
                   bgcolor: 'neutral.white',
                   borderRadius: 2,
                   p: 2,
-                  maxHeight: 400,
                   overflow: 'auto',
                 }}
               >
@@ -121,7 +150,7 @@ const ProjectPage: FC = () => {
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={() => handleOpenSnapshot(currentState)}
+                        onClick={() => handleOpenViewer(currentState)}
                         sx={{ p: 0 }}
                       >
                         <VisibilityIcon fontSize="small" />
@@ -134,33 +163,25 @@ const ProjectPage: FC = () => {
                 )}
               </Stack>
             </Stack>
-
-            <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Versions précédentes</Typography>
-              <Stack spacing={1} sx={{ maxHeight: 400 }}>
-                {previousStates.length > 0 ? (
-                  previousStates.map((s) => (
-                    <StateFileCard
-                      stateFile={s}
-                      onCompare={() => {}}
-                      onRestore={() => {}}
-                      onView={handleOpenSnapshot}
-                    />
-                  ))
-                ) : (
-                  <Alert severity="info">Aucune version précédente</Alert>
-                )}
-              </Stack>
-            </Stack>
           </Stack>
         </Stack>
       </Stack>
 
       <StateFileViewerModal
         open={viewerOpen}
-        onClose={handleCloseSnapshot}
+        onClose={handleCloseViewer}
         snapshot={selectedSnapshot}
       />
+
+      {currentState && (
+        <StateFileCompareModal
+          open={compareOpen}
+          onClose={handleCloseCompare}
+          current={currentState}
+          previousSnapshots={previousStates}
+          initialCompareId={selectedSnapshot?.id}
+        />
+      )}
     </>
   );
 };

@@ -11,7 +11,7 @@ import {
 import { FC } from 'react';
 import { sampleUsers } from '../../sampleData';
 import { StateFileSnapshot } from '../../types/buisness';
-import JsonViewer from '../JSONViewer';
+import JsonViewer from '../JsonViewer';
 
 type StateFileViewerModalProps = {
   open: boolean;

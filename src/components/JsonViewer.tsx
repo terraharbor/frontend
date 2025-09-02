@@ -6,7 +6,7 @@ type JsonViewerProps = {
   maxHeight?: number | string;
 };
 
-const JsonViewer: FC<JsonViewerProps> = ({ value, maxHeight = '70vh' }) => {
+const JsonViewer: FC<JsonViewerProps> = ({ value, maxHeight = '60vh' }) => {
   return (
     <Box
       component="pre"
