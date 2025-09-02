@@ -1,16 +1,25 @@
 import { Add as AddIcon, Login, Logout } from '@mui/icons-material';
-import { Box, Stack, Typography, Button, TextField, Card, CardContent, Divider, Alert } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Grid from '@mui/material/Grid';
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
+import { getAuthToken } from '../api/client';
 import { PageHeader } from '../components/PageHeader';
 import { ProjectCard } from '../components/cards/ProjectCard';
-import { useToast } from '../components/providers/useToast';
-import { TeamCard} from '../components/cards/TeamCard';
-import { sampleProjects, sampleTeams } from '../sampleData';
+import { TeamCard } from '../components/cards/TeamCard';
 import { useAuth } from '../components/providers/useAuth';
-import { getAuthToken } from '../api/client';
-import { Project, Team } from '../types/buisness';
-
+import { useToast } from '../components/providers/useToast';
+import { sampleProjects, sampleTeams } from '../sampleData';
+import { Project } from '../types/buisness';
 
 const TestPage: FC = () => {
   const { showToast } = useToast();
@@ -21,7 +30,7 @@ const TestPage: FC = () => {
     username: '',
     password: '',
   });
-  
+
   const [registerData, setRegisterData] = useState({
     firstName: '',
     lastName: '',
@@ -39,17 +48,19 @@ const TestPage: FC = () => {
     console.log('Ouvrir project:', project.name);
   };
 
-  const handleTeamOpen = (team: Team) => {
-    console.log('Ouvrir team:', team.name);
-  };
-
   // API Test Functions
   const handleRegister = async () => {
-    if (!registerData.username || !registerData.password || !registerData.email || !registerData.firstName || !registerData.lastName) {
+    if (
+      !registerData.username ||
+      !registerData.password ||
+      !registerData.email ||
+      !registerData.firstName ||
+      !registerData.lastName
+    ) {
       showToast({ message: 'All fields are required for registration', severity: 'error' });
       return;
     }
-    
+
     try {
       const result = await register(registerData);
       showToast({ message: `User registered: ${result.user.username}`, severity: 'success' });
@@ -57,9 +68,9 @@ const TestPage: FC = () => {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
       console.error('Register error:', error);
-      showToast({ 
-        message: `Register failed (${status}): ${errorMessage}`, 
-        severity: 'error' 
+      showToast({
+        message: `Register failed (${status}): ${errorMessage}`,
+        severity: 'error',
       });
     }
   };
@@ -69,17 +80,20 @@ const TestPage: FC = () => {
       showToast({ message: 'Username and password required', severity: 'error' });
       return;
     }
-    
+
     try {
       const result = await login(loginData);
-      showToast({ message: `Login successful! Token: ${result.access_token.substring(0, 10)}...`, severity: 'success' });
+      showToast({
+        message: `Login successful! Token: ${result.access_token.substring(0, 10)}...`,
+        severity: 'success',
+      });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
       console.error('Login error:', error);
-      showToast({ 
-        message: `Login failed (${status}): ${errorMessage}`, 
-        severity: 'error' 
+      showToast({
+        message: `Login failed (${status}): ${errorMessage}`,
+        severity: 'error',
       });
     }
   };
@@ -103,9 +117,11 @@ const TestPage: FC = () => {
     <Stack spacing={4}>
       {/* API Testing*/}
       <PageHeader title="API Client Testing" />
-      
+
       <Alert severity={isAuthenticated ? 'success' : 'info'}>
-        {isAuthenticated ? `Logged in with token: ${getAuthToken()?.substring(0, 20)}...` : 'Not logged in'}
+        {isAuthenticated
+          ? `Logged in with token: ${getAuthToken()?.substring(0, 20)}...`
+          : 'Not logged in'}
         {user && ` | Current user: ${user.username}`}
       </Alert>
 
@@ -113,58 +129,72 @@ const TestPage: FC = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>Authentication Testing</Typography>
-              
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Authentication Testing
+              </Typography>
+
               <Stack spacing={2}>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>Login Test</Typography>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  Login Test
+                </Typography>
                 <TextField
                   label="Username"
                   value={loginData.username}
-                  onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+                  onChange={(e) => setLoginData((prev) => ({ ...prev, username: e.target.value }))}
                   size="small"
                 />
                 <TextField
                   label="Password"
                   type="password"
                   value={loginData.password}
-                  onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) => setLoginData((prev) => ({ ...prev, password: e.target.value }))}
                   size="small"
                 />
-                
-                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Registration Test</Typography>
+
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                  Registration Test
+                </Typography>
                 <TextField
                   label="First Name"
                   value={registerData.firstName}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, firstName: e.target.value }))}
+                  onChange={(e) =>
+                    setRegisterData((prev) => ({ ...prev, firstName: e.target.value }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="Last Name"
                   value={registerData.lastName}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, lastName: e.target.value }))}
+                  onChange={(e) =>
+                    setRegisterData((prev) => ({ ...prev, lastName: e.target.value }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="Username"
                   value={registerData.username}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, username: e.target.value }))}
+                  onChange={(e) =>
+                    setRegisterData((prev) => ({ ...prev, username: e.target.value }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="Email"
                   type="email"
                   value={registerData.email}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => setRegisterData((prev) => ({ ...prev, email: e.target.value }))}
                   size="small"
                 />
                 <TextField
                   label="Password"
                   type="password"
                   value={registerData.password}
-                  onChange={(e) => setRegisterData(prev => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) =>
+                    setRegisterData((prev) => ({ ...prev, password: e.target.value }))
+                  }
                   size="small"
                 />
-                
+
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   <Button
                     variant="outlined"
@@ -262,7 +292,7 @@ const TestPage: FC = () => {
             </Typography>
             <Stack spacing={2}>
               {sampleTeams.map((team) => (
-                <TeamCard key={team.id} team={team} onOpen={handleTeamOpen} />
+                <TeamCard key={team.id} team={team} />
               ))}
             </Stack>
           </Box>
@@ -304,7 +334,7 @@ const TestPage: FC = () => {
       <Grid container spacing={3}>
         {sampleTeams.map((team) => (
           <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={`grid-${team.id}`}>
-            <TeamCard team={team} onOpen={handleTeamOpen} />
+            <TeamCard team={team} />
           </Grid>
         ))}
       </Grid>

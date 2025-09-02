@@ -32,10 +32,6 @@ export const TeamsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenTeam = (project: Team) => {
-    console.log('Ouvrir équipe:', project.name);
-  };
-
   return (
     <Box>
       <PageHeader
@@ -50,9 +46,7 @@ export const TeamsPage: FC = () => {
       />
 
       {teams.length > 0 ? (
-        <Stack spacing={1}>
-          {...teams.map((team) => <TeamCard key={team.id} team={team} onOpen={handleOpenTeam} />)}
-        </Stack>
+        <Stack spacing={1}>{...teams.map((team) => <TeamCard key={team.id} team={team} />)}</Stack>
       ) : (
         <Box
           display="flex"

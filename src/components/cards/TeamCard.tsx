@@ -1,21 +1,28 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Team } from '../../types/buisness';
 import { SummaryCard } from './SummaryCard';
 
 export interface TeamCardProps {
   team: Team;
-  onOpen: (team: Team) => void;
-  onCardClick?: (team: Team) => void;
 }
 
-export const TeamCard: FC<TeamCardProps> = ({ team, onOpen, onCardClick }) => (
-  <SummaryCard
-    title={team.name}
-    description={team.description}
-    metadata={[`${team.userIds.length} ${team.userIds.length === 1 ? 'membre' : 'membres'}`]}
-    action={{ onClick: () => onOpen(team) }}
-    onClick={onCardClick ? () => onCardClick(team) : undefined}
-  />
-);
+export const TeamCard: FC<TeamCardProps> = ({ team }) => {
+  const navigate = useNavigate();
+
+  const openTeam = () => {
+    navigate(`/teams/${team.id}`);
+  };
+
+  return (
+    <SummaryCard
+      title={team.name}
+      description={team.description}
+      metadata={[`${team.userIds.length} ${team.userIds.length === 1 ? 'membre' : 'membres'}`]}
+      action={{ onClick: openTeam }}
+      onClick={openTeam}
+    />
+  );
+};
 
 export default TeamCard;
