@@ -1,18 +1,21 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Alert, IconButton, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ProjectCard from '../components/cards/ProjectCard';
 import UsersList from '../components/lists/UsersList';
+import UsersPickerModal from '../components/modals/UsersPickerModal';
 import PageHeader from '../components/PageHeader';
 import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData';
 import { Project, Team, User } from '../types/buisness';
 
 const TeamPage: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [membersModalOpen, setMembersModalOpen] = useState(false);
 
-  const team: Team | undefined = useMemo(() => sampleTeams.find((t) => t.id === id), [id]);
+  const initialTeam: Team | undefined = useMemo(() => sampleTeams.find((t) => t.id === id), [id]);
+  const [team, setTeam] = useState<Team | undefined>(initialTeam);
 
   const projects = useMemo<Project[]>(
     () => (team ? sampleProjects.filter((p) => p.teamIds.includes(team.id)) : []),
@@ -24,6 +27,14 @@ const TeamPage: FC = () => {
     [team],
   );
 
+  const openMembersModal = () => setMembersModalOpen(true);
+  const closeMembersModal = () => setMembersModalOpen(false);
+
+  const handleSaveMembers = (selectedUserIds: string[]) => {
+    setTeam((prev) => (prev ? { ...prev, userIds: selectedUserIds } : prev));
+    setMembersModalOpen(false);
+  };
+
   if (!team) {
     return (
       <Stack spacing={2}>
@@ -34,41 +45,56 @@ const TeamPage: FC = () => {
   }
 
   return (
-    <Stack>
-      <PageHeader title={team.name} />
-      {team.description && <Typography variant="body2">{team.description}</Typography>}
+    <>
+      <Stack>
+        <PageHeader title={team.name} />
+        {team.description && <Typography variant="body2">{team.description}</Typography>}
 
-      <Stack direction="row" spacing={2}>
-        <Stack sx={{ flex: 1 }} spacing={2}>
-          <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography>Membres</Typography>
-            <IconButton color="primary" onClick={() => {}} title="Ajouter un membre" sx={{ p: 0 }}>
-              <AddIcon />
-            </IconButton>
+        <Stack direction="row" spacing={2}>
+          <Stack sx={{ flex: 1 }} spacing={2}>
+            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography>Membres</Typography>
+              <IconButton
+                color="primary"
+                onClick={openMembersModal}
+                title="Ajouter un membre"
+                sx={{ p: 0 }}
+              >
+                <AddIcon />
+              </IconButton>
+            </Stack>
+
+            <UsersList users={users} allowDelete={true} />
           </Stack>
 
-          <UsersList users={users} allowDelete={true} />
-        </Stack>
-
-        <Stack spacing={2} sx={{ flex: 1 }}>
-          <Typography>Projets</Typography>
-          {projects && projects.length > 0 ? (
-            <Grid container spacing={1}>
-              {projects.map((project) => (
-                <Grid key={project.id} size={{ xs: 12, sm: 12, md: 12, lg: 6 }}>
-                  <ProjectCard
-                    project={project}
-                    onOpen={() => console.log('Open project: ' + project.id)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          ) : (
-            <Alert severity="info">Aucun projet</Alert>
-          )}
+          <Stack spacing={2} sx={{ flex: 1 }}>
+            <Typography>Projets</Typography>
+            {projects && projects.length > 0 ? (
+              <Grid container spacing={1}>
+                {projects.map((project) => (
+                  <Grid key={project.id} size={{ xs: 12, sm: 12, md: 12, lg: 6 }}>
+                    <ProjectCard
+                      project={project}
+                      onOpen={() => console.log('Open project: ' + project.id)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Alert severity="info">Aucun projet</Alert>
+            )}
+          </Stack>
         </Stack>
       </Stack>
-    </Stack>
+
+      <UsersPickerModal
+        open={membersModalOpen}
+        users={sampleUsers}
+        selectedUserIds={team.userIds}
+        onClose={closeMembersModal}
+        onSubmit={handleSaveMembers}
+      />
+    </>
   );
 };
 
