@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.21](https://github.com/terraharbor/frontend/compare/v0.1.20...v0.1.21) (2025-09-03)
+
+
+### Features
+
+* icons updated ([e2af3c9](https://github.com/terraharbor/frontend/commit/e2af3c9623863fb1ebd5146c95171eceda7018c7))
+* update cards ([37d11da](https://github.com/terraharbor/frontend/commit/37d11da47e9f9ab7a2d296f0668e8fe1b9ca39fa))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#93](https://github.com/terraharbor/frontend/issues/93) from terraharbor/feat/delete-team-project ([1fa7ec5](https://github.com/terraharbor/frontend/commit/1fa7ec5755c885c6cab6b6384a4974eac5988ea6))
+
 ## [0.1.20](https://github.com/terraharbor/frontend/compare/v0.1.19...v0.1.20) (2025-09-03)
 
 
