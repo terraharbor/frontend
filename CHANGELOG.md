@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.19](https://github.com/terraharbor/frontend/compare/v0.1.18...v0.1.19) (2025-09-03)
+
+
+### Features
+
+* add user to team ([bc94dc2](https://github.com/terraharbor/frontend/commit/bc94dc2af71b6072298645cc8e8ce32e469a0d44))
+* improve user update/delete + remove user from team ([4ef1d1c](https://github.com/terraharbor/frontend/commit/4ef1d1c888a1df6c8b8f38ed9c1380010530169d))
+* team page ([2ffe278](https://github.com/terraharbor/frontend/commit/2ffe27851091d1b3496b86de69d36eb459759315))
+* team page + add user to team modal + improve user update/delete ([7a1f62a](https://github.com/terraharbor/frontend/commit/7a1f62a299dd17fedb5780ddef50df84efcba7bf))
+* temp fix ([5dacfac](https://github.com/terraharbor/frontend/commit/5dacfacc9f95bf9111035d8b296afc5787018410))
+* update TeamCard ([e6ffd78](https://github.com/terraharbor/frontend/commit/e6ffd78382164eb2e9e055327a22d1148572da2c))
+* update User type ([5fd81ed](https://github.com/terraharbor/frontend/commit/5fd81ed77149e4b16b7ba2656083fcac53ca3035))
+* wip team page ([c06e6a8](https://github.com/terraharbor/frontend/commit/c06e6a83fc422f178b819ce4ea78c6a7900de26f))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#81](https://github.com/terraharbor/frontend/issues/81) from terraharbor/feat/team-page ([7a1f62a](https://github.com/terraharbor/frontend/commit/7a1f62a299dd17fedb5780ddef50df84efcba7bf))
+
 ## [0.1.18](https://github.com/terraharbor/frontend/compare/v0.1.17...v0.1.18) (2025-09-01)
 
 
