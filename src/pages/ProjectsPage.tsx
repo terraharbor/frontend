@@ -6,11 +6,13 @@ import { ProjectCard } from '../components/cards/ProjectCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
 import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects } from '../sampleData';
 import { Project } from '../types/buisness';
 
 export const ProjectsPage: FC = () => {
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,13 +53,17 @@ export const ProjectsPage: FC = () => {
     <Box>
       <PageHeader
         title="Projets"
-        action={{
-          label: 'CRÉER',
-          onClick: handleCreateProject,
-          startIcon: <AddIcon />,
-          variant: 'contained',
-          color: 'primary',
-        }}
+        action={
+          isAdmin
+            ? {
+                label: 'CRÉER',
+                onClick: handleCreateProject,
+                startIcon: <AddIcon />,
+                variant: 'contained',
+                color: 'primary',
+              }
+            : undefined
+        }
       />
 
       {projects.length > 0 ? (

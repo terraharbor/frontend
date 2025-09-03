@@ -6,6 +6,7 @@ import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { FC, useMemo } from 'react';
 import { sampleUsers } from '../../sampleData';
 import { StateFileSnapshot } from '../../types/buisness';
+import { useAuth } from '../providers/useAuth';
 
 type StateFileCardProps = {
   stateFile: StateFileSnapshot;
@@ -22,6 +23,7 @@ const StateFileCard: FC<StateFileCardProps> = ({
   onView,
   onDelete,
 }) => {
+  const { isAdmin } = useAuth();
   const createdByUser = useMemo(
     () => sampleUsers.find((u) => u.id === stateFile.createdBy),
     [stateFile],
@@ -55,21 +57,25 @@ const StateFileCard: FC<StateFileCardProps> = ({
             <CompareArrowsIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Restaurer">
-          <IconButton size="small" onClick={() => onRestore(stateFile)}>
-            <RestoreIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {isAdmin && (
+          <Tooltip title="Restaurer">
+            <IconButton size="small" onClick={() => onRestore(stateFile)}>
+              <RestoreIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
         <Tooltip title="Voir">
           <IconButton size="small" onClick={() => onView(stateFile)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton size="small" color="error" onClick={() => onDelete(stateFile)}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {isAdmin && (
+          <Tooltip title="Delete">
+            <IconButton size="small" color="error" onClick={() => onDelete(stateFile)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Stack>
     </Stack>
   );
