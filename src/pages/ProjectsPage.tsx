@@ -39,10 +39,6 @@ export const ProjectsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenProject = (project: Project) => {
-    console.log('Ouvrir projet:', project.name);
-  };
-
   return (
     <Box>
       <PageHeader
@@ -60,7 +56,7 @@ export const ProjectsPage: FC = () => {
         <Grid container spacing={3}>
           {projects.map((project) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={project.id}>
-              <ProjectCard project={project} onOpen={handleOpenProject} />
+              <ProjectCard project={project} />
             </Grid>
           ))}
         </Grid>

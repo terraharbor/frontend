@@ -119,7 +119,7 @@ const ProjectPage: FC = () => {
 
               {teams && teams.length > 0 ? (
                 <Stack spacing={1}>
-                  {...teams.map((team) => <TeamCard key={team.id} team={team} onOpen={() => {}} />)}
+                  {...teams.map((team) => <TeamCard key={team.id} team={team} />)}
                 </Stack>
               ) : (
                 <Alert severity="info">Aucune équipe</Alert>
@@ -163,15 +163,16 @@ const ProjectPage: FC = () => {
 
             <Stack spacing={1} sx={{ flex: 1 }}>
               <Typography>State File Terraform</Typography>
-              <Stack
-                sx={{
-                  bgcolor: 'neutral.white',
-                  borderRadius: 2,
-                  p: 2,
-                  overflow: 'auto',
-                }}
-              >
-                {currentState ? (
+
+              {currentState ? (
+                <Stack
+                  sx={{
+                    bgcolor: 'neutral.white',
+                    borderRadius: 2,
+                    p: 2,
+                    overflow: 'auto',
+                  }}
+                >
                   <Stack spacing={2}>
                     <Stack
                       direction="row"
@@ -192,10 +193,10 @@ const ProjectPage: FC = () => {
                     </Stack>
                     <JsonViewer value={currentState.content} />
                   </Stack>
-                ) : (
-                  <Alert severity="info">Aucun state file pour ce projet.</Alert>
-                )}
-              </Stack>
+                </Stack>
+              ) : (
+                <Alert severity="info">Aucun state file pour ce projet.</Alert>
+              )}
             </Stack>
           </Stack>
         </Stack>

@@ -19,7 +19,6 @@ import { TeamCard } from '../components/cards/TeamCard';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleTeams } from '../sampleData';
-import { Project } from '../types/buisness';
 
 const TestPage: FC = () => {
   const { showToast } = useToast();
@@ -42,10 +41,6 @@ const TestPage: FC = () => {
   // Event handlers
   const handleCreateProject = () => {
     console.log('Créer new project clicked');
-  };
-
-  const handleProjectOpen = (project: Project) => {
-    console.log('Ouvrir project:', project.name);
   };
 
   // API Test Functions
@@ -270,7 +265,7 @@ const TestPage: FC = () => {
             </Typography>
             <Stack spacing={2}>
               {sampleProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} onOpen={handleProjectOpen} />
+                <ProjectCard key={project.id} project={project} />
               ))}
             </Stack>
           </Box>
@@ -314,7 +309,7 @@ const TestPage: FC = () => {
       <Grid container spacing={3}>
         {sampleProjects.map((project) => (
           <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={`grid-${project.id}`}>
-            <ProjectCard project={project} onOpen={handleProjectOpen} />
+            <ProjectCard project={project} />
           </Grid>
         ))}
       </Grid>
