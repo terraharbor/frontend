@@ -69,11 +69,11 @@ export const ProjectsPage: FC = () => {
   return (
     <Box>
       <PageHeader
-        title="Projets"
+        title="Projects"
         action={
           isAdmin
             ? {
-                label: 'CRÉER',
+                label: 'New',
                 onClick: handleCreateProject,
                 startIcon: <AddIcon />,
                 variant: 'contained',
@@ -100,7 +100,7 @@ export const ProjectsPage: FC = () => {
           sx={{ mt: 4 }}
         >
           <Typography variant="h6" color="text.secondary" textAlign="center">
-            Aucun projet disponible
+            No project
           </Typography>
         </Box>
       )}

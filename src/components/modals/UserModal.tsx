@@ -20,8 +20,8 @@ const UserModal: FC<UserModalProps> = ({
   onSubmit,
   loading,
 }) => {
-  const title = mode === 'create' ? 'Créer un utilisateur' : 'Modifier l’utilisateur';
-  const cta = mode === 'create' ? 'Créer' : 'Enregistrer';
+  const title = mode === 'create' ? 'Create a user' : 'Edit the user';
+  const cta = mode === 'create' ? 'Create' : 'Save';
 
   const handleProtectedClose = () => {
     if (loading) return;
@@ -42,7 +42,7 @@ const UserModal: FC<UserModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleProtectedClose} color="inherit" disabled={loading}>
-          Annuler
+          Cancel
         </Button>
         <Button type="submit" form="user-form" variant="contained" disabled={loading}>
           {cta}

@@ -61,11 +61,11 @@ export const TeamsPage: FC = () => {
   return (
     <Box>
       <PageHeader
-        title="Equipes"
+        title="Teams"
         action={
           isAdmin
             ? {
-                label: 'CRÉER',
+                label: 'New',
                 onClick: handleOpenCreateModal,
                 startIcon: <AddIcon />,
                 variant: 'contained',
@@ -90,7 +90,7 @@ export const TeamsPage: FC = () => {
           sx={{ mt: 4 }}
         >
           <Typography variant="h6" color="text.secondary" textAlign="center">
-            Aucune équipe disponible
+            No team
           </Typography>
         </Box>
       )}
@@ -109,7 +109,7 @@ export const TeamsPage: FC = () => {
         message={
           teamToDelete
             ? `Are you sure you want to delete the team "${teamToDelete.name}"? This action is irreversible.`
-            : "Are you sure you want to delete this team? This action is irreversible."
+            : 'Are you sure you want to delete this team? This action is irreversible.'
         }
         confirmLabel="Delete"
         confirmColor="error"

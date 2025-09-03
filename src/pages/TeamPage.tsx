@@ -76,17 +76,13 @@ const TeamPage: FC = () => {
       if (!prev) return prev;
       return { ...prev, name: values.name, description: values.description };
     });
+
     showToast({ message: 'Team updated successfully.', severity: 'success' });
     closeTeamEditModal();
   };
 
   if (!team) {
-    return (
-      <Stack spacing={2}>
-        <PageHeader title="Équipe introuvable" />
-        <Alert severity="error">Impossible de trouver une équipe avec l'id "{id}".</Alert>
-      </Stack>
-    );
+    return <Alert severity="error">No team found with the id: "{id}".</Alert>;
   }
 
   return (
@@ -110,12 +106,12 @@ const TeamPage: FC = () => {
         <Stack direction="row" spacing={2}>
           <Stack sx={{ flex: 1 }} spacing={2}>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography>Membres</Typography>
+              <Typography>Members</Typography>
               {isAdmin && (
                 <IconButton
                   color="primary"
                   onClick={openMembersModal}
-                  title="Ajouter un membre"
+                  title="Edit members"
                   sx={{ p: 0 }}
                 >
                   <EditIcon />
@@ -127,7 +123,7 @@ const TeamPage: FC = () => {
           </Stack>
 
           <Stack spacing={2} sx={{ flex: 1 }}>
-            <Typography>Projets</Typography>
+            <Typography>Projects</Typography>
             {projects && projects.length > 0 ? (
               <Grid container spacing={1}>
                 {projects.map((project) => (
@@ -137,7 +133,7 @@ const TeamPage: FC = () => {
                 ))}
               </Grid>
             ) : (
-              <Alert severity="info">Aucun projet</Alert>
+              <Alert severity="info">No project</Alert>
             )}
           </Stack>
         </Stack>

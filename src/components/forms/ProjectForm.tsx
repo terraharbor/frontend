@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const schema = z.object({
-  name: z.string().trim().min(1, 'Le nom est requis').max(100),
+  name: z.string().trim().min(1, 'Name required').max(100),
   description: z.string().trim().max(1000).optional(),
   teamIds: z.array(z.string()).default([]),
 });
@@ -38,7 +38,7 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
     >
       <TextField
         autoFocus
-        label="Nom"
+        label="Name"
         fullWidth
         variant="outlined"
         margin="dense"
@@ -48,7 +48,7 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
         disabled={disabled}
       />
       <TextField
-        label="Description (optionnel)"
+        label="Description (optional)"
         fullWidth
         variant="outlined"
         margin="dense"

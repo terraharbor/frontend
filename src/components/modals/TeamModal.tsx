@@ -20,8 +20,8 @@ const TeamModal: FC<TeamModalProps> = ({
   onSubmit,
   loading,
 }) => {
-  const title = mode === 'create' ? 'Créer une équipe' : 'Modifier l’équipe';
-  const cta = mode === 'create' ? 'Créer' : 'Enregistrer';
+  const title = mode === 'create' ? 'Create a team' : 'Edit the team';
+  const cta = mode === 'create' ? 'Create' : 'Save';
 
   const handleProtectedClose = () => {
     if (loading) return;
@@ -42,7 +42,7 @@ const TeamModal: FC<TeamModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleProtectedClose} color="inherit" disabled={loading}>
-          Annuler
+          Cancel
         </Button>
         <Button type="submit" form="team-form" variant="contained" disabled={loading}>
           {cta}

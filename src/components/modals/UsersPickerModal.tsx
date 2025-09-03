@@ -29,7 +29,7 @@ type UsersPickerModalProps = {
 
 const UsersPickerModal: FC<UsersPickerModalProps> = ({
   open,
-  title = 'Membres de l’équipe',
+  title = 'Team members',
   users,
   selectedUserIds,
   onClose,
@@ -70,7 +70,7 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Rechercher par nom, email, rôle…"
+          placeholder="Find by username or email"
           fullWidth
           variant="outlined"
           margin="normal"
@@ -111,17 +111,17 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
           })}
           {filtered.length === 0 && (
             <ListItem>
-              <ListItemText primary="Aucun utilisateur" />
+              <ListItemText primary="No user" />
             </ListItem>
           )}
         </List>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleProtectedClose} color="inherit" disabled={loading}>
-          Annuler
+          Cancel
         </Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-          Enregistrer {selected.length ? `(${selected.length})` : ''}
+          Save {selected.length ? `(${selected.length})` : ''}
         </Button>
       </DialogActions>
     </Dialog>

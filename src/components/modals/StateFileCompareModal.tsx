@@ -76,7 +76,7 @@ const StateFileCompareModal: FC<StateFileCompareModalProps> = ({
       <DialogTitle>
         <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2}>
           <Stack>
-            <Typography variant="h6">Comparaison des versions</Typography>
+            <Typography variant="h6">Versions comparison</Typography>
           </Stack>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -89,11 +89,11 @@ const StateFileCompareModal: FC<StateFileCompareModalProps> = ({
           <Stack>
             <Stack direction="row" spacing={2}>
               <Stack sx={{ flex: 1 }}>
-                <Typography variant="h5">Version précédente</Typography>
+                <Typography variant="h5">Previous version</Typography>
               </Stack>
 
               <Stack sx={{ flex: 1 }}>
-                <Typography variant="h5">Version actuelle</Typography>
+                <Typography variant="h5">Actual version</Typography>
               </Stack>
             </Stack>
 

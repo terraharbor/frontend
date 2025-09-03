@@ -47,24 +47,25 @@ const StateFileCard: FC<StateFileCardProps> = ({
           v{stateFile.version}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {new Date(stateFile.createdAt).toLocaleString()} • par {createdByUser?.username}
+          {new Date(stateFile.createdAt).toLocaleString()} • by {createdByUser?.username}
         </Typography>
       </Stack>
 
       <Stack direction="row" spacing={1}>
-        <Tooltip title="Comparer">
+        <Tooltip title="Compare">
           <IconButton size="small" onClick={() => onCompare(stateFile)}>
             <CompareArrowsIcon fontSize="small" />
           </IconButton>
         </Tooltip>
+
         {isAdmin && (
-          <Tooltip title="Restaurer">
+          <Tooltip title="Restore">
             <IconButton size="small" onClick={() => onRestore(stateFile)}>
               <RestoreIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title="Voir">
+        <Tooltip title="Open">
           <IconButton size="small" onClick={() => onView(stateFile)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>

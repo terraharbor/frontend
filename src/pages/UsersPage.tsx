@@ -45,10 +45,10 @@ export const UsersPage: FC = () => {
         isAdmin: values.isAdmin,
       };
       setUsers((prev) => [newUser, ...prev]);
-      showToast({ message: 'Utilisateur créé.', severity: 'success' });
+      showToast({ message: 'User created', severity: 'success' });
     } else if (mode === 'edit' && editingUser) {
       setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...values } : u)));
-      showToast({ message: 'Utilisateur mis à jour.', severity: 'success' });
+      showToast({ message: 'User updated', severity: 'success' });
     }
     setIsModalOpen(false);
   };
@@ -79,11 +79,11 @@ export const UsersPage: FC = () => {
   return (
     <Box>
       <PageHeader
-        title="Utilisateurs"
+        title="Users"
         action={
           isAdmin
             ? {
-                label: 'CRÉER',
+                label: 'New',
                 onClick: openCreateModal,
                 startIcon: <AddIcon />,
                 variant: 'contained',
@@ -115,7 +115,7 @@ export const UsersPage: FC = () => {
         message={
           userToDelete
             ? `Are you sure you want to delete the user "${userToDelete.username}"? This action is irreversible.`
-            : "Are you sure you want to delete this user? This action is irreversible."
+            : 'Are you sure you want to delete this user? This action is irreversible.'
         }
         confirmLabel="Delete"
         confirmColor="error"

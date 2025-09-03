@@ -20,8 +20,8 @@ const ProjectModal: FC<ProjectModalProps> = ({
   onSubmit,
   loading,
 }) => {
-  const title = mode === 'create' ? 'Créer un projet' : 'Modifier le projet';
-  const cta = mode === 'create' ? 'Créer' : 'Enregistrer';
+  const title = mode === 'create' ? 'Create a project' : 'Edit the project';
+  const cta = mode === 'create' ? 'Create' : 'Save';
 
   const handleProtectedClose = () => {
     if (loading) return;
@@ -42,7 +42,7 @@ const ProjectModal: FC<ProjectModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleProtectedClose} color="inherit" disabled={loading}>
-          Annuler
+          Cancel
         </Button>
         <Button type="submit" form="project-form" variant="contained" disabled={loading}>
           {cta}

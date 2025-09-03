@@ -107,7 +107,7 @@ const ProjectPage: FC = () => {
 
   const handleSaveTeams = (selectedTeamIds: string[]) => {
     setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
-    showToast({ message: 'Équipes mises à jour.', severity: 'success' });
+    showToast({ message: 'Teams updated', severity: 'success' });
     closeTeamsModal();
   };
 
@@ -121,6 +121,7 @@ const ProjectPage: FC = () => {
       if (!prev) return prev;
       return { ...prev, name: values.name, description: values.description };
     });
+
     showToast({ message: 'Project updated successfully.', severity: 'success' });
     closeProjectEditModal();
   };
@@ -198,12 +199,7 @@ const ProjectPage: FC = () => {
   };
 
   if (!project) {
-    return (
-      <Stack spacing={2}>
-        <PageHeader title="Projet introuvable" />
-        <Alert severity="error">Impossible de trouver un projet avec l'id "{id}".</Alert>
-      </Stack>
-    );
+    return <Alert severity="error">No project found with the id: "{id}".</Alert>;
   }
 
   return (
@@ -228,12 +224,12 @@ const ProjectPage: FC = () => {
           <Stack direction="row" spacing={2}>
             <Stack spacing={1} sx={{ flex: 1 }}>
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography>Equipes</Typography>
+                <Typography>Teams</Typography>
                 {isAdmin && (
                   <IconButton
                     color="primary"
                     onClick={openTeamsModal}
-                    title="Ajouter une équipe"
+                    title="Edit the team"
                     sx={{ p: 0 }}
                   >
                     <EditIcon />
@@ -253,12 +249,12 @@ const ProjectPage: FC = () => {
                   ))}
                 </Stack>
               ) : (
-                <Alert severity="info">Aucune équipe</Alert>
+                <Alert severity="info">No team</Alert>
               )}
             </Stack>
 
             <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Activités</Typography>
+              <Typography>Activities</Typography>
               <Stack
                 height="100%"
                 sx={{
@@ -275,7 +271,7 @@ const ProjectPage: FC = () => {
 
           <Stack direction="row" spacing={2}>
             <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Versions précédentes</Typography>
+              <Typography>Previous versions</Typography>
               <Stack spacing={1} sx={{ maxHeight: '60vh' }}>
                 {previousStates.length > 0 ? (
                   previousStates.map((s) => (
@@ -288,7 +284,7 @@ const ProjectPage: FC = () => {
                     />
                   ))
                 ) : (
-                  <Alert severity="info">Aucune version précédente</Alert>
+                  <Alert severity="info">No previous version</Alert>
                 )}
               </Stack>
             </Stack>
@@ -311,8 +307,8 @@ const ProjectPage: FC = () => {
                       sx={{ justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <Typography variant="caption" color="text.secondary">
-                        Actuel • v{currentState.version} •{' '}
-                        {new Date(currentState.createdAt).toLocaleString()} • par{' '}
+                        Actual • v{currentState.version} •{' '}
+                        {new Date(currentState.createdAt).toLocaleString()} • by{' '}
                         {currentStateCreatedByUser && currentStateCreatedByUser.username}
                       </Typography>
 
@@ -374,7 +370,7 @@ const ProjectPage: FC = () => {
                   </Stack>
                 </Stack>
               ) : (
-                <Alert severity="info">Aucun state file pour ce projet.</Alert>
+                <Alert severity="info">No state file</Alert>
               )}
             </Stack>
           </Stack>
