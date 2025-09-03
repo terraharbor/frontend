@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.20](https://github.com/terraharbor/frontend/compare/v0.1.19...v0.1.20) (2025-09-03)
+
+
+### Features
+
+* add/remove team from project ([461042f](https://github.com/terraharbor/frontend/commit/461042fc5c8e1f0015cddfe20d3273a9dce63194))
+* json compare modal ([fa2ff6b](https://github.com/terraharbor/frontend/commit/fa2ff6b31c374904371a319675ae624e25ad65f0))
+* JsonViewer ([fbba4ca](https://github.com/terraharbor/frontend/commit/fbba4ca5a897175d3ac8dba1df724db0195d31f3))
+* open project card ([3e9c6cb](https://github.com/terraharbor/frontend/commit/3e9c6cb4c04f26650bef07ac6d5fcd14240d33a9))
+* project page ([15e1c79](https://github.com/terraharbor/frontend/commit/15e1c79e9d96be2f83d55334c9cc6ded330204d4))
+* wip compare modal ([e1be3ca](https://github.com/terraharbor/frontend/commit/e1be3ca6156c3de8e28e55e85688ac22148926ef))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#83](https://github.com/terraharbor/frontend/issues/83) from terraharbor/feat/project-page ([d500943](https://github.com/terraharbor/frontend/commit/d5009433e687a07cf091e16887dc77b39be588ea))
+
 ## [0.1.19](https://github.com/terraharbor/frontend/compare/v0.1.18...v0.1.19) (2025-09-03)
 
 
