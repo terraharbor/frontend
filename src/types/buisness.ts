@@ -72,8 +72,8 @@ export type StateFileStatus = 'locked' | 'unlocked';
 
 export type StateFileInfos = {
   status: StateFileStatus;
-  lockedAt: Date;
-  lockedBy: string;
+  lockedAt?: Date;
+  lockedBy?: string;
 };
 
 export type StateFileSnapshot = {

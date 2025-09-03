@@ -1,6 +1,8 @@
 import EditIcon from '@mui/icons-material/Edit';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Alert, IconButton, Stack, Typography } from '@mui/material';
+import { Alert, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StateFileCard from '../components/cards/StateFileCard';
@@ -11,8 +13,14 @@ import StateFileViewerModal from '../components/modals/StateFileViewerModal';
 import TeamsPickerModal from '../components/modals/TeamsPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects, sampleStateFilesTerraform, sampleTeams, sampleUsers } from '../sampleData';
-import { Project, StateFileSnapshot, Team } from '../types/buisness';
+import {
+  sampleProjects,
+  sampleStateFileInfos,
+  sampleStateFilesTerraform,
+  sampleTeams,
+  sampleUsers,
+} from '../sampleData';
+import { Project, StateFileInfos, StateFileSnapshot, Team } from '../types/buisness';
 
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,6 +55,15 @@ const ProjectPage: FC = () => {
   const currentStateCreatedByUser = useMemo(
     () => (currentState ? sampleUsers.find((u) => currentState?.createdBy === u.id) : undefined),
     [currentState],
+  );
+
+  const stateFileInfos: StateFileInfos = sampleStateFileInfos[0];
+
+  const locked = stateFileInfos.status === 'locked';
+
+  const stateFileLockedByUser = useMemo(
+    () => (stateFileInfos ? sampleUsers.find((u) => stateFileInfos.lockedBy === u.id) : undefined),
+    [stateFileInfos],
   );
 
   const handleOpenViewer = (s: StateFileSnapshot) => {
@@ -85,6 +102,14 @@ const ProjectPage: FC = () => {
       return { ...prev, teamIds: prev.teamIds.filter((id) => id !== team.id) };
     });
     showToast({ message: 'Équipe retirée du projet.', severity: 'success' });
+  };
+
+  const handleLockOrUnlock = () => {
+    if (locked) {
+      // Unlock -> TODO API call
+    } else {
+      // Lock -> TODO API call
+    }
   };
 
   if (!project) {
@@ -190,14 +215,50 @@ const ProjectPage: FC = () => {
                         {new Date(currentState.createdAt).toLocaleString()} • par{' '}
                         {currentStateCreatedByUser && currentStateCreatedByUser.username}
                       </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenViewer(currentState)}
-                        sx={{ p: 0 }}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
+
+                      <Stack direction="row" spacing={1}>
+                        <IconButton size="small" onClick={handleLockOrUnlock} sx={{ p: 0 }}>
+                          <Tooltip title={locked ? 'Unlock' : 'Lock'}>
+                            {locked ? (
+                              <LockOpenIcon fontSize="small" />
+                            ) : (
+                              <LockIcon fontSize="small" />
+                            )}
+                          </Tooltip>
+                        </IconButton>
+
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenViewer(currentState)}
+                          sx={{ p: 0 }}
+                        >
+                          <Tooltip title="Open">
+                            <VisibilityIcon fontSize="small" />
+                          </Tooltip>
+                        </IconButton>
+                      </Stack>
                     </Stack>
+
+                    {locked && (
+                      <Stack
+                        direction="row"
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1.5,
+                          alignItems: 'center',
+                          px: 1,
+                          py: 0.5,
+                        }}
+                      >
+                        <LockIcon color="error" />
+                        <Typography
+                          variant="caption"
+                          sx={{ ml: 2 }}
+                        >{`Locked by ${stateFileLockedByUser?.username} the ${new Date(stateFileInfos.lockedAt!).toLocaleString()}`}</Typography>
+                      </Stack>
+                    )}
+
                     <JsonViewer value={currentState.content} />
                   </Stack>
                 </Stack>
