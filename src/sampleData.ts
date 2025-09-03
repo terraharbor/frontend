@@ -1,4 +1,4 @@
-import { Project, StateFileSnapshot, Team, User } from './types/buisness';
+import { Project, StateFileInfos, StateFileSnapshot, Team, User } from './types/buisness';
 
 export const sampleProjects: Project[] = [
   {
@@ -181,5 +181,16 @@ export const sampleStateFilesTerraform: StateFileSnapshot[] = [
     ),
     createdAt: new Date('2025-08-30T10:02:00Z'),
     createdBy: '1',
+  },
+];
+
+export const sampleStateFileInfos: StateFileInfos[] = [
+  {
+    status: 'locked',
+    lockedAt: new Date('2025-08-14T10:02:00Z'),
+    lockedBy: '2',
+  },
+  {
+    status: 'unlocked',
   },
 ];
