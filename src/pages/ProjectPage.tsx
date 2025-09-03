@@ -1,3 +1,4 @@
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -112,6 +113,16 @@ const ProjectPage: FC = () => {
     }
   };
 
+  const handleDeleteStateFileSnapshot = (stateFileSnapshot: StateFileSnapshot) => {
+    console.log('Delete v' + stateFileSnapshot.version);
+    // Call API
+  };
+
+  const handleRestoreStateFileSnapshot = (stateFileSnapshot: StateFileSnapshot) => {
+    console.log('Restore v' + stateFileSnapshot.version);
+    // Call API
+  };
+
   if (!project) {
     return (
       <Stack spacing={2}>
@@ -183,8 +194,9 @@ const ProjectPage: FC = () => {
                     <StateFileCard
                       stateFile={s}
                       onCompare={handleOpenCompare}
-                      onRestore={() => {}}
+                      onRestore={handleRestoreStateFileSnapshot}
                       onView={handleOpenViewer}
+                      onDelete={handleDeleteStateFileSnapshot}
                     />
                   ))
                 ) : (
@@ -226,7 +238,6 @@ const ProjectPage: FC = () => {
                             )}
                           </Tooltip>
                         </IconButton>
-
                         <IconButton
                           size="small"
                           onClick={() => handleOpenViewer(currentState)}
@@ -234,6 +245,15 @@ const ProjectPage: FC = () => {
                         >
                           <Tooltip title="Open">
                             <VisibilityIcon fontSize="small" />
+                          </Tooltip>
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteStateFileSnapshot(currentState)}
+                          sx={{ p: 0 }}
+                        >
+                          <Tooltip title="Delete">
+                            <DeleteIcon fontSize="small" color="error" />
                           </Tooltip>
                         </IconButton>
                       </Stack>

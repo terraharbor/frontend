@@ -1,4 +1,5 @@
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import DeleteIcon from '@mui/icons-material/Delete';
 import RestoreIcon from '@mui/icons-material/Restore';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
@@ -11,9 +12,16 @@ type StateFileCardProps = {
   onCompare: (state: StateFileSnapshot) => void;
   onRestore: (state: StateFileSnapshot) => void;
   onView: (state: StateFileSnapshot) => void;
+  onDelete: (state: StateFileSnapshot) => void;
 };
 
-const StateFileCard: FC<StateFileCardProps> = ({ stateFile, onCompare, onRestore, onView }) => {
+const StateFileCard: FC<StateFileCardProps> = ({
+  stateFile,
+  onCompare,
+  onRestore,
+  onView,
+  onDelete,
+}) => {
   const createdByUser = useMemo(
     () => sampleUsers.find((u) => u.id === stateFile.createdBy),
     [stateFile],
@@ -55,6 +63,11 @@ const StateFileCard: FC<StateFileCardProps> = ({ stateFile, onCompare, onRestore
         <Tooltip title="Voir">
           <IconButton size="small" onClick={() => onView(stateFile)}>
             <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton size="small" color="error" onClick={() => onDelete(stateFile)}>
+            <DeleteIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       </Stack>
