@@ -1,4 +1,4 @@
-import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Alert, IconButton, Stack, Typography } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
@@ -113,7 +113,7 @@ const ProjectPage: FC = () => {
                   title="Ajouter une équipe"
                   sx={{ p: 0 }}
                 >
-                  <AddIcon />
+                  <EditIcon />
                 </IconButton>
               </Stack>
 
