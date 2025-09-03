@@ -1,6 +1,17 @@
-import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography, MenuItem, Divider, ListItemIcon } from '@mui/material';
+import { Logout as LogoutIcon } from '@mui/icons-material';
+import {
+  Avatar,
+  Button,
+  Chip,
+  Divider,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Stack,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import { FC, MouseEvent, useState } from 'react';
-import { Logout as LogoutIcon, Person as PersonIcon } from '@mui/icons-material';
 import { useAuth } from '../providers/useAuth';
 import { useToast } from '../providers/useToast';
 
@@ -21,9 +32,9 @@ const UserMenu: FC = () => {
   const handleLogout = () => {
     logout();
     handleClose();
-    showToast({ 
-      message: 'Successfully logged out', 
-      severity: 'info' 
+    showToast({
+      message: 'Successfully logged out',
+      severity: 'info',
     });
   };
 
@@ -31,34 +42,30 @@ const UserMenu: FC = () => {
     return null;
   }
 
-  const initials = user.firstName && user.lastName 
-    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
-    : user.username.charAt(0).toUpperCase();
+  const initials =
+    user.firstName && user.lastName
+      ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+      : user.username.charAt(0).toUpperCase();
 
-  const displayName = user.firstName && user.lastName 
-    ? `${user.firstName} ${user.lastName}`
-    : user.username;
+  const displayName =
+    user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username;
 
   return (
     <>
       <Button
         onMouseEnter={handleOpen}
-        sx={{ 
+        sx={{
           minWidth: 'auto',
           p: 0,
           borderRadius: '50%',
           '&:hover': {
             bgcolor: 'action.hover',
-          }
+          },
         }}
       >
-        <Avatar
-          sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}
-        >
-          {initials}
-        </Avatar>
+        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>{initials}</Avatar>
       </Button>
-      
+
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -67,15 +74,13 @@ const UserMenu: FC = () => {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{
           paper: {
-            sx: { minWidth: 280, mt: 1 }
-          }
+            sx: { minWidth: 280, mt: 1 },
+          },
         }}
       >
         <Stack sx={{ p: 2, pb: 1 }}>
           <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-              {initials}
-            </Avatar>
+            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>{initials}</Avatar>
             <Stack spacing={0}>
               <Typography variant="subtitle1" fontWeight="bold">
                 {displayName}
@@ -90,10 +95,10 @@ const UserMenu: FC = () => {
               )}
             </Stack>
           </Stack>
-          
-          <Chip 
-            size="small" 
-            label={user.disabled ? 'Inactive' : 'Active'} 
+
+          <Chip
+            size="small"
+            label={user.disabled ? 'Inactive' : 'Active'}
             color={user.disabled ? 'error' : 'success'}
             variant="outlined"
             sx={{ alignSelf: 'flex-start', mt: 1 }}
@@ -102,15 +107,6 @@ const UserMenu: FC = () => {
 
         <Divider />
 
-        <MenuItem onClick={handleClose}>
-          <ListItemIcon>
-            <PersonIcon fontSize="small" />
-          </ListItemIcon>
-          Profile Settings
-        </MenuItem>
-        
-        <Divider />
-        
         <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" color="error" />

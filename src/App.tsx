@@ -1,9 +1,9 @@
-import { Stack } from '@mui/material';
 import { FC } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './components/providers/useAuth';
+import AuditPage from './pages/AuditPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import ProjectPage from './pages/ProjectPage';
@@ -12,11 +12,8 @@ import RegisterPage from './pages/RegisterPage';
 import TeamPage from './pages/TeamPage';
 import { TeamsPage } from './pages/TeamsPage';
 import TestPage from './pages/TestPage';
+import TokensPage from './pages/TokensPage';
 import UsersPage from './pages/UsersPage';
-
-const Tokens: FC = () => <Stack>Tokens</Stack>;
-const Audit: FC = () => <Stack>Audit logs</Stack>;
-const Settings: FC = () => <Stack>Settings</Stack>;
 
 const App: FC = () => {
   const { isLoading } = useAuth();
@@ -44,9 +41,8 @@ const App: FC = () => {
                 <Route path="/teams" element={<TeamsPage />} />
                 <Route path="/teams/:id" element={<TeamPage />} />
                 <Route path="/users" element={<UsersPage />} />
-                <Route path="/tokens" element={<Tokens />} />
-                <Route path="/audit" element={<Audit />} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/tokens" element={<TokensPage />} />
+                <Route path="/audit" element={<AuditPage />} />
                 <Route path="/test" element={<TestPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
