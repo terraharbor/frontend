@@ -38,13 +38,7 @@ const DashboardPage: FC = () => {
             <Typography sx={{ mb: 1 }}>Mes équipes</Typography>
             {myTeams && myTeams.length > 0 ? (
               <Stack spacing={1}>
-                {...myTeams.map((team) => (
-                  <TeamCard
-                    key={team.id}
-                    team={team}
-                    onOpen={() => console.log('Open team: ' + team.id)}
-                  />
-                ))}
+                {...myTeams.map((team) => <TeamCard key={team.id} team={team} />)}
               </Stack>
             ) : (
               <Alert severity="info">Aucune équipe</Alert>

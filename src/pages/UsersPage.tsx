@@ -1,3 +1,4 @@
+import { ModalMode } from '@/types';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { FC, useState } from 'react';
@@ -5,31 +6,52 @@ import { UserFormOutput } from '../components/forms/UserForm';
 import UsersList from '../components/lists/UsersList';
 import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
+import { useToast } from '../components/providers/useToast';
 import { sampleUsers } from '../sampleData';
 import { User } from '../types/buisness';
 
 export const UsersPage: FC = () => {
   const [users, setUsers] = useState<User[]>(sampleUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mode, setMode] = useState<ModalMode>('create');
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const { showToast } = useToast();
 
-  const handleOpenCreateModal = () => {
+  const openCreateModal = () => {
+    setMode('create');
+    setEditingUser(null);
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const openEditModal = (user: User) => {
+    setMode('edit');
+    setEditingUser(user);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleSubmitUser = (values: UserFormOutput) => {
+    if (mode === 'create') {
+      const newUser: User = {
+        id: '0', // TODO: géré par le backend plus tard
+        username: values.username,
+        email: values.email,
+        role: values.role,
+      };
+      setUsers((prev) => [newUser, ...prev]);
+      showToast({ message: 'Utilisateur créé.', severity: 'success' });
+    } else if (mode === 'edit' && editingUser) {
+      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...values } : u)));
+      showToast({ message: 'Utilisateur mis à jour.', severity: 'success' });
+    }
     setIsModalOpen(false);
   };
 
-  const handleSubmitUser = (values: UserFormOutput) => {
-    const newUser: User = {
-      id: '0' /* TODO: A gérer avec backend */,
-      username: values.username,
-      email: values.email,
-      role: values.role,
-    };
-
-    setUsers((prev) => [newUser, ...prev]);
-    setIsModalOpen(false);
+  const handleDeleteUser = (id: string) => {
+    // TODO: appeler l’API
+    setUsers((prev) => prev.filter((u) => u.id !== id));
+    showToast({ message: 'Utilisateur supprimé.', severity: 'success' });
   };
 
   return (
@@ -38,20 +60,26 @@ export const UsersPage: FC = () => {
         title="Utilisateurs"
         action={{
           label: 'CRÉER',
-          onClick: handleOpenCreateModal,
+          onClick: openCreateModal,
           startIcon: <AddIcon />,
           variant: 'contained',
           color: 'primary',
         }}
       />
 
-      <UsersList users={users} allowDelete={true} />
+      <UsersList
+        users={users}
+        allowUpdate
+        allowDelete
+        onUpdate={openEditModal}
+        onDelete={handleDeleteUser}
+      />
 
       <UserModal
         open={isModalOpen}
-        mode="create"
-        initialValues={{}}
-        onClose={handleCloseModal}
+        mode={mode}
+        initialValues={editingUser ?? undefined}
+        onClose={closeModal}
         onSubmit={handleSubmitUser}
       />
     </Box>

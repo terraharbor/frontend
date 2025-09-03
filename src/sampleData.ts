@@ -31,12 +31,12 @@ export const sampleTeams: Team[] = [
   {
     id: '1',
     name: 'Dev Team',
-    userIds: [],
+    userIds: ['1', '3'],
   },
   {
     id: '2',
     name: 'Security Team',
-    userIds: [],
+    userIds: ['2'],
   },
 ];
 
