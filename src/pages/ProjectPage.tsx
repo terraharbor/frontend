@@ -78,11 +78,11 @@ const ProjectPage: FC = () => {
     closeTeamsModal();
   };
 
-  const handleRemoveTeam = (teamId: string) => {
+  const handleRemoveTeam = (team: Team) => {
     setProject((prev) => {
       if (!prev) return prev;
-      if (!prev.teamIds.includes(teamId)) return prev;
-      return { ...prev, teamIds: prev.teamIds.filter((id) => id !== teamId) };
+      if (!prev.teamIds.includes(team.id)) return prev;
+      return { ...prev, teamIds: prev.teamIds.filter((id) => id !== team.id) };
     });
     showToast({ message: 'Équipe retirée du projet.', severity: 'success' });
   };
@@ -119,7 +119,14 @@ const ProjectPage: FC = () => {
 
               {teams && teams.length > 0 ? (
                 <Stack spacing={1}>
-                  {...teams.map((team) => <TeamCard key={team.id} team={team} />)}
+                  {...teams.map((team) => (
+                    <TeamCard
+                      key={team.id}
+                      team={team}
+                      onDelete={handleRemoveTeam}
+                      displayActions
+                    />
+                  ))}
                 </Stack>
               ) : (
                 <Alert severity="info">Aucune équipe</Alert>
