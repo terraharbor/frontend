@@ -5,10 +5,12 @@ import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import TeamModal from '../components/modals/TeamModal';
+import { useToast } from '../components/providers/useToast';
 import { sampleTeams } from '../sampleData';
 import { Team } from '../types/buisness';
 
 export const TeamsPage: FC = () => {
+  const { showToast } = useToast();
   const [teams, setTeams] = useState<Team[]>(sampleTeams);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -32,6 +34,11 @@ export const TeamsPage: FC = () => {
     setIsModalOpen(false);
   };
 
+  const handleDeleteTeam = (team: Team) => {
+    setTeams((prev) => prev.filter((t) => t.id !== team.id));
+    showToast({ message: 'Equipe supprimée.', severity: 'success' });
+  };
+
   return (
     <Box>
       <PageHeader
@@ -46,7 +53,11 @@ export const TeamsPage: FC = () => {
       />
 
       {teams.length > 0 ? (
-        <Stack spacing={1}>{...teams.map((team) => <TeamCard key={team.id} team={team} />)}</Stack>
+        <Stack spacing={1}>
+          {...teams.map((team) => (
+            <TeamCard key={team.id} team={team} onDelete={handleDeleteTeam} displayActions />
+          ))}
+        </Stack>
       ) : (
         <Box
           display="flex"

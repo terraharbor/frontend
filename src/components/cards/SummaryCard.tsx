@@ -1,83 +1,104 @@
-import { FC } from 'react';
-import { Card, CardContent, CardActions, Typography, Button, Stack } from '@mui/material';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { FC, ReactNode } from 'react';
+
+export type SummaryAction = {
+  label: string;
+  onClick: () => void;
+  icon: ReactNode;
+};
 
 export interface SummaryCardProps {
   title: string;
   description?: string;
   metadata?: string[];
-  action?: {
-    label?: string;
-    onClick: () => void;
-  };
+  actions?: SummaryAction[];
+  actionsPlacement?: 'bottom' | 'right';
   onClick?: () => void;
 }
 
-//TerraHarbor summary card
 export const SummaryCard: FC<SummaryCardProps> = ({
   title,
   description,
   metadata = [],
-  action,
+  actions = [],
+  actionsPlacement = 'bottom',
   onClick,
-}) => (
-  <Card
-    onClick={onClick}
-    sx={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      cursor: onClick ? 'pointer' : 'default',
-    }}
-  >
-    <CardContent sx={(theme) => ({ flexGrow: 1, p: theme.spacing(3) })}>
-      <Typography variant="h6" component="h2" sx={(theme) => ({ mb: theme.spacing(1) })}>
-        {title}
-      </Typography>
+}) => {
+  const hasActions = actions.length > 0;
 
-      {description && (
-        <Typography variant="body2" sx={(theme) => ({ mb: theme.spacing(2) })}>
-          {description}
-        </Typography>
-      )}
+  const ActionButtons = (
+    <Stack direction="row" spacing={1}>
+      {actions.map((a) => (
+        <Tooltip title={a.label}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              a.onClick();
+            }}
+          >
+            {a.icon}
+          </IconButton>
+        </Tooltip>
+      ))}
+    </Stack>
+  );
 
-      {metadata.length > 0 && (
-        <Stack spacing={0.5}>
-          {metadata.map((item, index) => (
-            <Typography key={index} variant="caption">
-              {item}
-            </Typography>
-          ))}
-        </Stack>
-      )}
-    </CardContent>
-
-    {action && (
-      <CardActions sx={(theme) => ({ p: theme.spacing(3), pt: 0 })}>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={(e) => {
-            e.stopPropagation();
-            action.onClick();
-          }}
-          size="small"
+  return (
+    <Card
+      onClick={onClick}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
+      <CardContent sx={(theme) => ({ flexGrow: 1, p: theme.spacing(3) })}>
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          justifyContent="space-between"
           sx={(theme) => ({
-            borderColor: 'primary.main',
-            color: 'primary.main',
-            px: theme.spacing(2),
-            py: theme.spacing(0.5),
-            minWidth: 'auto',
-            '&:hover': {
-              borderColor: 'primary.dark',
-              backgroundColor: 'primary.lighter',
-            },
+            mb: description || (metadata?.length ?? 0) > 0 ? theme.spacing(1) : 0,
           })}
         >
-          {action.label || 'OUVRIR'}
-        </Button>
-      </CardActions>
-    )}
-  </Card>
-);
+          <Typography variant="h6" component="h2" sx={(theme) => ({ mr: theme.spacing(2) })}>
+            {title}
+          </Typography>
+          {hasActions && actionsPlacement === 'right' && ActionButtons}
+        </Stack>
+
+        {description && (
+          <Typography variant="body2" sx={(theme) => ({ mb: theme.spacing(2) })}>
+            {description}
+          </Typography>
+        )}
+
+        {metadata.length > 0 && (
+          <Stack spacing={0.5}>
+            {metadata.map((item, index) => (
+              <Typography key={index} variant="caption">
+                {item}
+              </Typography>
+            ))}
+          </Stack>
+        )}
+      </CardContent>
+
+      {hasActions && actionsPlacement === 'bottom' && (
+        <CardActions sx={(theme) => ({ p: theme.spacing(3), pt: 0 })}>{ActionButtons}</CardActions>
+      )}
+    </Card>
+  );
+};
 
 export default SummaryCard;

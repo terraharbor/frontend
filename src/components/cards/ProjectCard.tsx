@@ -1,3 +1,5 @@
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project } from '../../types/buisness';
@@ -5,9 +7,15 @@ import { SummaryCard } from './SummaryCard';
 
 export interface ProjectCardProps {
   project: Project;
+  displayActions?: boolean;
+  onDelete?: (project: Project) => void;
 }
 
-export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
+export const ProjectCard: FC<ProjectCardProps> = ({
+  project,
+  displayActions = false,
+  onDelete,
+}) => {
   const navigate = useNavigate();
   const metadata = [];
 
@@ -21,12 +29,27 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
     navigate(`/projects/${project.id}`);
   };
 
+  const deleteProject = () => {
+    if (onDelete) onDelete(project);
+  };
+
   return (
     <SummaryCard
       title={project.name}
       description={project.description}
       metadata={metadata}
-      action={{ onClick: openProject }}
+      actions={
+        displayActions
+          ? [
+              {
+                label: 'Delete',
+                onClick: deleteProject,
+                icon: <DeleteIcon fontSize="small" color="error" />,
+              },
+              { label: 'Open', onClick: openProject, icon: <VisibilityIcon fontSize="small" /> },
+            ]
+          : undefined
+      }
       onClick={openProject}
     />
   );

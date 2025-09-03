@@ -6,9 +6,12 @@ import { ProjectCard } from '../components/cards/ProjectCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
 import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
+import { useToast } from '../components/providers/useToast';
 import { sampleProjects } from '../sampleData';
 import { Project } from '../types/buisness';
+
 export const ProjectsPage: FC = () => {
+  const { showToast } = useToast();
   const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,6 +42,11 @@ export const ProjectsPage: FC = () => {
     setIsModalOpen(false);
   };
 
+  const handleDeleteProject = (project: Project) => {
+    setProjects((prev) => prev.filter((p) => p.id !== project.id));
+    showToast({ message: 'Projet supprimé.', severity: 'success' });
+  };
+
   return (
     <Box>
       <PageHeader
@@ -56,7 +64,7 @@ export const ProjectsPage: FC = () => {
         <Grid container spacing={3}>
           {projects.map((project) => (
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={project.id}>
-              <ProjectCard project={project} />
+              <ProjectCard project={project} displayActions onDelete={handleDeleteProject} />
             </Grid>
           ))}
         </Grid>
