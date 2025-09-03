@@ -37,7 +37,7 @@ export const UsersPage: FC = () => {
         id: '0', // TODO: géré par le backend plus tard
         username: values.username,
         email: values.email,
-        role: values.role,
+        isAdmin: values.isAdmin,
       };
       setUsers((prev) => [newUser, ...prev]);
       showToast({ message: 'Utilisateur créé.', severity: 'success' });

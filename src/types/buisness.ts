@@ -13,8 +13,6 @@ export type Team = {
   userIds: string[];
 };
 
-export type UserRole = 'Admin' | 'User';
-
 export type User = {
   id: string;
   username: string;
@@ -25,7 +23,7 @@ export type User = {
   sha512_hash?: string;
   token?: string;
   token_validity?: number;
-  role: UserRole;
+  isAdmin: boolean;
 };
 
 export type UserLogin = {

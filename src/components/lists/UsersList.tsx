@@ -24,7 +24,7 @@ const UsersList: FC<UsersListProps> = ({
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'username', headerName: 'Nom', flex: 1 },
     { field: 'email', headerName: 'E-mail', flex: 1 },
-    { field: 'role', headerName: 'Rôle', flex: 1 },
+    { field: 'isAdmin', headerName: 'Admin', flex: 1 },
     {
       field: 'actions',
       headerName: 'Actions',
