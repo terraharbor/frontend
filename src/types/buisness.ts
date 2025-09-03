@@ -68,6 +68,14 @@ export type AuthToken = {
   createdAt: Date;
 };
 
+export type StateFileStatus = 'locked' | 'unlocked';
+
+export type StateFileInfos = {
+  status: StateFileStatus;
+  lockedAt: Date;
+  lockedBy: string;
+};
+
 export type StateFileSnapshot = {
   id: string;
   projectId: string;
