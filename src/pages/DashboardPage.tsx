@@ -23,10 +23,7 @@ const DashboardPage: FC = () => {
               <Grid container spacing={1}>
                 {myProjects.map((project) => (
                   <Grid key={project.id} size={{ xs: 12, sm: 12, md: 12, lg: 6 }}>
-                    <ProjectCard
-                      project={project}
-                      onOpen={() => console.log('Open project: ' + project.id)}
-                    />
+                    <ProjectCard project={project} />
                   </Grid>
                 ))}
               </Grid>

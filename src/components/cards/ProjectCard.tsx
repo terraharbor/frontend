@@ -1,14 +1,14 @@
 import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Project } from '../../types/buisness';
 import { SummaryCard } from './SummaryCard';
 
 export interface ProjectCardProps {
   project: Project;
-  onOpen: (project: Project) => void;
-  onCardClick?: (project: Project) => void;
 }
 
-export const ProjectCard: FC<ProjectCardProps> = ({ project, onOpen, onCardClick }) => {
+export const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
+  const navigate = useNavigate();
   const metadata = [];
 
   metadata.push(`${project.teamIds.length} ${project.teamIds.length === 1 ? 'équipe' : 'équipes'}`);
@@ -17,13 +17,17 @@ export const ProjectCard: FC<ProjectCardProps> = ({ project, onOpen, onCardClick
     metadata.push(project.lastUpdated);
   }
 
+  const openProject = () => {
+    navigate(`/projects/${project.id}`);
+  };
+
   return (
     <SummaryCard
       title={project.name}
       description={project.description}
       metadata={metadata}
-      action={{ onClick: () => onOpen(project) }}
-      onClick={onCardClick ? () => onCardClick(project) : undefined}
+      action={{ onClick: openProject }}
+      onClick={openProject}
     />
   );
 };
