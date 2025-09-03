@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.22](https://github.com/terraharbor/frontend/compare/v0.1.21...v0.1.22) (2025-09-03)
+
+
+### Features
+
+* handle delete state file version ([8dbd2dd](https://github.com/terraharbor/frontend/commit/8dbd2dd0f5c98eddef7e2c9c85126e3fc7040fb0))
+* state file lock/unlock ([dca0df0](https://github.com/terraharbor/frontend/commit/dca0df04a89f3fa71f2a2841e6d8c95ce2fd3fad))
+* state file management ([7a3cc84](https://github.com/terraharbor/frontend/commit/7a3cc8419701b7b8e4bbe2fb8b4b8c4102985a6d))
+* wip ([392ca86](https://github.com/terraharbor/frontend/commit/392ca868a17e4a41d50e020fb40cdb594e1c20ba))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#95](https://github.com/terraharbor/frontend/issues/95) from terraharbor/feat/state-file-management ([7a3cc84](https://github.com/terraharbor/frontend/commit/7a3cc8419701b7b8e4bbe2fb8b4b8c4102985a6d))
+
 ## [0.1.21](https://github.com/terraharbor/frontend/compare/v0.1.20...v0.1.21) (2025-09-03)
 
 
