@@ -1,33 +1,36 @@
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RestoreIcon from '@mui/icons-material/Restore';
+import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import { FC, useMemo } from 'react';
-import { sampleUsers } from '../../sampleData';
-import { StateFileSnapshot } from '../../types/buisness';
-import { useAuth } from '../providers/useAuth';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Box, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
+import { FC, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { sampleProjects } from '../../sampleData';
+import { ProjectToken } from '../../types/buisness';
 
 type ProjectTokenCardProps = {
-  stateFile: StateFileSnapshot;
-  onCompare: (state: StateFileSnapshot) => void;
-  onRestore: (state: StateFileSnapshot) => void;
-  onView: (state: StateFileSnapshot) => void;
-  onDelete: (state: StateFileSnapshot) => void;
+  token: ProjectToken;
+  onDelete?: (token: ProjectToken) => void;
+  onEdit?: (token: ProjectToken) => void;
 };
 
-const ProjectTokenCard: FC<ProjectTokenCardProps> = ({
-  stateFile,
-  onCompare,
-  onRestore,
-  onView,
-  onDelete,
-}) => {
-  const { isAdmin } = useAuth();
-  const createdByUser = useMemo(
-    () => sampleUsers.find((u) => u.id === stateFile.createdBy),
-    [stateFile],
+const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete, onEdit }) => {
+  const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(false);
+
+  const project = useMemo(
+    () => sampleProjects.find((p) => p.id === token.projectId),
+    [token.projectId],
   );
+
+  const openProject = () => {
+    if (project) navigate(`/projects/${project.id}`);
+  };
+
+  const masked = useMemo(() => {
+    const v = token.value ?? '';
+    return '•'.repeat(v.length);
+  }, [token.value]);
 
   return (
     <Stack
@@ -39,40 +42,71 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({
         borderColor: 'divider',
         borderRadius: 2,
         p: 2,
-        bgcolor: 'neutral.white',
+        bgcolor: 'background.paper',
       }}
     >
-      <Stack>
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          v{stateFile.version}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {new Date(stateFile.createdAt).toLocaleString()} • by {createdByUser?.username}
-        </Typography>
+      <Stack spacing={1} sx={{ minWidth: 0, pr: 1, flex: 1 }}>
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            Token for{' '}
+          </Typography>
+          {project ? (
+            <Link component="button" onClick={openProject} underline="hover">
+              {project.name}
+            </Link>
+          ) : (
+            <Typography component="span" variant="body2" color="text.secondary">
+              (unknown project)
+            </Typography>
+          )}
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+          <Box
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              px: 1.5,
+              py: 1,
+              bgcolor: (t) => t.palette.action.hover,
+              fontFamily:
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              fontSize: 12,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: 520,
+              minWidth: 240,
+            }}
+          >
+            {expanded ? token.value : masked}
+          </Box>
+
+          <Tooltip title={expanded ? 'Hide token' : 'Show token'}>
+            <IconButton size="small" onClick={() => setExpanded((v) => !v)}>
+              {expanded ? (
+                <VisibilityOffIcon fontSize="small" />
+              ) : (
+                <VisibilityIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Tooltip>
+        </Stack>
       </Stack>
 
-      <Stack direction="row" spacing={1}>
-        <Tooltip title="Compare">
-          <IconButton size="small" onClick={() => onCompare(stateFile)}>
-            <CompareArrowsIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        {isAdmin && (
-          <Tooltip title="Restore">
-            <IconButton size="small" onClick={() => onRestore(stateFile)}>
-              <RestoreIcon fontSize="small" />
+      <Stack direction="row" spacing={1} alignItems="center">
+        {onEdit && (
+          <Tooltip title="Edit token">
+            <IconButton size="small" onClick={() => onEdit(token)}>
+              <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title="Open">
-          <IconButton size="small" onClick={() => onView(stateFile)}>
-            <VisibilityIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        {isAdmin && (
-          <Tooltip title="Delete">
-            <IconButton size="small" color="error" onClick={() => onDelete(stateFile)}>
+
+        {onDelete && (
+          <Tooltip title="Delete token">
+            <IconButton size="small" color="error" onClick={() => onDelete(token)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
