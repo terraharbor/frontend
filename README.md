@@ -1,8 +1,24 @@
-# Frontend
+<h1 align="center" style="margin-top: 0px;">frontend</h1>
+
+<p align="center">Frontend of the TerraHarbor application built with React, TypeScript and Vite</p>
+
+<div align="center">
+
+![Version](https://img.shields.io/github/v/release/terraharbor/frontend?sort=semver&style=for-the-badge&label=Version&color=%2325c2a0&link=https%3A%2F%2Fgithub.com%2Fterraharbor%2Ffrontend%2Freleases) ![License](https://img.shields.io/github/license/terraharbor/frontend?style=for-the-badge&logo=gplv3&label=License) ![Build](https://img.shields.io/github/actions/workflow/status/terraharbor/frontend/docker-build.yaml?event=push&style=for-the-badge&logo=docker&label=Build&link=https%3A%2F%2Fgithub.com%2Fterraharbor%2Ffrontend%2Factions%2Fworkflows%2Fdocker-build.yaml%3Fquery%3Devent%253Apush)
+
+</div>
+
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [📖 Description](#-description)
+- [🎨 Mockups](#-mockups)
+- [🛠️ Technical stack](#️-technical-stack)
+- [🚀 Useful commands](#-useful-commands)
 
 ## 📖 Description
 
-Frontend of the TerraHarbor application built with React, TypeScript and Vite. It provides the user interface to manage Terraform states through the TerraHarbor backend.
+This repository contains the code for the user interface to manage Terraform states through the TerraHarbor backend.
 
 ## 🎨 Mockups
 
