@@ -51,19 +51,16 @@ export const sampleUsers: User[] = [
   {
     id: '1',
     username: 'John Doe',
-    email: 'john.doe@test.ch',
     isAdmin: true,
   },
   {
     id: '2',
     username: 'Marie Martin',
-    email: 'marie.martin@test.ch',
     isAdmin: true,
   },
   {
     id: '3',
     username: 'Luc Bernard',
-    email: 'luc.bernard@test.ch',
     isAdmin: true,
   },
 ];

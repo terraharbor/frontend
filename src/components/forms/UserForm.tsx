@@ -5,7 +5,6 @@ import { z } from 'zod';
 
 const schema = z.object({
   username: z.string().trim().min(1, 'Name required').max(100),
-  email: z.string().trim().email('Invalid e-mail').max(255),
   isAdmin: z.boolean(),
 });
 
@@ -26,7 +25,7 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
     formState: { errors },
   } = useForm<UserFormInput, unknown, UserFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { username: '', email: '', isAdmin: false, ...defaultValues },
+    defaultValues: { username: '', isAdmin: false, ...defaultValues },
   });
 
   return (
@@ -46,18 +45,6 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
         {...register('username')}
         error={!!errors.username}
         helperText={errors.username?.message}
-        disabled={disabled}
-      />
-
-      <TextField
-        label="E-mail"
-        fullWidth
-        type="email"
-        variant="outlined"
-        margin="dense"
-        {...register('email')}
-        error={!!errors.email}
-        helperText={errors.email?.message}
         disabled={disabled}
       />
 

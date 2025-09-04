@@ -46,9 +46,7 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return users;
-    return users.filter(
-      (u) => u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
-    );
+    return users.filter((u) => u.username.toLowerCase().includes(q));
   }, [users, query]);
 
   const toggle = (id: string) => {
@@ -103,7 +101,7 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
                   <ListItemText
                     id={`user-${u.id}`}
                     primary={u.username}
-                    secondary={`${u.email} • ${u.isAdmin ? 'Admin' : 'User'}`}
+                    secondary={`${u.isAdmin ? 'Admin' : 'User'}`}
                   />
                 </ListItemButton>
               </ListItem>

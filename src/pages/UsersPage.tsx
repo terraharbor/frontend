@@ -1,7 +1,7 @@
-import { ModalMode } from '../types';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { FC, useState, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { UserService } from '../api/userService';
 import { UserFormOutput } from '../components/forms/UserForm';
 import UsersList from '../components/lists/UsersList';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -9,7 +9,7 @@ import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { UserService } from '../api/userService';
+import { ModalMode } from '../types';
 // import { sampleUsers } from '../sampleData'; // Fallback sample data
 import { User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -67,11 +67,10 @@ export const UsersPage: FC = () => {
       if (mode === 'create') {
         await UserService.createUser({
           username: values.username,
-          email: values.email,
           isAdmin: values.isAdmin,
         });
         showToast({ message: 'User created successfully', severity: 'success' });
-        
+
         // Sample data fallback implementation (commented out):
         // const newUser: User = {
         //   id: String(Date.now()), // Temporary ID for sample data
@@ -85,10 +84,9 @@ export const UsersPage: FC = () => {
       } else if (mode === 'edit' && editingUser) {
         await UserService.updateUser(editingUser.id, {
           username: values.username,
-          email: values.email,
         });
         showToast({ message: 'User updated successfully', severity: 'success' });
-        
+
         // Sample data fallback implementation (commented out):
         // setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...values } : u)));
       }
@@ -103,22 +101,19 @@ export const UsersPage: FC = () => {
     }
   };
 
-  const handleDeleteUser = (id: string) => {
-    const user = users.find((u) => u.id === id);
-    if (user) {
-      setUserToDelete(user);
-      setDeleteConfirmationOpen(true);
-    }
+  const handleDeleteUser = async (user: User) => {
+    setUserToDelete(user);
+    await confirmDeleteUser;
   };
 
   const confirmDeleteUser = async () => {
     if (!userToDelete) return;
-    
+
     try {
       await UserService.deleteUser(userToDelete.id);
       showToast({ message: 'User deleted successfully', severity: 'success' });
       await loadUsers(); // Reload data from API
-      
+
       // Sample data fallback implementation (commented out):
       // setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
     } catch (err) {

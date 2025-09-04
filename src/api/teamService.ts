@@ -1,5 +1,5 @@
-import { apiClient } from './client';
 import { Team, User } from '../types/buisness';
+import { apiClient } from './client';
 
 export class TeamService {
   static async getTeams(): Promise<Team[]> {
@@ -32,11 +32,11 @@ export class TeamService {
   }
 
   static async addTeamMember(teamId: string, userId: string): Promise<void> {
-    await apiClient.post(`/teams/${teamId}/members`, { userId });
+    await apiClient.post(`/teams/${teamId}/users`, { userId });
   }
 
   static async removeTeamMember(teamId: string, userId: string): Promise<void> {
-    await apiClient.delete(`/teams/${teamId}/members/${userId}`);
+    await apiClient.delete(`/teams/${teamId}/users/${userId}`);
   }
 
   static async getTeamProjects(teamId: string): Promise<any[]> {

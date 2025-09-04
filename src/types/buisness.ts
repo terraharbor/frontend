@@ -16,7 +16,6 @@ export type Team = {
 export type User = {
   id: string;
   username: string;
-  email: string;
   firstName?: string;
   lastName?: string;
   disabled?: boolean;

@@ -1,8 +1,10 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Alert, IconButton, Stack, Typography, Box, CircularProgress } from '@mui/material';
+import { Alert, Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC, useState, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { TeamService } from '../api/teamService';
+import { UserService } from '../api/userService';
 import ProjectCard from '../components/cards/ProjectCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import UsersList from '../components/lists/UsersList';
@@ -12,8 +14,6 @@ import UsersPickerModal from '../components/modals/UsersPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { TeamService } from '../api/teamService';
-import { UserService } from '../api/userService';
 // import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData'; // Fallback sample data
 import { Project, Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -27,7 +27,7 @@ const TeamPage: FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [membersModalOpen, setMembersModalOpen] = useState(false);
   const [teamEditModalOpen, setTeamEditModalOpen] = useState(false);
   const [removeUserConfirmationOpen, setRemoveUserConfirmationOpen] = useState(false);
@@ -54,7 +54,7 @@ const TeamPage: FC = () => {
         TeamService.getTeam(id),
         TeamService.getTeamProjects(id),
         TeamService.getTeamMembers(id),
-        UserService.getUsers()
+        UserService.getUsers(),
       ]);
 
       setTeam(teamData);
@@ -90,9 +90,9 @@ const TeamPage: FC = () => {
     if (!team) return;
 
     try {
-      const currentMemberIds = users.map(u => u.id);
-      const toAdd = selectedUserIds.filter(id => !currentMemberIds.includes(id));
-      const toRemove = currentMemberIds.filter(id => !selectedUserIds.includes(id));
+      const currentMemberIds = users.map((u) => u.id);
+      const toAdd = selectedUserIds.filter((id) => !currentMemberIds.includes(id));
+      const toRemove = currentMemberIds.filter((id) => !selectedUserIds.includes(id));
 
       for (const userId of toAdd) {
         await TeamService.addTeamMember(team.id, userId);
@@ -107,7 +107,7 @@ const TeamPage: FC = () => {
 
       const updatedMembers = await TeamService.getTeamMembers(team.id);
       setUsers(updatedMembers);
-      
+
       // Sample data fallback implementation (commented out):
       // setTeam((prev) => (prev ? { ...prev, userIds: selectedUserIds } : prev));
     } catch (err) {
@@ -117,20 +117,20 @@ const TeamPage: FC = () => {
     }
   };
 
-  const handleRemoveUser = (userId: string) => {
-    setUserToRemove(userId);
+  const handleRemoveUser = (user: User) => {
+    setUserToRemove(user.id);
     setRemoveUserConfirmationOpen(true);
   };
 
   const confirmRemoveUser = async () => {
     if (!userToRemove || !team) return;
-    
+
     try {
       await TeamService.removeTeamMember(team.id, userToRemove);
       showToast({ message: 'User removed from team successfully', severity: 'success' });
 
-      setUsers(prev => prev.filter(u => u.id !== userToRemove));
-      
+      setUsers((prev) => prev.filter((u) => u.id !== userToRemove));
+
       // Sample data fallback implementation (commented out):
       // setTeam((prev) => {
       //   if (!prev) return prev;
@@ -154,17 +154,19 @@ const TeamPage: FC = () => {
 
   const handleSaveTeam = async (values: TeamFormOutput) => {
     if (!team) return;
-    
+
     try {
       await TeamService.updateTeam(team.id, {
         name: values.name,
         description: values.description,
       });
-      
-      setTeam(prev => prev ? { ...prev, name: values.name, description: values.description } : prev);
+
+      setTeam((prev) =>
+        prev ? { ...prev, name: values.name, description: values.description } : prev,
+      );
       showToast({ message: 'Team updated successfully', severity: 'success' });
       closeTeamEditModal();
-      
+
       // Sample data fallback implementation (commented out):
       // setTeam((prev) => {
       //   if (!prev) return prev;
@@ -246,7 +248,7 @@ const TeamPage: FC = () => {
       <UsersPickerModal
         open={membersModalOpen}
         users={allUsers}
-        selectedUserIds={users.map(u => u.id)}
+        selectedUserIds={users.map((u) => u.id)}
         onClose={closeMembersModal}
         onSubmit={handleSaveMembers}
       />

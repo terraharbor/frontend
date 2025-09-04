@@ -1,5 +1,5 @@
+import { Team, User } from '../types/buisness';
 import { apiClient } from './client';
-import { User, Organization, Team } from '../types/buisness';
 
 export class UserService {
   static async getUsers(): Promise<User[]> {
@@ -24,11 +24,6 @@ export class UserService {
 
   static async deleteUser(id: string): Promise<void> {
     await apiClient.delete(`/users/${id}`);
-  }
-
-  static async getUserOrganizations(userId: string): Promise<Organization[]> {
-    const response = await apiClient.get(`/users/${userId}/organizations`);
-    return response.data;
   }
 
   static async getUserTeams(userId: string): Promise<Team[]> {
