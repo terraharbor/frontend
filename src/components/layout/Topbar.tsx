@@ -46,8 +46,8 @@ const UserMenu: FC = () => {
               {user?.username.charAt(0) ?? 'A'}
             </Avatar>
             <Stack>
-              <Typography fontWeight="bold">Name</Typography>
-              <Typography variant="body2">E-mail</Typography>
+              <Typography fontWeight="bold">{user?.username}</Typography>
+              <Typography variant="body2">{user?.email}</Typography>
             </Stack>
           </Stack>
 
