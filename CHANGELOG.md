@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.23](https://github.com/terraharbor/frontend/compare/v0.1.22...v0.1.23) (2025-09-04)
+
+
+### Features
+
+* admin pages ([aba8779](https://github.com/terraharbor/frontend/commit/aba8779d6196f022cb7083d5b3cb78a36c1676ed))
+* fix usersPicker ([78e294c](https://github.com/terraharbor/frontend/commit/78e294ce088ff7eb3d6dfb09826ae4030cfeeecc))
+* Implement RBAC ([6f8fa1d](https://github.com/terraharbor/frontend/commit/6f8fa1d56191fa6a63becdb0fe3cd9ccfa06bd04))
+* RBAC implemented ([6ef858d](https://github.com/terraharbor/frontend/commit/6ef858db19519f0ea845122cd0c3129a129aa9dd))
+* update User ([807e2b9](https://github.com/terraharbor/frontend/commit/807e2b9d51c21af1661dce26a2c926a5524d1aed))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#98](https://github.com/terraharbor/frontend/issues/98) from terraharbor/feat/rbac ([6f8fa1d](https://github.com/terraharbor/frontend/commit/6f8fa1d56191fa6a63becdb0fe3cd9ccfa06bd04))
+
 ## [0.1.22](https://github.com/terraharbor/frontend/compare/v0.1.21...v0.1.22) (2025-09-03)
 
 
