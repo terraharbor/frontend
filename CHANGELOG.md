@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.24](https://github.com/terraharbor/frontend/compare/v0.1.23...v0.1.24) (2025-09-04)
+
+
+### Features
+
+* edit team/project + confirmation modal ([37aefd3](https://github.com/terraharbor/frontend/commit/37aefd327b742572fb8cb5989aa7695a634f204f))
+* edit team/project + confirmation modal ([9e1244f](https://github.com/terraharbor/frontend/commit/9e1244f56a215b73c91da7f46a20061945800d78))
+* fixes ([3647e00](https://github.com/terraharbor/frontend/commit/3647e00657ee0e5b52967547e0aa338cb74cb533))
+* fixes ([cc38936](https://github.com/terraharbor/frontend/commit/cc389360342aad3e39ba0872886e40ee9c80b892))
+* wip improvements ([86a5600](https://github.com/terraharbor/frontend/commit/86a560071ee404ef94fab0687b335977ba864834))
+
 ## [0.1.23](https://github.com/terraharbor/frontend/compare/v0.1.22...v0.1.23) (2025-09-04)
 
 
