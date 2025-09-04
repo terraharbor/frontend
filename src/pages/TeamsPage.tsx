@@ -6,6 +6,7 @@ import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import TeamModal from '../components/modals/TeamModal';
 import { useToast } from '../components/providers/useToast';
+import { useAuth } from '../components/providers/useAuth';
 import { TeamService } from '../api/teamService';
 import { Team } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -16,6 +17,7 @@ export const TeamsPage: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const { isAdmin } = useAuth();
 
   const loadTeams = async () => {
     setLoading(true);
@@ -68,13 +70,13 @@ export const TeamsPage: FC = () => {
     <Box>
       <PageHeader
         title="Teams"
-        action={{
+        action={isAdmin ? {
           label: 'New',
           onClick: handleOpenCreateModal,
           startIcon: <AddIcon />,
           variant: 'contained',
           color: 'primary',
-        }}
+        } : undefined}
       />
 
       {loading ? (

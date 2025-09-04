@@ -4,6 +4,7 @@ import { Box, IconButton } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { FC } from 'react';
 import { User } from '../../types/buisness';
+import { useAuth } from '../providers/useAuth';
 
 type UsersListProps = {
   users: User[];
@@ -20,41 +21,46 @@ const UsersList: FC<UsersListProps> = ({
   onUpdate,
   onDelete,
 }) => {
-  const columns: GridColDef<User>[] = [
+  const { isAdmin } = useAuth();
+
+  const baseColumns: GridColDef<User>[] = [
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'E-mail', flex: 1 },
-    { field: 'role', headerName: 'Rôle', flex: 1 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 1,
-      sortable: false,
-      renderCell: (params: { row: User }) => (
-        <Box>
-          {allowUpdate && (
-            <IconButton
-              color="primary"
-              onClick={() => onUpdate?.(params.row)}
-              title="Modifier l'utilisateur"
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-
-          {allowDelete ? (
-            <IconButton
-              color="error"
-              onClick={() => onDelete?.(params.row.id)}
-              title="Supprimer l'utilisateur"
-            >
-              <DeleteIcon />
-            </IconButton>
-          ) : null}
-        </Box>
-      ),
-    },
+    { field: 'isAdmin', headerName: 'Admin', flex: 1 },
   ];
+
+  const actionColumn: GridColDef<User> = {
+    field: 'actions',
+    headerName: 'Actions',
+    flex: 1,
+    sortable: false,
+    renderCell: (params) => (
+      <Box>
+        {allowUpdate && (
+          <IconButton
+            color="primary"
+            onClick={() => onUpdate?.(params.row)}
+            title="Modifier l'utilisateur"
+          >
+            <EditIcon />
+          </IconButton>
+        )}
+
+        {allowDelete && (
+          <IconButton
+            color="error"
+            onClick={() => onDelete?.(params.row.id)}
+            title="Supprimer l'utilisateur"
+          >
+            <DeleteIcon />
+          </IconButton>
+        )}
+      </Box>
+    ),
+  };
+
+  const columns = isAdmin ? [...baseColumns, actionColumn] : baseColumns;
 
   return (
     <>

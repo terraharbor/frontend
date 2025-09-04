@@ -7,6 +7,7 @@ import { ProjectFormOutput } from '../components/forms/ProjectForm';
 import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../components/providers/useToast';
+import { useAuth } from '../components/providers/useAuth';
 import { ProjectService } from '../api/projectService';
 import { Project } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -17,6 +18,7 @@ export const ProjectsPage: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const { isAdmin } = useAuth();
 
   const loadProjects = async () => {
     setLoading(true);
@@ -82,13 +84,13 @@ export const ProjectsPage: FC = () => {
     <Box>
       <PageHeader
         title="Projects"
-        action={{
+        action={isAdmin ? {
           label: 'New',
           onClick: handleCreateProject,
           startIcon: <AddIcon />,
           variant: 'contained',
           color: 'primary',
-        }}
+        } : undefined}
       />
 
       {loading && (
@@ -110,7 +112,7 @@ export const ProjectsPage: FC = () => {
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project.id}>
                   <ProjectCard 
                     project={project} 
-                    displayActions={true}
+                    displayActions={isAdmin}
                     onDelete={handleDeleteProject}
                   />
                 </Grid>

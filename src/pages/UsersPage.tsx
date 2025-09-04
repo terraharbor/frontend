@@ -7,6 +7,7 @@ import UsersList from '../components/lists/UsersList';
 import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../components/providers/useToast';
+import { useAuth } from '../components/providers/useAuth';
 import { UserService } from '../api/userService';
 import { User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -19,6 +20,7 @@ export const UsersPage: FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const { isAdmin } = useAuth();
 
   const loadUsers = async () => {
     setLoading(true);
@@ -87,13 +89,13 @@ export const UsersPage: FC = () => {
     <Box>
       <PageHeader
         title="Users"
-        action={{
+        action={isAdmin ? {
           label: 'New',
           onClick: openCreateModal,
           startIcon: <AddIcon />,
           variant: 'contained',
           color: 'primary',
-        }}
+        } : undefined}
       />
 
       {loading ? (
@@ -109,8 +111,8 @@ export const UsersPage: FC = () => {
       ) : (
         <UsersList
           users={users}
-          allowUpdate
-          allowDelete
+          allowUpdate={isAdmin}
+          allowDelete={isAdmin}
           onUpdate={openEditModal}
           onDelete={async (id: string) => {
             try {
