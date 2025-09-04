@@ -1,4 +1,11 @@
-import { Project, StateFileInfos, StateFileSnapshot, Team, User } from './types/buisness';
+import {
+  Project,
+  ProjectToken,
+  StateFileInfos,
+  StateFileSnapshot,
+  Team,
+  User,
+} from './types/buisness';
 
 export const sampleProjects: Project[] = [
   {
@@ -192,5 +199,24 @@ export const sampleStateFileInfos: StateFileInfos[] = [
   },
   {
     status: 'unlocked',
+  },
+];
+
+export const sampleProjectTokens: ProjectToken[] = [
+  {
+    value: 'jnjndewonkwn-820993-ndjnjedn',
+    projectId: '3',
+    createdAt: new Date('2025-08-14T10:02:00Z'),
+    createdBy: '2',
+    canRead: true,
+    canWrite: true,
+  },
+  {
+    value: 'hjidehbdnkwn-820993-ndjnjedn',
+    projectId: '2',
+    createdAt: new Date('2025-08-14T10:02:00Z'),
+    createdBy: '1',
+    canRead: true,
+    canWrite: false,
   },
 ];
