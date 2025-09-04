@@ -6,11 +6,13 @@ import { UserFormOutput } from '../components/forms/UserForm';
 import UsersList from '../components/lists/UsersList';
 import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleUsers } from '../sampleData';
 import { User } from '../types/buisness';
 
 export const UsersPage: FC = () => {
+  const { isAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>(sampleUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>('create');
@@ -37,7 +39,7 @@ export const UsersPage: FC = () => {
         id: '0', // TODO: géré par le backend plus tard
         username: values.username,
         email: values.email,
-        role: values.role,
+        isAdmin: values.isAdmin,
       };
       setUsers((prev) => [newUser, ...prev]);
       showToast({ message: 'Utilisateur créé.', severity: 'success' });
@@ -58,13 +60,17 @@ export const UsersPage: FC = () => {
     <Box>
       <PageHeader
         title="Utilisateurs"
-        action={{
-          label: 'CRÉER',
-          onClick: openCreateModal,
-          startIcon: <AddIcon />,
-          variant: 'contained',
-          color: 'primary',
-        }}
+        action={
+          isAdmin
+            ? {
+                label: 'CRÉER',
+                onClick: openCreateModal,
+                startIcon: <AddIcon />,
+                variant: 'contained',
+                color: 'primary',
+              }
+            : undefined
+        }
       />
 
       <UsersList

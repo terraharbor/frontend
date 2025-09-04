@@ -3,6 +3,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Project } from '../../types/buisness';
+import { useAuth } from '../providers/useAuth';
 import { SummaryCard } from './SummaryCard';
 
 export interface ProjectCardProps {
@@ -16,6 +17,7 @@ export const ProjectCard: FC<ProjectCardProps> = ({
   displayActions = false,
   onDelete,
 }) => {
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const metadata = [];
 
@@ -41,11 +43,15 @@ export const ProjectCard: FC<ProjectCardProps> = ({
       actions={
         displayActions
           ? [
-              {
-                label: 'Delete',
-                onClick: deleteProject,
-                icon: <DeleteIcon fontSize="small" color="error" />,
-              },
+              ...(isAdmin && onDelete
+                ? [
+                    {
+                      label: 'Delete',
+                      onClick: deleteProject,
+                      icon: <DeleteIcon fontSize="small" color="error" />,
+                    },
+                  ]
+                : []),
               { label: 'Open', onClick: openProject, icon: <VisibilityIcon fontSize="small" /> },
             ]
           : undefined

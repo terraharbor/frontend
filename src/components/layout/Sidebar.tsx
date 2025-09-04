@@ -2,40 +2,45 @@ import {
   FactCheck as AuditIcon,
   Dashboard as DashboardIcon,
   Folder as ProjectsIcon,
-  Settings as SettingsIcon,
   Groups as TeamsIcon,
   VpnKey as TokensIcon,
   People as UsersIcon,
 } from '@mui/icons-material';
-import { List, ListItemButton, ListItemIcon, ListItemText, Stack, Typography, Box } from '@mui/material';
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { FC, JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import theme from '../../theme';
+import { useAuth } from '../providers/useAuth';
 
-type NavItem = { label: string; to: string; icon: JSX.Element };
+type NavItem = { label: string; to: string; icon: JSX.Element; adminOnly?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', to: '/', icon: <DashboardIcon /> },
   { label: 'Projects', to: '/projects', icon: <ProjectsIcon /> },
   { label: 'Teams', to: '/teams', icon: <TeamsIcon /> },
   { label: 'Users', to: '/users', icon: <UsersIcon /> },
-  { label: 'Tokens', to: '/tokens', icon: <TokensIcon /> },
-  { label: 'Audit (logs)', to: '/audit', icon: <AuditIcon /> },
-  { label: 'Settings', to: '/settings', icon: <SettingsIcon /> },
+  { label: 'Tokens', to: '/tokens', icon: <TokensIcon />, adminOnly: true },
+  { label: 'Audit (logs)', to: '/audit', icon: <AuditIcon />, adminOnly: true },
 ];
 
 const Sidebar: FC = () => {
+  const { isAdmin } = useAuth();
   const { pathname } = useLocation();
+
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <Stack sx={{ height: '100%', width: '300px', bgcolor: 'secondary.main' }}>
-      <Stack 
-        direction="row" 
-        alignItems="center" 
-        spacing={2}
-        sx={{ height: 64, p: 2 }}
-      >
+      <Stack direction="row" alignItems="center" spacing={2} sx={{ height: 64, p: 2 }}>
         <Box
           component="img"
           src="/logob.png"
@@ -52,7 +57,7 @@ const Sidebar: FC = () => {
       </Stack>
 
       <List>
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const selected = item.to === '/' ? pathname === '/' : pathname.startsWith(item.to);
           return (
             <ListItemButton

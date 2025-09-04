@@ -47,10 +47,7 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
     const q = query.trim().toLowerCase();
     if (!q) return users;
     return users.filter(
-      (u) =>
-        u.username.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.role.toLowerCase().includes(q),
+      (u) => u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
   }, [users, query]);
 
@@ -106,7 +103,7 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
                   <ListItemText
                     id={`user-${u.id}`}
                     primary={u.username}
-                    secondary={`${u.email} • ${u.role}`}
+                    secondary={`${u.email} • ${u.isAdmin ? 'Admin' : 'User'}`}
                   />
                 </ListItemButton>
               </ListItem>

@@ -7,12 +7,14 @@ import ProjectCard from '../components/cards/ProjectCard';
 import UsersList from '../components/lists/UsersList';
 import UsersPickerModal from '../components/modals/UsersPickerModal';
 import PageHeader from '../components/PageHeader';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData';
 import { Project, Team, User } from '../types/buisness';
 
 const TeamPage: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [membersModalOpen, setMembersModalOpen] = useState(false);
 
@@ -65,14 +67,16 @@ const TeamPage: FC = () => {
           <Stack sx={{ flex: 1 }} spacing={2}>
             <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography>Membres</Typography>
-              <IconButton
-                color="primary"
-                onClick={openMembersModal}
-                title="Ajouter un membre"
-                sx={{ p: 0 }}
-              >
-                <EditIcon />
-              </IconButton>
+              {isAdmin && (
+                <IconButton
+                  color="primary"
+                  onClick={openMembersModal}
+                  title="Ajouter un membre"
+                  sx={{ p: 0 }}
+                >
+                  <EditIcon />
+                </IconButton>
+              )}
             </Stack>
 
             <UsersList users={users} allowDelete onDelete={handleRemoveUser} />

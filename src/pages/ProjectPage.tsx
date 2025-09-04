@@ -13,6 +13,7 @@ import StateFileCompareModal from '../components/modals/StateFileCompareModal';
 import StateFileViewerModal from '../components/modals/StateFileViewerModal';
 import TeamsPickerModal from '../components/modals/TeamsPickerModal';
 import PageHeader from '../components/PageHeader';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import {
   sampleProjects,
@@ -25,6 +26,7 @@ import { Project, StateFileInfos, StateFileSnapshot, Team } from '../types/buisn
 
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
@@ -143,14 +145,16 @@ const ProjectPage: FC = () => {
             <Stack spacing={1} sx={{ flex: 1 }}>
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography>Equipes</Typography>
-                <IconButton
-                  color="primary"
-                  onClick={openTeamsModal}
-                  title="Ajouter une équipe"
-                  sx={{ p: 0 }}
-                >
-                  <EditIcon />
-                </IconButton>
+                {isAdmin && (
+                  <IconButton
+                    color="primary"
+                    onClick={openTeamsModal}
+                    title="Ajouter une équipe"
+                    sx={{ p: 0 }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                )}
               </Stack>
 
               {teams && teams.length > 0 ? (
@@ -247,15 +251,18 @@ const ProjectPage: FC = () => {
                             <VisibilityIcon fontSize="small" />
                           </Tooltip>
                         </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteStateFileSnapshot(currentState)}
-                          sx={{ p: 0 }}
-                        >
-                          <Tooltip title="Delete">
-                            <DeleteIcon fontSize="small" color="error" />
-                          </Tooltip>
-                        </IconButton>
+
+                        {isAdmin && (
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteStateFileSnapshot(currentState)}
+                            sx={{ p: 0 }}
+                          >
+                            <Tooltip title="Delete">
+                              <DeleteIcon fontSize="small" color="error" />
+                            </Tooltip>
+                          </IconButton>
+                        )}
                       </Stack>
                     </Stack>
 

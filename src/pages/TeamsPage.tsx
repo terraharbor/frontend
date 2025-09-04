@@ -5,11 +5,13 @@ import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import TeamModal from '../components/modals/TeamModal';
+import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleTeams } from '../sampleData';
 import { Team } from '../types/buisness';
 
 export const TeamsPage: FC = () => {
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [teams, setTeams] = useState<Team[]>(sampleTeams);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,13 +45,17 @@ export const TeamsPage: FC = () => {
     <Box>
       <PageHeader
         title="Equipes"
-        action={{
-          label: 'CRÉER',
-          onClick: handleOpenCreateModal,
-          startIcon: <AddIcon />,
-          variant: 'contained',
-          color: 'primary',
-        }}
+        action={
+          isAdmin
+            ? {
+                label: 'CRÉER',
+                onClick: handleOpenCreateModal,
+                startIcon: <AddIcon />,
+                variant: 'contained',
+                color: 'primary',
+              }
+            : undefined
+        }
       />
 
       {teams.length > 0 ? (

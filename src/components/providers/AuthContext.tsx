@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
 import { AuthService } from '../../api/authService';
 import { getAuthToken } from '../../api/client';
-import { User, UserLogin, UserRegister, AuthResponse } from '../../types/buisness';
+import { AuthResponse, User, UserLogin, UserRegister } from '../../types/buisness';
 
 export interface AuthContextType {
   user: User | null;
@@ -13,6 +13,7 @@ export interface AuthContextType {
   getCurrentUser: () => Promise<User>;
   hasPermission: (permission: string) => boolean;
   isUserRole: (role: string) => boolean;
+  isAdmin: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -85,15 +86,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return currentUser;
   }, []);
 
-  const hasPermission = useCallback((permission: string): boolean => {
-    if (!user) return false;
-    return isAuthenticated;
-  }, [user, isAuthenticated]);
+  const hasPermission = useCallback(
+    (permission: string): boolean => {
+      if (!user) return false;
+      return isAuthenticated;
+    },
+    [user, isAuthenticated],
+  );
 
-  const isUserRole = useCallback((role: string): boolean => {
-    if (!user) return false;
-    return isAuthenticated;
-  }, [user, isAuthenticated]);
+  const isUserRole = useCallback(
+    (role: string): boolean => {
+      if (!user) return false;
+      return isAuthenticated;
+    },
+    [user, isAuthenticated],
+  );
 
   const contextValue: AuthContextType = {
     user,
@@ -105,11 +112,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getCurrentUser,
     hasPermission,
     isUserRole,
+    isAdmin: user?.isAdmin || false,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };

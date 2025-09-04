@@ -1,15 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, MenuItem, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { Box, Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { UserRole } from '../../types/buisness';
-
-const USER_ROLES: UserRole[] = ['Admin', 'User'];
 
 const schema = z.object({
   username: z.string().trim().min(1, 'Le nom est requis').max(100),
   email: z.string().trim().email('E-mail invalide').max(255),
-  role: z.enum(USER_ROLES),
+  isAdmin: z.boolean(),
 });
 
 export type UserFormInput = z.input<typeof schema>;
@@ -25,10 +22,11 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<UserFormInput, unknown, UserFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { username: '', email: '', role: 'User', ...defaultValues },
+    defaultValues: { username: '', email: '', isAdmin: false, ...defaultValues },
   });
 
   return (
@@ -63,24 +61,24 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
         disabled={disabled}
       />
 
-      <TextField
-        select
-        defaultValue="User"
-        label="Rôle"
-        fullWidth
-        variant="outlined"
-        margin="dense"
-        {...register('role')}
-        error={!!errors.role}
-        helperText={errors.role?.message}
-        disabled={disabled}
-      >
-        {USER_ROLES.map((role) => (
-          <MenuItem key={role} value={role}>
-            {role}
-          </MenuItem>
-        ))}
-      </TextField>
+      <Controller
+        name="isAdmin"
+        control={control}
+        render={({ field }) => (
+          <FormControlLabel
+            sx={{ mt: 1 }}
+            control={
+              <Checkbox
+                {...field}
+                checked={!!field.value}
+                onChange={(e) => field.onChange(e.target.checked)}
+              />
+            }
+            label="Administrateur"
+            disabled={disabled}
+          />
+        )}
+      />
     </Box>
   );
 }
