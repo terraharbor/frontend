@@ -1,23 +1,39 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { Box, Stack, Typography, CircularProgress } from '@mui/material';
+import { FC, useState, useEffect } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
-import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
-import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleTeams } from '../sampleData';
+import { TeamService } from '../api/teamService';
 import { Team } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 export const TeamsPage: FC = () => {
-  const { isAdmin } = useAuth();
-  const { showToast } = useToast();
-  const [teams, setTeams] = useState<Team[]>(sampleTeams);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
+
+  const loadTeams = async () => {
+    setLoading(true);
+    try {
+      const data = await TeamService.getTeams();
+      setTeams(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading teams: ${errorMessage}`, severity: 'error' });
+      logError('loadTeams', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTeams();
+  }, []);
 
   const handleOpenCreateModal = () => {
     setIsModalOpen(true);
@@ -27,60 +43,52 @@ export const TeamsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmitTeam = (values: TeamFormOutput) => {
-    const newTeam: Team = {
-      id: '0' /* TODO: A gérer avec backend */,
-      name: values.name,
-      description: values.description,
-      userIds: values.userIds,
-    };
-
-    setTeams((prev) => [newTeam, ...prev]);
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteTeam = (team: Team) => {
-    setTeamToDelete(team);
-    setDeleteConfirmationOpen(true);
-  };
-
-  const confirmDeleteTeam = () => {
-    if (teamToDelete) {
-      setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
-      showToast({ message: 'Team deleted successfully.', severity: 'success' });
-      setTeamToDelete(null);
+  const handleSubmitTeam = async (values: TeamFormOutput) => {
+    setIsSubmitting(true);
+    try {
+      await TeamService.createTeam({
+        name: values.name,
+        description: values.description,
+        userIds: values.userIds,
+      });
+      
+      showToast({ message: 'Team created successfully', severity: 'success' });
+      await loadTeams();
+      setIsModalOpen(false);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error creating team: ${errorMessage}`, severity: 'error' });
+      logError('createTeam', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setDeleteConfirmationOpen(false);
-  };
-
-  const cancelDeleteTeam = () => {
-    setTeamToDelete(null);
-    setDeleteConfirmationOpen(false);
   };
 
   return (
     <Box>
       <PageHeader
         title="Teams"
-        action={
-          isAdmin
-            ? {
-                label: 'New',
-                onClick: handleOpenCreateModal,
-                startIcon: <AddIcon />,
-                variant: 'contained',
-                color: 'primary',
-              }
-            : undefined
-        }
+        action={{
+          label: 'New',
+          onClick: handleOpenCreateModal,
+          startIcon: <AddIcon />,
+          variant: 'contained',
+          color: 'primary',
+        }}
       />
 
-      {teams.length > 0 ? (
-        <Stack spacing={1}>
-          {...teams.map((team) => (
-            <TeamCard key={team.id} team={team} onDelete={handleDeleteTeam} displayActions />
-          ))}
-        </Stack>
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+          sx={{ mt: 4 }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : teams.length > 0 ? (
+        <Stack spacing={1}>{teams.map((team) => <TeamCard key={team.id} team={team} />)}</Stack>
       ) : (
         <Box
           display="flex"
@@ -90,7 +98,7 @@ export const TeamsPage: FC = () => {
           sx={{ mt: 4 }}
         >
           <Typography variant="h6" color="text.secondary" textAlign="center">
-            No team
+            No teams available
           </Typography>
         </Box>
       )}
@@ -101,20 +109,7 @@ export const TeamsPage: FC = () => {
         initialValues={{}}
         onClose={handleCloseModal}
         onSubmit={handleSubmitTeam}
-      />
-
-      <ConfirmationModal
-        open={deleteConfirmationOpen}
-        title="Delete Team"
-        message={
-          teamToDelete
-            ? `Are you sure you want to delete the team "${teamToDelete.name}"? This action is irreversible.`
-            : 'Are you sure you want to delete this team? This action is irreversible.'
-        }
-        confirmLabel="Delete"
-        confirmColor="error"
-        onConfirm={confirmDeleteTeam}
-        onCancel={cancelDeleteTeam}
+        loading={isSubmitting}
       />
     </Box>
   );

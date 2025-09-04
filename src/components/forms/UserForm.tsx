@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Checkbox, FormControlLabel, TextField } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -26,7 +26,12 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
     formState: { errors },
   } = useForm<UserFormInput, unknown, UserFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { username: '', email: '', isAdmin: false, ...defaultValues },
+    defaultValues: { 
+      username: '', 
+      email: '', 
+      isAdmin: false, 
+      ...defaultValues 
+    },
   });
 
   return (

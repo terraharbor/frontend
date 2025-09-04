@@ -1,5 +1,6 @@
-import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography } from '@mui/material';
+import { Avatar, Button, Chip, Menu, Stack, Toolbar, Typography, MenuItem, Divider, ListItemIcon } from '@mui/material';
 import { FC, MouseEvent, useState } from 'react';
+import { Logout as LogoutIcon, Person as PersonIcon } from '@mui/icons-material';
 import { useAuth } from '../providers/useAuth';
 import { useToast } from '../providers/useToast';
 
@@ -19,43 +20,96 @@ const UserMenu: FC = () => {
 
   const handleLogout = () => {
     logout();
-    showToast({
-      message: 'Successfully logged out',
-      severity: 'info',
+    handleClose();
+    showToast({ 
+      message: 'Successfully logged out', 
+      severity: 'info' 
     });
   };
 
+  if (!user) {
+    return null;
+  }
+
+  const initials = user.firstName && user.lastName 
+    ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    : user.username.charAt(0).toUpperCase();
+
+  const displayName = user.firstName && user.lastName 
+    ? `${user.firstName} ${user.lastName}`
+    : user.username;
+
   return (
     <>
-      <Avatar
-        sx={{ width: 32, height: 32, bgcolor: 'secondary.main', cursor: 'pointer' }}
+      <Button
         onMouseEnter={handleOpen}
+        sx={{ 
+          minWidth: 'auto',
+          p: 0,
+          borderRadius: '50%',
+          '&:hover': {
+            bgcolor: 'action.hover',
+          }
+        }}
       >
-        {user?.username.charAt(0) ?? 'A'}
-      </Avatar>
+        <Avatar
+          sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}
+        >
+          {initials}
+        </Avatar>
+      </Button>
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{
+          paper: {
+            sx: { minWidth: 280, mt: 1 }
+          }
+        }}
       >
-        <Stack spacing={1} sx={{ p: 1, minWidth: 300 }}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-            <Avatar sx={{ width: 48, height: 48, bgcolor: 'secondary.main' }}>
-              {user?.username.charAt(0) ?? 'A'}
+        <Stack sx={{ p: 2, pb: 1 }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+              {initials}
             </Avatar>
-            <Stack>
-              <Typography fontWeight="bold">{user?.username}</Typography>
-              <Typography variant="body2">{user?.email}</Typography>
+            <Stack spacing={0}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                {displayName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                @{user.username}
+              </Typography>
+              {user.email && (
+                <Typography variant="body2" color="text.secondary">
+                  {user.email}
+                </Typography>
+              )}
             </Stack>
           </Stack>
-
-          {isAdmin && <Chip size="small" label="Administrator" />}
-          <Button variant="outlined" size="small" fullWidth onClick={handleLogout}>
-            Déconnexion
-          </Button>
+          
+          {isAdmin && <Chip size="small" label="Administrator" sx={{ alignSelf: 'flex-start', mt: 1 }} />}
         </Stack>
+
+        <Divider />
+
+        <MenuItem onClick={handleClose}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          Profile Settings
+        </MenuItem>
+        
+        <Divider />
+        
+        <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
       </Menu>
     </>
   );

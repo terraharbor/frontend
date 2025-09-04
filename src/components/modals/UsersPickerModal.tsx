@@ -47,7 +47,10 @@ const UsersPickerModal: FC<UsersPickerModalProps> = ({
     const q = query.trim().toLowerCase();
     if (!q) return users;
     return users.filter(
-      (u) => u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
+      (u) =>
+        u.username.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        (u.isAdmin ? 'admin' : 'user').includes(q),
     );
   }, [users, query]);
 

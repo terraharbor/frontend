@@ -1,17 +1,19 @@
-import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { AuthService } from '../../api/authService';
 import { getAuthToken } from '../../api/client';
-import { AuthResponse, User, UserLogin, UserRegister } from '../../types/buisness';
+import { User, UserLogin, UserRegister, AuthResponse } from '../../types/buisness';
 
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isLoading: boolean;
   login: (credentials: UserLogin) => Promise<AuthResponse>;
   register: (credentials: UserRegister) => Promise<{ message: string; user: User }>;
   logout: () => void;
   getCurrentUser: () => Promise<User>;
-  isAdmin: boolean;
+  hasPermission: (permission: string) => boolean;
+  isUserRole: (role: string) => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = Boolean(getAuthToken() && user);
+  const isAdmin = Boolean(user && user.isAdmin);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -84,16 +87,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return currentUser;
   }, []);
 
+  const hasPermission = useCallback((permission: string): boolean => {
+    if (!user) return false;
+    return isAuthenticated;
+  }, [user, isAuthenticated]);
+
+  const isUserRole = useCallback((role: string): boolean => {
+    if (!user) return false;
+    return isAuthenticated;
+  }, [user, isAuthenticated]);
+
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
+    isAdmin,
     isLoading,
     login,
     register,
     logout,
     getCurrentUser,
-    isAdmin: user?.isAdmin || true,
+    hasPermission,
+    isUserRole,
   };
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

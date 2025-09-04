@@ -1,24 +1,40 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { ProjectCard } from '../components/cards/ProjectCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
-import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
-import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects } from '../sampleData';
+import { ProjectService } from '../api/projectService';
 import { Project } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 export const ProjectsPage: FC = () => {
-  const { isAdmin } = useAuth();
-  const { showToast } = useToast();
-  const [projects, setProjects] = useState<Project[]>(sampleProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
+
+  const loadProjects = async () => {
+    setLoading(true);
+    try {
+      const data = await ProjectService.getProjects();
+      setProjects(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading projects: ${errorMessage}`, severity: 'error' });
+      logError('loadProjects', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
 
   const handleCreateProject = () => {
     setIsModalOpen(true);
@@ -28,106 +44,89 @@ export const ProjectsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmitProject = (values: ProjectFormOutput) => {
-    const newProject: Project = {
-      id: '0' /* TODO: A gérer avec backend */,
-      name: values.name,
-      description: values.description,
-      teamIds: [],
-      lastUpdated: new Date().toLocaleString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    };
-
-    setProjects((prev) => [newProject, ...prev]);
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteProject = (project: Project) => {
-    setProjectToDelete(project);
-    setDeleteConfirmationOpen(true);
-  };
-
-  const confirmDeleteProject = () => {
-    if (projectToDelete) {
-      setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
-      showToast({ message: 'Project deleted successfully.', severity: 'success' });
-      setProjectToDelete(null);
+  const handleSubmitProject = async (values: ProjectFormOutput) => {
+    setIsSubmitting(true);
+    try {
+      await ProjectService.createProject({
+        name: values.name,
+        description: values.description,
+        teamIds: [],
+        lastUpdated: new Date().toISOString(),
+      });
+      
+      showToast({ message: 'Project created successfully', severity: 'success' });
+      await loadProjects();
+      setIsModalOpen(false);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error creating project: ${errorMessage}`, severity: 'error' });
+      logError('createProject', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setDeleteConfirmationOpen(false);
   };
 
-  const cancelDeleteProject = () => {
-    setProjectToDelete(null);
-    setDeleteConfirmationOpen(false);
+  const handleDeleteProject = async (project: Project) => {
+    try {
+      await ProjectService.deleteProject(project.id);
+      showToast({ message: 'Project deleted successfully', severity: 'success' });
+      await loadProjects();
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error deleting project: ${errorMessage}`, severity: 'error' });
+      logError('deleteProject', err);
+    }
   };
 
   return (
     <Box>
       <PageHeader
         title="Projects"
-        action={
-          isAdmin
-            ? {
-                label: 'New',
-                onClick: handleCreateProject,
-                startIcon: <AddIcon />,
-                variant: 'contained',
-                color: 'primary',
-              }
-            : undefined
-        }
+        action={{
+          label: 'New',
+          onClick: handleCreateProject,
+          startIcon: <AddIcon />,
+          variant: 'contained',
+          color: 'primary',
+        }}
       />
 
-      {projects.length > 0 ? (
-        <Grid container spacing={3}>
-          {projects.map((project) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={project.id}>
-              <ProjectCard project={project} displayActions onDelete={handleDeleteProject} />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="200px"
-          sx={{ mt: 4 }}
-        >
-          <Typography variant="h6" color="text.secondary" textAlign="center">
-            No project
-          </Typography>
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
         </Box>
+      )}
+
+
+      {!loading && (
+        <>
+          {projects.length === 0 ? (
+            <Typography variant="body1" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
+              No projects found. Create your first project!
+            </Typography>
+          ) : (
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+              {projects.map((project) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project.id}>
+                  <ProjectCard 
+                    project={project} 
+                    displayActions={true}
+                    onDelete={handleDeleteProject}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </>
       )}
 
       <ProjectModal
         open={isModalOpen}
         mode="create"
-        initialValues={{}}
         onClose={handleCloseModal}
         onSubmit={handleSubmitProject}
-      />
-
-      <ConfirmationModal
-        open={deleteConfirmationOpen}
-        title="Delete Project"
-        message={
-          projectToDelete
-            ? `Are you sure you want to delete the project "${projectToDelete.name}"? This action is irreversible.`
-            : "Are you sure you want to delete this project? This action is irreversible."
-        }
-        confirmLabel="Delete"
-        confirmColor="error"
-        onConfirm={confirmDeleteProject}
-        onCancel={cancelDeleteProject}
+        loading={isSubmitting}
       />
     </Box>
   );
 };
-
-export default ProjectsPage;
