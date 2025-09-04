@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.25](https://github.com/terraharbor/frontend/compare/v0.1.24...v0.1.25) (2025-09-04)
+
+
+### Features
+
+* Texts in english ([95b21f7](https://github.com/terraharbor/frontend/commit/95b21f7f5d0ca9c3d3654b84d8f0bbf1a64b2ddd))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#99](https://github.com/terraharbor/frontend/issues/99) from terraharbor/feat/english-only ([95b21f7](https://github.com/terraharbor/frontend/commit/95b21f7f5d0ca9c3d3654b84d8f0bbf1a64b2ddd))
+
 ## [0.1.24](https://github.com/terraharbor/frontend/compare/v0.1.23...v0.1.24) (2025-09-04)
 
 
