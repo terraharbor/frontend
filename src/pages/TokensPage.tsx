@@ -1,16 +1,17 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Alert, Box, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { TokenService } from '../api/tokenService';
 import { PageHeader } from '../components/PageHeader';
 import ProjectTokenCard from '../components/cards/ProjectTokenCard';
 import { ProjectTokenFormOutput } from '../components/forms/ProjectTokenForm';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectTokenModal from '../components/modals/ProjectTokenModal';
-
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects, sampleProjectTokens } from '../sampleData';
+import { sampleProjects } from '../sampleData';
 import { ProjectToken } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 function generateTokenValue(length = 48) {
   const arr = new Uint8Array(length);
@@ -21,7 +22,28 @@ function generateTokenValue(length = 48) {
 export const ProjectTokensPage: FC = () => {
   const { isAdmin, user } = useAuth();
   const { showToast } = useToast();
-  const [tokens, setTokens] = useState<ProjectToken[]>(sampleProjectTokens ?? []);
+  const [tokens, setTokens] = useState<ProjectToken[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loadTokens = async () => {
+    setLoading(true);
+    try {
+      const data = await TokenService.getTokens();
+      console.log(data);
+      setTokens(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading tokens: ${errorMessage}`, severity: 'error' });
+      logError('loadTokens', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTokens();
+  }, []);
 
   // Create modal
   const [isCreateOpen, setIsCreateOpen] = useState(false);

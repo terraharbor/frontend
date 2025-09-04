@@ -1,7 +1,8 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC, useState, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { ProjectService } from '../api/projectService';
 import { ProjectCard } from '../components/cards/ProjectCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -9,7 +10,6 @@ import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { ProjectService } from '../api/projectService';
 // import { sampleProjects } from '../sampleData'; // Fallback sample data
 import { Project } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -64,7 +64,7 @@ export const ProjectsPage: FC = () => {
       showToast({ message: 'Project created successfully', severity: 'success' });
       setIsModalOpen(false);
       await loadProjects(); // Reload data from API
-      
+
       // Sample data fallback implementation (commented out):
       // const newProject: Project = {
       //   id: String(Date.now()), // Temporary ID for sample data
@@ -96,12 +96,12 @@ export const ProjectsPage: FC = () => {
 
   const confirmDeleteProject = async () => {
     if (!projectToDelete) return;
-    
+
     try {
       await ProjectService.deleteProject(projectToDelete.id);
       showToast({ message: 'Project deleted successfully', severity: 'success' });
       await loadProjects(); // Reload data from API
-      
+
       // Sample data fallback implementation (commented out):
       // setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
     } catch (err) {
@@ -145,17 +145,20 @@ export const ProjectsPage: FC = () => {
       {!loading && (
         <>
           {projects.length === 0 ? (
-            <Typography variant="body1" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
+            <Typography
+              variant="body1"
+              sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}
+            >
               No projects found. Create your first project!
             </Typography>
           ) : (
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {projects.map((project) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project.id}>
-                  <ProjectCard 
-                    project={project} 
-                    displayActions={isAdmin} 
-                    onDelete={handleDeleteProject} 
+                  <ProjectCard
+                    project={project}
+                    displayActions={isAdmin}
+                    onDelete={handleDeleteProject}
                   />
                 </Grid>
               ))}
@@ -178,7 +181,7 @@ export const ProjectsPage: FC = () => {
         message={
           projectToDelete
             ? `Are you sure you want to delete the project "${projectToDelete.name}"? This action is irreversible.`
-            : "Are you sure you want to delete this project? This action is irreversible."
+            : 'Are you sure you want to delete this project? This action is irreversible.'
         }
         confirmLabel="Delete"
         confirmColor="error"

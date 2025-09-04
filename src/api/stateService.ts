@@ -20,7 +20,12 @@ export class StateService {
     return response.data;
   }
 
-  static async putState(project: string, stateName: string, stateData: Blob | string, version?: number): Promise<void> {
+  static async putState(
+    project: string,
+    stateName: string,
+    stateData: Blob | string,
+    version?: number,
+  ): Promise<void> {
     const versionParam = version ? `?version=${version}` : '';
     await apiClient.post(`/state/${project}/${stateName}${versionParam}`, stateData, {
       headers: {
@@ -34,7 +39,11 @@ export class StateService {
     await apiClient.delete(`/state/${project}/${stateName}${versionParam}`);
   }
 
-  static async lockState(project: string, stateName: string, lockInfo: Record<string, any> = {}): Promise<void> {
+  static async lockState(
+    project: string,
+    stateName: string,
+    lockInfo: Record<string, any> = {},
+  ): Promise<void> {
     await apiClient.request({
       method: 'LOCK',
       url: `/state/${project}/${stateName}`,
@@ -42,7 +51,11 @@ export class StateService {
     });
   }
 
-  static async unlockState(project: string, stateName: string, lockInfo: Record<string, any> = {}): Promise<void> {
+  static async unlockState(
+    project: string,
+    stateName: string,
+    lockInfo: Record<string, any> = {},
+  ): Promise<void> {
     await apiClient.request({
       method: 'UNLOCK',
       url: `/state/${project}/${stateName}`,

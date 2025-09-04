@@ -3,9 +3,21 @@ import EditIcon from '@mui/icons-material/Edit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Alert, IconButton, Stack, Tooltip, Typography, Box, CircularProgress } from '@mui/material';
-import { FC, useState, useEffect } from 'react';
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ProjectService } from '../api/projectService';
+import { StateService } from '../api/stateService';
+import { TeamService } from '../api/teamService';
+import { UserService } from '../api/userService';
 import StateFileCard from '../components/cards/StateFileCard';
 import TeamCard from '../components/cards/TeamCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
@@ -18,10 +30,6 @@ import TeamsPickerModal from '../components/modals/TeamsPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { ProjectService } from '../api/projectService';
-import { TeamService } from '../api/teamService';
-import { UserService } from '../api/userService';
-import { StateService } from '../api/stateService';
 // Sample data fallbacks (commented out):
 // import {
 //   sampleProjects,
@@ -30,7 +38,7 @@ import { StateService } from '../api/stateService';
 //   sampleTeams,
 //   sampleUsers,
 // } from '../sampleData';
-import { sampleStateFileInfos, sampleStateFilesTerraform, sampleUsers } from '../sampleData'; // Temporary for state files
+import { sampleStateFileInfos, sampleStateFilesTerraform } from '../sampleData'; // Temporary for state files
 import { Project, StateFileInfos, StateFileSnapshot, Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
@@ -90,16 +98,14 @@ const ProjectPage: FC = () => {
       const [projectData, allTeamsData, usersData] = await Promise.all([
         ProjectService.getProject(id),
         TeamService.getTeams(),
-        UserService.getUsers()
+        UserService.getUsers(),
       ]);
 
       setProject(projectData);
       setAllTeams(allTeamsData);
       setUsers(usersData);
 
-      const projectTeams = allTeamsData.filter(team =>
-        projectData.teamIds.includes(team.id)
-      );
+      const projectTeams = allTeamsData.filter((team) => projectData.teamIds.includes(team.id));
       setTeams(projectTeams);
 
       // Load state files (using sample data for now)
@@ -109,7 +115,7 @@ const ProjectPage: FC = () => {
 
       setStateData({
         currentState: states[0],
-        previousStates: states.slice(1)
+        previousStates: states.slice(1),
       });
 
       // Sample data fallback implementation (commented out):
@@ -118,7 +124,6 @@ const ProjectPage: FC = () => {
       // setTeams(sampleTeams.filter((t) => initialProject?.teamIds.includes(t.id) || false));
       // setAllTeams(sampleTeams);
       // setUsers(sampleUsers);
-
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error loading project: ${errorMessage}`, severity: 'error' });
@@ -138,7 +143,9 @@ const ProjectPage: FC = () => {
 
   const locked = stateFileInfos.status === 'locked';
 
-  const stateFileLockedByUser = stateFileInfos ? users.find((u) => stateFileInfos.lockedBy === u.id) : undefined;
+  const stateFileLockedByUser = stateFileInfos
+    ? users.find((u) => stateFileInfos.lockedBy === u.id)
+    : undefined;
 
   const handleOpenViewer = (s: StateFileSnapshot) => {
     setSelectedSnapshot(s);
@@ -172,14 +179,14 @@ const ProjectPage: FC = () => {
     try {
       await ProjectService.updateProject(project.id, { teamIds: selectedTeamIds });
 
-      setProject(prev => prev ? { ...prev, teamIds: selectedTeamIds } : prev);
+      setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
 
-      const updatedTeams = allTeams.filter(team => selectedTeamIds.includes(team.id));
+      const updatedTeams = allTeams.filter((team) => selectedTeamIds.includes(team.id));
       setTeams(updatedTeams);
 
       showToast({ message: 'Project teams updated successfully', severity: 'success' });
       closeTeamsModal();
-      
+
       // Sample data fallback implementation (commented out):
       // setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
     } catch (err) {
@@ -196,17 +203,19 @@ const ProjectPage: FC = () => {
 
   const handleSaveProject = async (values: ProjectFormOutput) => {
     if (!project) return;
-    
+
     try {
       await ProjectService.updateProject(project.id, {
         name: values.name,
         description: values.description,
       });
-      
-      setProject(prev => prev ? { ...prev, name: values.name, description: values.description } : prev);
+
+      setProject((prev) =>
+        prev ? { ...prev, name: values.name, description: values.description } : prev,
+      );
       showToast({ message: 'Project updated successfully', severity: 'success' });
       closeProjectEditModal();
-      
+
       // Sample data fallback implementation (commented out):
       // setProject((prev) => {
       //   if (!prev) return prev;
@@ -221,13 +230,13 @@ const ProjectPage: FC = () => {
 
   const handleLockOrUnlock = async () => {
     if (!project) return;
-    
+
     const stateName = 'main'; // Default state name
-    
+
     const lockInfo = {
       ID: `lock-${Date.now()}`,
       user: currentUser?.username || 'unknown-user',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -240,7 +249,6 @@ const ProjectPage: FC = () => {
         await StateService.lockState(project.id, stateName, lockInfo);
         showToast({ message: 'State locked successfully', severity: 'success' });
       }
-      
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       const action = locked ? 'unlock' : 'lock';
@@ -261,7 +269,7 @@ const ProjectPage: FC = () => {
 
   const confirmDeleteStateFile = async () => {
     if (!stateFileToDelete) return;
-    
+
     try {
       // TODO: Implement StateService.deleteSnapshot when available
       // await StateService.deleteState(project?.id, 'main', stateFileToDelete.version);
@@ -270,9 +278,12 @@ const ProjectPage: FC = () => {
         severity: 'success',
       });
 
-      setStateData(prev => ({
-        currentState: prev.currentState?.id === stateFileToDelete.id ? prev.previousStates[0] : prev.currentState,
-        previousStates: prev.previousStates.filter(s => s.id !== stateFileToDelete.id)
+      setStateData((prev) => ({
+        currentState:
+          prev.currentState?.id === stateFileToDelete.id
+            ? prev.previousStates[0]
+            : prev.currentState,
+        previousStates: prev.previousStates.filter((s) => s.id !== stateFileToDelete.id),
       }));
     } catch (err) {
       const errorMessage = getErrorMessage(err);
@@ -309,16 +320,16 @@ const ProjectPage: FC = () => {
 
   const confirmRemoveTeam = async () => {
     if (!teamToRemove || !project) return;
-    
+
     try {
-      const updatedTeamIds = project.teamIds.filter(id => id !== teamToRemove.id);
+      const updatedTeamIds = project.teamIds.filter((id) => id !== teamToRemove.id);
       await ProjectService.updateProject(project.id, { teamIds: updatedTeamIds });
 
-      setProject(prev => prev ? { ...prev, teamIds: updatedTeamIds } : prev);
-      setTeams(prev => prev.filter(t => t.id !== teamToRemove.id));
+      setProject((prev) => (prev ? { ...prev, teamIds: updatedTeamIds } : prev));
+      setTeams((prev) => prev.filter((t) => t.id !== teamToRemove.id));
 
       showToast({ message: 'Team removed from project successfully', severity: 'success' });
-      
+
       // Sample data fallback implementation (commented out):
       // setProject((prev) => {
       //   if (!prev) return prev;

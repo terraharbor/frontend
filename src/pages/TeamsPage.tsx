@@ -1,6 +1,7 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Stack, Typography, CircularProgress, Alert } from '@mui/material';
-import { FC, useState, useEffect } from 'react';
+import { Alert, Box, CircularProgress, Stack } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { TeamService } from '../api/teamService';
 import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
@@ -8,7 +9,6 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { TeamService } from '../api/teamService';
 // import { sampleTeams } from '../sampleData'; // Fallback sample data
 import { Team } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -63,7 +63,7 @@ export const TeamsPage: FC = () => {
       showToast({ message: 'Team created successfully', severity: 'success' });
       setIsModalOpen(false);
       await loadTeams(); // Reload data from API
-      
+
       // Sample data fallback implementation (commented out):
       // const newTeam: Team = {
       //   id: String(Date.now()), // Temporary ID for sample data
@@ -88,12 +88,12 @@ export const TeamsPage: FC = () => {
 
   const confirmDeleteTeam = async () => {
     if (!teamToDelete) return;
-    
+
     try {
       await TeamService.deleteTeam(teamToDelete.id);
       showToast({ message: 'Team deleted successfully', severity: 'success' });
       await loadTeams(); // Reload data from API
-      
+
       // Sample data fallback implementation (commented out):
       // setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
     } catch (err) {
@@ -141,10 +141,10 @@ export const TeamsPage: FC = () => {
       ) : teams.length > 0 ? (
         <Stack spacing={1}>
           {teams.map((team) => (
-            <TeamCard 
-              key={team.id} 
-              team={team} 
-              onDelete={handleDeleteTeam} 
+            <TeamCard
+              key={team.id}
+              team={team}
+              onDelete={handleDeleteTeam}
               displayActions={isAdmin}
             />
           ))}

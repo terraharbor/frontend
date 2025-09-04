@@ -1,8 +1,8 @@
+import { AuthToken, ProjectToken } from '../types/buisness';
 import { apiClient } from './client';
-import { AuthToken } from '../types/buisness';
 
 export class TokenService {
-  static async getTokens(): Promise<AuthToken[]> {
+  static async getTokens(): Promise<ProjectToken[]> {
     const response = await apiClient.get('/tokens');
     return response.data;
   }

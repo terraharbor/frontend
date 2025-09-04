@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
 import { AuthService } from '../../api/authService';
 import { getAuthToken } from '../../api/client';
-import { User, UserLogin, UserRegister, AuthResponse } from '../../types/buisness';
+import { AuthResponse, User, UserLogin, UserRegister } from '../../types/buisness';
 
 export interface AuthContextType {
   user: User | null;
@@ -84,7 +84,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return currentUser;
   }, []);
 
-
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
@@ -96,9 +95,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAdmin: user?.isAdmin || true,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
