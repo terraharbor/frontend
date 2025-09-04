@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.27](https://github.com/terraharbor/frontend/compare/v0.1.26...v0.1.27) (2025-09-04)
+
+
+### Documentation
+
+* add badges and table of contents ([1e08a79](https://github.com/terraharbor/frontend/commit/1e08a792a2adb1a9055aac321529b980bcdf80f9))
+* add badges and table of contents ([9c83cad](https://github.com/terraharbor/frontend/commit/9c83cad6c7e384182781166fd61b2cdfbe9c001f))
+
 ## [0.1.26](https://github.com/terraharbor/frontend/compare/v0.1.25...v0.1.26) (2025-09-04)
 
 
