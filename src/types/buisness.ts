@@ -82,3 +82,8 @@ export type StateFileSnapshot = {
   createdAt: Date;
   createdBy: string;
 };
+
+export type ProjectToken = {
+  value: string;
+  projectId: string;
+};
