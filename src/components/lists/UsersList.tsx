@@ -25,7 +25,7 @@ const UsersList: FC<UsersListProps> = ({
 
   const baseColumns: GridColDef<User>[] = [
     { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'username', headerName: 'Nom', flex: 1 },
+    { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'E-mail', flex: 1 },
     { field: 'isAdmin', headerName: 'Admin', flex: 1 },
   ];

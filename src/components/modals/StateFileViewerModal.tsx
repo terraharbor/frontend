@@ -39,13 +39,13 @@ const StateFileViewerModal: FC<StateFileViewerModalProps> = ({ open, onClose, sn
             <Typography variant="caption" color="text.secondary">
               {new Date(snapshot.createdAt).toLocaleString()}
               {' • '}
-              par {createdByUser?.username ?? snapshot.createdBy}
+              by {createdByUser?.username ?? snapshot.createdBy}
             </Typography>
 
             <JsonViewer value={snapshot.content} />
           </Stack>
         ) : (
-          <Alert severity="info">Aucune version sélectionnée</Alert>
+          <Alert severity="info">No version selected</Alert>
         )}
       </DialogContent>
     </Dialog>

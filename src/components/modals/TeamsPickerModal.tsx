@@ -29,7 +29,7 @@ type TeamsPickerModalProps = {
 
 const TeamsPickerModal: FC<TeamsPickerModalProps> = ({
   open,
-  title = 'Équipes du projet',
+  title = 'Project teams',
   teams,
   selectedTeamIds,
   onClose,
@@ -71,7 +71,7 @@ const TeamsPickerModal: FC<TeamsPickerModalProps> = ({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Rechercher par nom/description…"
+          placeholder="Find by name or description"
           fullWidth
           variant="outlined"
           margin="normal"
@@ -102,17 +102,17 @@ const TeamsPickerModal: FC<TeamsPickerModalProps> = ({
           })}
           {filtered.length === 0 && (
             <ListItem>
-              <ListItemText primary="Aucune équipe" />
+              <ListItemText primary="No team" />
             </ListItem>
           )}
         </List>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleProtectedClose} color="inherit" disabled={loading}>
-          Annuler
+          Cancel
         </Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-          Enregistrer {selected.length ? `(${selected.length})` : ''}
+          Save {selected.length ? `(${selected.length})` : ''}
         </Button>
       </DialogActions>
     </Dialog>

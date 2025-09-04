@@ -18,7 +18,7 @@ const DashboardPage: FC = () => {
       <Stack spacing={2}>
         <Stack direction="row" spacing={2}>
           <Stack sx={{ flex: 1 }}>
-            <Typography sx={{ mb: 1 }}>Mes projets</Typography>
+            <Typography sx={{ mb: 1 }}>My projects</Typography>
             {myProjects && myProjects.length > 0 ? (
               <Grid container spacing={1}>
                 {myProjects.map((project) => (
@@ -28,23 +28,23 @@ const DashboardPage: FC = () => {
                 ))}
               </Grid>
             ) : (
-              <Alert severity="info">Aucun projet</Alert>
+              <Alert severity="info">No project</Alert>
             )}
           </Stack>
           <Stack sx={{ flex: 1 }}>
-            <Typography sx={{ mb: 1 }}>Mes équipes</Typography>
+            <Typography sx={{ mb: 1 }}>My teams</Typography>
             {myTeams && myTeams.length > 0 ? (
               <Stack spacing={1}>
                 {...myTeams.map((team) => <TeamCard key={team.id} team={team} />)}
               </Stack>
             ) : (
-              <Alert severity="info">Aucune équipe</Alert>
+              <Alert severity="info">No team</Alert>
             )}
           </Stack>
         </Stack>
 
         <Stack>
-          <Typography sx={{ mb: 1 }}>Mes activités</Typography>
+          <Typography sx={{ mb: 1 }}>My activties</Typography>
           <Stack
             sx={{
               height: 200,

@@ -30,7 +30,7 @@ export const TeamCard: FC<TeamCardProps> = ({ team, displayActions = false, onDe
     <SummaryCard
       title={team.name}
       description={team.description}
-      metadata={[`${team.userIds.length} ${team.userIds.length === 1 ? 'membre' : 'membres'}`]}
+      metadata={[`${team.userIds.length} ${team.userIds.length === 1 ? 'member' : 'members'}`]}
       actions={
         displayActions
           ? [

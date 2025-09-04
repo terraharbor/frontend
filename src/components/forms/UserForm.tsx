@@ -4,8 +4,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const schema = z.object({
-  username: z.string().trim().min(1, 'Le nom est requis').max(100),
-  email: z.string().trim().email('E-mail invalide').max(255),
+  username: z.string().trim().min(1, 'Name required').max(100),
+  email: z.string().trim().email('Invalid e-mail').max(255),
   isAdmin: z.boolean(),
 });
 
@@ -39,7 +39,7 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
     >
       <TextField
         autoFocus
-        label="Nom d'utilisateur"
+        label="Username"
         fullWidth
         variant="outlined"
         margin="dense"
@@ -74,7 +74,7 @@ export function UserForm({ defaultValues, onSubmit, disabled }: Props) {
                 onChange={(e) => field.onChange(e.target.checked)}
               />
             }
-            label="Administrateur"
+            label="Admin"
             disabled={disabled}
           />
         )}
