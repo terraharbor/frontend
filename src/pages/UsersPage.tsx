@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { FC, useState } from 'react';
 import { UserFormOutput } from '../components/forms/UserForm';
 import UsersList from '../components/lists/UsersList';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
 import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
@@ -17,6 +18,8 @@ export const UsersPage: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>('create');
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const { showToast } = useToast();
 
   const openCreateModal = () => {
@@ -51,9 +54,26 @@ export const UsersPage: FC = () => {
   };
 
   const handleDeleteUser = (id: string) => {
-    // TODO: appeler l’API
-    setUsers((prev) => prev.filter((u) => u.id !== id));
-    showToast({ message: 'Utilisateur supprimé.', severity: 'success' });
+    const user = users.find((u) => u.id === id);
+    if (user) {
+      setUserToDelete(user);
+      setDeleteConfirmationOpen(true);
+    }
+  };
+
+  const confirmDeleteUser = () => {
+    if (userToDelete) {
+      // TODO: appeler l'API
+      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+      showToast({ message: 'User deleted successfully.', severity: 'success' });
+      setUserToDelete(null);
+    }
+    setDeleteConfirmationOpen(false);
+  };
+
+  const cancelDeleteUser = () => {
+    setUserToDelete(null);
+    setDeleteConfirmationOpen(false);
   };
 
   return (
@@ -87,6 +107,20 @@ export const UsersPage: FC = () => {
         initialValues={editingUser ?? undefined}
         onClose={closeModal}
         onSubmit={handleSubmitUser}
+      />
+
+      <ConfirmationModal
+        open={deleteConfirmationOpen}
+        title="Delete User"
+        message={
+          userToDelete
+            ? `Are you sure you want to delete the user "${userToDelete.username}"? This action is irreversible.`
+            : "Are you sure you want to delete this user? This action is irreversible."
+        }
+        confirmLabel="Delete"
+        confirmColor="error"
+        onConfirm={confirmDeleteUser}
+        onCancel={cancelDeleteUser}
       />
     </Box>
   );

@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import { FC, useState } from 'react';
 import { ProjectCard } from '../components/cards/ProjectCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectModal from '../components/modals/ProjectModal';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
@@ -16,6 +17,8 @@ export const ProjectsPage: FC = () => {
   const { showToast } = useToast();
   const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   const handleCreateProject = () => {
     setIsModalOpen(true);
@@ -45,8 +48,22 @@ export const ProjectsPage: FC = () => {
   };
 
   const handleDeleteProject = (project: Project) => {
-    setProjects((prev) => prev.filter((p) => p.id !== project.id));
-    showToast({ message: 'Projet supprimé.', severity: 'success' });
+    setProjectToDelete(project);
+    setDeleteConfirmationOpen(true);
+  };
+
+  const confirmDeleteProject = () => {
+    if (projectToDelete) {
+      setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
+      showToast({ message: 'Project deleted successfully.', severity: 'success' });
+      setProjectToDelete(null);
+    }
+    setDeleteConfirmationOpen(false);
+  };
+
+  const cancelDeleteProject = () => {
+    setProjectToDelete(null);
+    setDeleteConfirmationOpen(false);
   };
 
   return (
@@ -94,6 +111,20 @@ export const ProjectsPage: FC = () => {
         initialValues={{}}
         onClose={handleCloseModal}
         onSubmit={handleSubmitProject}
+      />
+
+      <ConfirmationModal
+        open={deleteConfirmationOpen}
+        title="Delete Project"
+        message={
+          projectToDelete
+            ? `Are you sure you want to delete the project "${projectToDelete.name}"? This action is irreversible.`
+            : "Are you sure you want to delete this project? This action is irreversible."
+        }
+        confirmLabel="Delete"
+        confirmColor="error"
+        onConfirm={confirmDeleteProject}
+        onCancel={cancelDeleteProject}
       />
     </Box>
   );

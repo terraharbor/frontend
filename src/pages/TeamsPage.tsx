@@ -4,6 +4,7 @@ import { FC, useState } from 'react';
 import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
@@ -15,6 +16,8 @@ export const TeamsPage: FC = () => {
   const { showToast } = useToast();
   const [teams, setTeams] = useState<Team[]>(sampleTeams);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
 
   const handleOpenCreateModal = () => {
     setIsModalOpen(true);
@@ -37,8 +40,22 @@ export const TeamsPage: FC = () => {
   };
 
   const handleDeleteTeam = (team: Team) => {
-    setTeams((prev) => prev.filter((t) => t.id !== team.id));
-    showToast({ message: 'Equipe supprimée.', severity: 'success' });
+    setTeamToDelete(team);
+    setDeleteConfirmationOpen(true);
+  };
+
+  const confirmDeleteTeam = () => {
+    if (teamToDelete) {
+      setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
+      showToast({ message: 'Team deleted successfully.', severity: 'success' });
+      setTeamToDelete(null);
+    }
+    setDeleteConfirmationOpen(false);
+  };
+
+  const cancelDeleteTeam = () => {
+    setTeamToDelete(null);
+    setDeleteConfirmationOpen(false);
   };
 
   return (
@@ -84,6 +101,20 @@ export const TeamsPage: FC = () => {
         initialValues={{}}
         onClose={handleCloseModal}
         onSubmit={handleSubmitTeam}
+      />
+
+      <ConfirmationModal
+        open={deleteConfirmationOpen}
+        title="Delete Team"
+        message={
+          teamToDelete
+            ? `Are you sure you want to delete the team "${teamToDelete.name}"? This action is irreversible.`
+            : "Are you sure you want to delete this team? This action is irreversible."
+        }
+        confirmLabel="Delete"
+        confirmColor="error"
+        onConfirm={confirmDeleteTeam}
+        onCancel={cancelDeleteTeam}
       />
     </Box>
   );
