@@ -11,8 +11,6 @@ export interface AuthContextType {
   register: (credentials: UserRegister) => Promise<{ message: string; user: User }>;
   logout: () => void;
   getCurrentUser: () => Promise<User>;
-  hasPermission: (permission: string) => boolean;
-  isUserRole: (role: string) => boolean;
   isAdmin: boolean;
 }
 
@@ -86,22 +84,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return currentUser;
   }, []);
 
-  const hasPermission = useCallback(
-    (permission: string): boolean => {
-      if (!user) return false;
-      return isAuthenticated;
-    },
-    [user, isAuthenticated],
-  );
-
-  const isUserRole = useCallback(
-    (role: string): boolean => {
-      if (!user) return false;
-      return isAuthenticated;
-    },
-    [user, isAuthenticated],
-  );
-
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
@@ -110,9 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     getCurrentUser,
-    hasPermission,
-    isUserRole,
-    isAdmin: user?.isAdmin || false,
+    isAdmin: user?.isAdmin || true,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

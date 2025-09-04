@@ -43,7 +43,7 @@ export const UserInfo: React.FC<UserInfoProps> = ({
 
   if (variant === 'compact') {
     return (
-      <Box display="flex" alignItems="center" gap={1}>
+      <Box display="flex" alignItems="center" gap={3}>
         <Avatar sx={{ width: 32, height: 32 }}>
           {user.username.charAt(0).toUpperCase()}
         </Avatar>
