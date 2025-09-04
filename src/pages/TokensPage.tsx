@@ -6,6 +6,7 @@ import ProjectTokenCard from '../components/cards/ProjectTokenCard';
 import { ProjectTokenFormOutput } from '../components/forms/ProjectTokenForm';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectTokenModal from '../components/modals/ProjectTokenModal';
+
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleProjectTokens } from '../sampleData';
@@ -20,7 +21,6 @@ function generateTokenValue(length = 48) {
 export const ProjectTokensPage: FC = () => {
   const { isAdmin, user } = useAuth();
   const { showToast } = useToast();
-
   const [tokens, setTokens] = useState<ProjectToken[]>(sampleProjectTokens ?? []);
 
   // Create modal

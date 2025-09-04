@@ -1,17 +1,20 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Alert, CircularProgress, IconButton, Stack, Typography, Box } from '@mui/material';
+import { Alert, IconButton, Stack, Typography, Box, CircularProgress } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ProjectCard from '../components/cards/ProjectCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import UsersList from '../components/lists/UsersList';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
+import TeamModal from '../components/modals/TeamModal';
 import UsersPickerModal from '../components/modals/UsersPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { TeamService } from '../api/teamService';
 import { UserService } from '../api/userService';
+// import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData'; // Fallback sample data
 import { Project, Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
@@ -19,17 +22,32 @@ const TeamPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
-  
   const [team, setTeam] = useState<Team | undefined>();
   const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const [membersModalOpen, setMembersModalOpen] = useState(false);
+  const [teamEditModalOpen, setTeamEditModalOpen] = useState(false);
+  const [removeUserConfirmationOpen, setRemoveUserConfirmationOpen] = useState(false);
+  const [userToRemove, setUserToRemove] = useState<string | null>(null);
+
+  // Sample data implementation (commented out):
+  // const initialTeam: Team | undefined = useMemo(() => sampleTeams.find((t) => t.id === id), [id]);
+  // const [team, setTeam] = useState<Team | undefined>(initialTeam);
+  // const projects = useMemo<Project[]>(
+  //   () => (team ? sampleProjects.filter((p) => p.teamIds.includes(team.id)) : []),
+  //   [team],
+  // );
+  // const users = useMemo<User[]>(
+  //   () => (team ? sampleUsers.filter((u) => team.userIds.includes(u.id)) : []),
+  //   [team],
+  // );
 
   const loadTeamData = async () => {
     if (!id) return;
-    
+
     setLoading(true);
     try {
       const [teamData, teamProjects, teamMembers, allUsersData] = await Promise.all([
@@ -38,7 +56,7 @@ const TeamPage: FC = () => {
         TeamService.getTeamMembers(id),
         UserService.getUsers()
       ]);
-      
+
       setTeam(teamData);
       setProjects(teamProjects);
       setUsers(teamMembers);
@@ -47,6 +65,12 @@ const TeamPage: FC = () => {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error loading team: ${errorMessage}`, severity: 'error' });
       logError('loadTeamData', err);
+      // Fallback to sample data if API fails
+      // const initialTeam = sampleTeams.find((t) => t.id === id);
+      // setTeam(initialTeam);
+      // setProjects(sampleProjects.filter((p) => p.teamIds.includes(id || '')));
+      // setUsers(sampleUsers.filter((u) => initialTeam?.userIds.includes(u.id) || false));
+      // setAllUsers(sampleUsers);
     } finally {
       setLoading(false);
     }
@@ -59,31 +83,33 @@ const TeamPage: FC = () => {
   const openMembersModal = () => setMembersModalOpen(true);
   const closeMembersModal = () => setMembersModalOpen(false);
 
+  const openTeamEditModal = () => setTeamEditModalOpen(true);
+  const closeTeamEditModal = () => setTeamEditModalOpen(false);
+
   const handleSaveMembers = async (selectedUserIds: string[]) => {
     if (!team) return;
-    
+
     try {
-      // Get current members and new members
       const currentMemberIds = users.map(u => u.id);
       const toAdd = selectedUserIds.filter(id => !currentMemberIds.includes(id));
       const toRemove = currentMemberIds.filter(id => !selectedUserIds.includes(id));
-      
-      // Add new members
+
       for (const userId of toAdd) {
         await TeamService.addTeamMember(team.id, userId);
       }
-      
-      // Remove members
+
       for (const userId of toRemove) {
         await TeamService.removeTeamMember(team.id, userId);
       }
-      
+
       showToast({ message: 'Team members updated successfully', severity: 'success' });
       setMembersModalOpen(false);
-      
-      // Reload team members
+
       const updatedMembers = await TeamService.getTeamMembers(team.id);
       setUsers(updatedMembers);
+      
+      // Sample data fallback implementation (commented out):
+      // setTeam((prev) => (prev ? { ...prev, userIds: selectedUserIds } : prev));
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error updating team members: ${errorMessage}`, severity: 'error' });
@@ -91,19 +117,63 @@ const TeamPage: FC = () => {
     }
   };
 
-  const handleRemoveUser = async (userId: string) => {
-    if (!team) return;
+  const handleRemoveUser = (userId: string) => {
+    setUserToRemove(userId);
+    setRemoveUserConfirmationOpen(true);
+  };
+
+  const confirmRemoveUser = async () => {
+    if (!userToRemove || !team) return;
     
     try {
-      await TeamService.removeTeamMember(team.id, userId);
+      await TeamService.removeTeamMember(team.id, userToRemove);
       showToast({ message: 'User removed from team successfully', severity: 'success' });
+
+      setUsers(prev => prev.filter(u => u.id !== userToRemove));
       
-      // Update local state
-      setUsers(prev => prev.filter(u => u.id !== userId));
+      // Sample data fallback implementation (commented out):
+      // setTeam((prev) => {
+      //   if (!prev) return prev;
+      //   if (!prev.userIds.includes(userToRemove)) return prev;
+      //   return { ...prev, userIds: prev.userIds.filter((id) => id !== userToRemove) };
+      // });
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error removing user: ${errorMessage}`, severity: 'error' });
-      logError('handleRemoveUser', err);
+      logError('confirmRemoveUser', err);
+    } finally {
+      setRemoveUserConfirmationOpen(false);
+      setUserToRemove(null);
+    }
+  };
+
+  const cancelRemoveUser = () => {
+    setUserToRemove(null);
+    setRemoveUserConfirmationOpen(false);
+  };
+
+  const handleSaveTeam = async (values: TeamFormOutput) => {
+    if (!team) return;
+    
+    try {
+      await TeamService.updateTeam(team.id, {
+        name: values.name,
+        description: values.description,
+      });
+      
+      setTeam(prev => prev ? { ...prev, name: values.name, description: values.description } : prev);
+      showToast({ message: 'Team updated successfully', severity: 'success' });
+      closeTeamEditModal();
+      
+      // Sample data fallback implementation (commented out):
+      // setTeam((prev) => {
+      //   if (!prev) return prev;
+      //   return { ...prev, name: values.name, description: values.description };
+      // });
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error updating team: ${errorMessage}`, severity: 'error' });
+      logError('handleSaveTeam', err);
     }
   };
 
@@ -122,7 +192,19 @@ const TeamPage: FC = () => {
   return (
     <>
       <Stack spacing={4}>
-        <PageHeader title={team.name} />
+        <PageHeader
+          title={team.name}
+          action={
+            isAdmin
+              ? {
+                  label: 'Edit',
+                  startIcon: <EditIcon />,
+                  onClick: openTeamEditModal,
+                }
+              : undefined
+          }
+        />
+
         {team.description && <Typography variant="body2">{team.description}</Typography>}
 
         <Stack direction="row" spacing={2}>
@@ -141,7 +223,7 @@ const TeamPage: FC = () => {
               )}
             </Stack>
 
-            <UsersList users={users} allowDelete={isAdmin} onDelete={handleRemoveUser} />
+            <UsersList users={users} allowDelete onDelete={handleRemoveUser} />
           </Stack>
 
           <Stack spacing={2} sx={{ flex: 1 }}>
@@ -167,6 +249,24 @@ const TeamPage: FC = () => {
         selectedUserIds={users.map(u => u.id)}
         onClose={closeMembersModal}
         onSubmit={handleSaveMembers}
+      />
+
+      <TeamModal
+        open={teamEditModalOpen}
+        mode="edit"
+        initialValues={{ name: team.name, description: team.description }}
+        onClose={closeTeamEditModal}
+        onSubmit={handleSaveTeam}
+      />
+
+      <ConfirmationModal
+        open={removeUserConfirmationOpen}
+        title="Remove User"
+        message="Are you sure you want to remove this user from the team?"
+        confirmLabel="Remove"
+        confirmColor="error"
+        onConfirm={confirmRemoveUser}
+        onCancel={cancelRemoveUser}
       />
     </>
   );

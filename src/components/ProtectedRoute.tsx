@@ -39,6 +39,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
+
   // Render the protected content
   return <>{children}</>;
 };

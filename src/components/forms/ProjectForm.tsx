@@ -6,6 +6,7 @@ import { z } from 'zod';
 const schema = z.object({
   name: z.string().trim().min(1, 'Name required').max(100),
   description: z.string().trim().max(1000).optional(),
+  teamIds: z.array(z.string()).default([]),
 });
 
 export type ProjectFormInput = z.input<typeof schema>;
@@ -24,7 +25,7 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
     formState: { errors },
   } = useForm<ProjectFormInput, unknown, ProjectFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', description: '', ...defaultValues },
+    defaultValues: { name: '', description: '', teamIds: [], ...defaultValues },
   });
 
   return (
@@ -45,7 +46,6 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
         error={!!errors.name}
         helperText={errors.name?.message}
         disabled={disabled}
-        sx={{ mb: 2 }}
       />
       <TextField
         label="Description (optional)"
@@ -53,7 +53,7 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
         variant="outlined"
         margin="dense"
         multiline
-        rows={4}
+        rows={3}
         {...register('description')}
         error={!!errors.description}
         helperText={errors.description?.message}
@@ -62,5 +62,3 @@ export function ProjectForm({ defaultValues, onSubmit, disabled }: Props) {
     </Box>
   );
 }
-
-export default ProjectForm;

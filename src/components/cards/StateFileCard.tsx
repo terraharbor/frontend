@@ -16,7 +16,13 @@ type StateFileCardProps = {
   onDelete: (state: StateFileSnapshot) => void;
 };
 
-const StateFileCard: FC<StateFileCardProps> = ({ stateFile, onCompare, onRestore, onView, onDelete }) => {
+const StateFileCard: FC<StateFileCardProps> = ({
+  stateFile,
+  onCompare,
+  onRestore,
+  onView,
+  onDelete,
+}) => {
   const { isAdmin } = useAuth();
   const createdByUser = useMemo(
     () => sampleUsers.find((u) => u.id === stateFile.createdBy),
@@ -51,6 +57,7 @@ const StateFileCard: FC<StateFileCardProps> = ({ stateFile, onCompare, onRestore
             <CompareArrowsIcon fontSize="small" />
           </IconButton>
         </Tooltip>
+
         {isAdmin && (
           <Tooltip title="Restore">
             <IconButton size="small" onClick={() => onRestore(stateFile)}>
@@ -58,7 +65,7 @@ const StateFileCard: FC<StateFileCardProps> = ({ stateFile, onCompare, onRestore
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title="View">
+        <Tooltip title="Open">
           <IconButton size="small" onClick={() => onView(stateFile)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>

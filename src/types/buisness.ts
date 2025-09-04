@@ -1,20 +1,8 @@
-// Organization types
-export type Organization = {
-  id: string;
-  name: string;
-  description?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
 export type Project = {
   id: string;
   name: string;
   description?: string;
   lastUpdated?: string;
-  created_at?: string;
-  updated_at?: string;
-  organizationId?: string;
   teamIds: string[];
 };
 
@@ -22,13 +10,8 @@ export type Team = {
   id: string;
   name: string;
   description?: string;
-  created_at?: string;
-  updated_at?: string;
-  organizationId?: string;
   userIds: string[];
 };
-
-export type UserRole = 'Admin' | 'User';
 
 export type User = {
   id: string;
@@ -41,8 +24,6 @@ export type User = {
   token?: string;
   token_validity?: number;
   isAdmin: boolean;
-  organizationIds?: string[];
-  teamIds?: string[];
 };
 
 export type UserLogin = {
@@ -83,6 +64,15 @@ export type AuthToken = {
   token: string;
   ttl: string;
   created_at: string;
+};
+
+// Organization types
+export type Organization = {
+  id: string;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 // Permission types
@@ -128,6 +118,14 @@ export type StateFile = {
   version?: number;
   content: Blob | string;
   last_modified: string;
+};
+
+export type StateFileStatus = 'locked' | 'unlocked';
+
+export type StateFileInfos = {
+  status: StateFileStatus;
+  lockedAt?: Date;
+  lockedBy?: string;
 };
 
 export type StateFileSnapshot = {

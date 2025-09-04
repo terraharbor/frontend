@@ -13,7 +13,6 @@ export type SummaryAction = {
   label: string;
   onClick: () => void;
   icon: ReactNode;
-  disabled?: boolean;
 };
 
 export interface SummaryCardProps {
@@ -37,11 +36,10 @@ export const SummaryCard: FC<SummaryCardProps> = ({
 
   const ActionButtons = (
     <Stack direction="row" spacing={1}>
-      {actions.map((a, index) => (
-        <Tooltip key={index} title={a.label}>
+      {actions.map((a) => (
+        <Tooltip title={a.label}>
           <IconButton
             size="small"
-            disabled={a.disabled}
             onClick={(e) => {
               e.stopPropagation();
               a.onClick();

@@ -3,6 +3,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Team } from '../../types/buisness';
+import { useAuth } from '../providers/useAuth';
 import { SummaryCard } from './SummaryCard';
 
 export interface TeamCardProps {
@@ -12,6 +13,7 @@ export interface TeamCardProps {
 }
 
 export const TeamCard: FC<TeamCardProps> = ({ team, displayActions = false, onDelete }) => {
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const openTeam = () => {
@@ -33,7 +35,7 @@ export const TeamCard: FC<TeamCardProps> = ({ team, displayActions = false, onDe
         displayActions
           ? [
               { label: 'Open', onClick: openTeam, icon: <VisibilityIcon fontSize="small" /> },
-              ...(onDelete
+              ...(isAdmin && onDelete
                 ? [
                     {
                       label: 'Delete',
