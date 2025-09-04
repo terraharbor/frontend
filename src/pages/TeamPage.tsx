@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ProjectCard from '../components/cards/ProjectCard';
+import { TeamFormOutput } from '../components/forms/TeamForm';
 import UsersList from '../components/lists/UsersList';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
@@ -13,7 +14,6 @@ import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData';
 import { Project, Team, User } from '../types/buisness';
-import { TeamFormOutput } from '../components/forms/TeamForm';
 
 const TeamPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -91,20 +91,20 @@ const TeamPage: FC = () => {
 
   return (
     <>
-      <Stack>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <PageHeader title={team.name} />
-          {isAdmin && (
-            <IconButton
-              color="primary"
-              onClick={openTeamEditModal}
-              title="Modifier l'équipe"
-              sx={{ p: 1 }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </Stack>
+      <Stack spacing={4}>
+        <PageHeader
+          title={team.name}
+          action={
+            isAdmin
+              ? {
+                  label: 'Edit',
+                  startIcon: <EditIcon />,
+                  onClick: openTeamEditModal,
+                }
+              : undefined
+          }
+        />
+
         {team.description && <Typography variant="body2">{team.description}</Typography>}
 
         <Stack direction="row" spacing={2}>
@@ -164,7 +164,7 @@ const TeamPage: FC = () => {
         title="Remove User"
         message="Are you sure you want to remove this user from the team?"
         confirmLabel="Remove"
-        confirmColor="warning"
+        confirmColor="error"
         onConfirm={confirmRemoveUser}
         onCancel={cancelRemoveUser}
       />

@@ -1,9 +1,5 @@
 import { Logout as LogoutIcon } from '@mui/icons-material';
-import {
-  Button,
-  Stack,
-  Toolbar,
-} from '@mui/material';
+import { Button, Stack, Toolbar } from '@mui/material';
 import { FC } from 'react';
 import { useAuth } from '../providers/useAuth';
 import { useToast } from '../providers/useToast';
@@ -24,12 +20,7 @@ const UserSection: FC = () => {
   return (
     <Stack direction="row" spacing={2} alignItems="center">
       <UserInfo variant="compact" />
-      <Button
-        onClick={handleLogout}
-        startIcon={<LogoutIcon />}
-        color="inherit"
-        size="small"
-      >
+      <Button onClick={handleLogout} startIcon={<LogoutIcon />} color="inherit" size="small">
         Logout
       </Button>
     </Stack>
@@ -49,7 +40,7 @@ const Topbar: FC = () => {
       }}
     >
       <Toolbar sx={{ justifyContent: 'flex-end', gap: 2 }}>
-        {isAuthenticated && <UserSection />}
+        {isAuthenticated && <UserInfo />}
       </Toolbar>
     </Stack>
   );

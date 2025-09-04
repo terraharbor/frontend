@@ -8,6 +8,7 @@ import { FC, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StateFileCard from '../components/cards/StateFileCard';
 import TeamCard from '../components/cards/TeamCard';
+import { ProjectFormOutput } from '../components/forms/ProjectForm';
 import JsonViewer from '../components/JsonViewer';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectModal from '../components/modals/ProjectModal';
@@ -25,12 +26,12 @@ import {
   sampleUsers,
 } from '../sampleData';
 import { Project, StateFileInfos, StateFileSnapshot, Team } from '../types/buisness';
-import { ProjectFormOutput } from '../components/forms/ProjectForm';
 
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
+  const [teamToRemove, setTeamToRemove] = useState<Team | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [teamsModalOpen, setTeamsModalOpen] = useState(false);
@@ -38,6 +39,7 @@ const ProjectPage: FC = () => {
   const [selectedSnapshot, setSelectedSnapshot] = useState<StateFileSnapshot | null>(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
+  const [removeTeamConfirmationOpen, setRemoveTeamConfirmationOpen] = useState(false);
   const [stateFileToDelete, setStateFileToDelete] = useState<StateFileSnapshot | null>(null);
   const [stateFileToRestore, setStateFileToRestore] = useState<StateFileSnapshot | null>(null);
 
@@ -110,12 +112,8 @@ const ProjectPage: FC = () => {
   };
 
   const handleRemoveTeam = (team: Team) => {
-    setProject((prev) => {
-      if (!prev) return prev;
-      if (!prev.teamIds.includes(team.id)) return prev;
-      return { ...prev, teamIds: prev.teamIds.filter((id) => id !== team.id) };
-    });
-    showToast({ message: 'Équipe retirée du projet.', severity: 'success' });
+    setTeamToRemove(team);
+    setRemoveTeamConfirmationOpen(true);
   };
 
   const handleSaveProject = (values: ProjectFormOutput) => {
@@ -149,7 +147,10 @@ const ProjectPage: FC = () => {
     if (stateFileToDelete) {
       console.log('Delete v' + stateFileToDelete.version);
       // TODO: Call API
-      showToast({ message: `Version ${stateFileToDelete.version} deleted successfully.`, severity: 'success' });
+      showToast({
+        message: `Version ${stateFileToDelete.version} deleted successfully.`,
+        severity: 'success',
+      });
       setStateFileToDelete(null);
     }
     setDeleteConfirmationOpen(false);
@@ -159,7 +160,10 @@ const ProjectPage: FC = () => {
     if (stateFileToRestore) {
       console.log('Restore v' + stateFileToRestore.version);
       // TODO: Call API
-      showToast({ message: `Version ${stateFileToRestore.version} restored successfully.`, severity: 'success' });
+      showToast({
+        message: `Version ${stateFileToRestore.version} restored successfully.`,
+        severity: 'success',
+      });
       setStateFileToRestore(null);
     }
     setRestoreConfirmationOpen(false);
@@ -175,6 +179,24 @@ const ProjectPage: FC = () => {
     setRestoreConfirmationOpen(false);
   };
 
+  const confirmRemoveTeam = () => {
+    if (teamToRemove) {
+      setProject((prev) => {
+        if (!prev) return prev;
+        if (!prev.teamIds.includes(teamToRemove.id)) return prev;
+        return { ...prev, teamIds: prev.teamIds.filter((id) => id !== teamToRemove.id) };
+      });
+      showToast({ message: 'Team removed successfully.', severity: 'success' });
+      setTeamToRemove(null);
+    }
+    setRemoveTeamConfirmationOpen(false);
+  };
+
+  const cancelRemoveTeam = () => {
+    setTeamToRemove(null);
+    setRemoveTeamConfirmationOpen(false);
+  };
+
   if (!project) {
     return (
       <Stack spacing={2}>
@@ -187,19 +209,19 @@ const ProjectPage: FC = () => {
   return (
     <>
       <Stack spacing={4}>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <PageHeader title={project.name} />
-          {isAdmin && (
-            <IconButton
-              color="primary"
-              onClick={openProjectEditModal}
-              title="Modifier le projet"
-              sx={{ p: 1 }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
-        </Stack>
+        <PageHeader
+          title={project.name}
+          action={
+            isAdmin
+              ? {
+                  label: 'Edit',
+                  startIcon: <EditIcon />,
+                  onClick: openProjectEditModal,
+                }
+              : undefined
+          }
+        />
+
         {project.description && <Typography variant="body2">{project.description}</Typography>}
 
         <Stack spacing={4}>
@@ -395,9 +417,9 @@ const ProjectPage: FC = () => {
         open={deleteConfirmationOpen}
         title="Delete Version"
         message={
-          stateFileToDelete ? 
-            `Are you sure you want to delete version ${stateFileToDelete.version}? This action is irreversible.` :
-            "Are you sure you want to delete this version? This action is irreversible."
+          stateFileToDelete
+            ? `Are you sure you want to delete version ${stateFileToDelete.version}? This action is irreversible.`
+            : 'Are you sure you want to delete this version? This action is irreversible.'
         }
         confirmLabel="Delete"
         confirmColor="error"
@@ -409,14 +431,24 @@ const ProjectPage: FC = () => {
         open={restoreConfirmationOpen}
         title="Restore Version"
         message={
-          stateFileToRestore ? 
-            `Are you sure you want to restore version ${stateFileToRestore.version}? This will replace the current version.` :
-            "Are you sure you want to restore this version? This will replace the current version."
+          stateFileToRestore
+            ? `Are you sure you want to restore version ${stateFileToRestore.version}? This will replace the current version.`
+            : 'Are you sure you want to restore this version? This will replace the current version.'
         }
         confirmLabel="Restore"
         confirmColor="warning"
         onConfirm={confirmRestoreStateFile}
         onCancel={cancelRestoreStateFile}
+      />
+
+      <ConfirmationModal
+        open={removeTeamConfirmationOpen}
+        title="Remove Team"
+        message="Are you sure you want to remove this team from the project?"
+        confirmLabel="Remove"
+        confirmColor="error"
+        onConfirm={confirmRemoveTeam}
+        onCancel={cancelRemoveTeam}
       />
     </>
   );
