@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.26](https://github.com/terraharbor/frontend/compare/v0.1.25...v0.1.26) (2025-09-04)
+
+
+### Features
+
+* tokens ([440c00b](https://github.com/terraharbor/frontend/commit/440c00b6b949f4ec8a7a760917bd23dcf873f534))
+* tokens ([1dcfb66](https://github.com/terraharbor/frontend/commit/1dcfb667ec8df8d197391f26e5146120be53dd83))
+* wip tokens ([2186349](https://github.com/terraharbor/frontend/commit/218634998cb3c2b08b740ff3dcd61ef730a5d1b6))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#107](https://github.com/terraharbor/frontend/issues/107) from terraharbor/feat/tokens ([440c00b](https://github.com/terraharbor/frontend/commit/440c00b6b949f4ec8a7a760917bd23dcf873f534))
+
 ## [0.1.25](https://github.com/terraharbor/frontend/compare/v0.1.24...v0.1.25) (2025-09-04)
 
 
