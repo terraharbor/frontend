@@ -16,7 +16,6 @@ export type Team = {
 export type User = {
   id: string;
   username: string;
-  email: string;
   firstName?: string;
   lastName?: string;
   disabled?: boolean;
@@ -59,11 +58,65 @@ export type File = {
 };
 
 export type AuthToken = {
-  id: number;
-  userId: number;
+  id: string;
+  user_id: string;
   token: string;
   ttl: string;
-  createdAt: Date;
+  created_at: string;
+};
+
+// Organization types
+export type Organization = {
+  id: string;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+// Permission types
+export type Permission = {
+  user_id: string;
+  read: boolean;
+  write: boolean;
+  edit_settings: boolean;
+  role: string;
+};
+
+export type OrganizationPermission = {
+  org_id: string;
+} & Permission;
+
+export type ProjectPermission = {
+  proj_id: string;
+} & Permission;
+
+// Audit and State types
+export type AuditLog = {
+  id: string;
+  user_id: string;
+  action: string;
+  resource_type: string;
+  resource_id: string;
+  timestamp: string;
+  details?: Record<string, any>;
+};
+
+export type StateVersion = {
+  id: string;
+  project_id: string;
+  state_name: string;
+  version: number;
+  created_at: string;
+  file_size: number;
+};
+
+export type StateFile = {
+  project_id: string;
+  state_name: string;
+  version?: number;
+  content: Blob | string;
+  last_modified: string;
 };
 
 export type StateFileStatus = 'locked' | 'unlocked';
@@ -84,6 +137,7 @@ export type StateFileSnapshot = {
 };
 
 export type ProjectToken = {
+  id: string;
   value: string;
   projectId: string;
   canRead: boolean;

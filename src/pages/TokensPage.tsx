@@ -1,6 +1,7 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Alert, Box, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { TokenService } from '../api/tokenService';
 import { PageHeader } from '../components/PageHeader';
 import ProjectTokenCard from '../components/cards/ProjectTokenCard';
 import { ProjectTokenFormOutput } from '../components/forms/ProjectTokenForm';
@@ -8,26 +9,46 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectTokenModal from '../components/modals/ProjectTokenModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects, sampleProjectTokens } from '../sampleData';
+import { sampleProjects } from '../sampleData';
 import { ProjectToken } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
+/*
 function generateTokenValue(length = 48) {
   const arr = new Uint8Array(length);
   crypto.getRandomValues(arr);
   return Array.from(arr, (b) => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
 }
+  */
 
 export const ProjectTokensPage: FC = () => {
-  const { isAdmin, user } = useAuth();
+  const { isAdmin } = useAuth();
   const { showToast } = useToast();
+  const [tokens, setTokens] = useState<ProjectToken[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [tokens, setTokens] = useState<ProjectToken[]>(sampleProjectTokens ?? []);
+  const loadTokens = async () => {
+    setLoading(true);
+    try {
+      const data = await TokenService.getTokens();
+      console.log(data);
+      setTokens(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading tokens: ${errorMessage}`, severity: 'error' });
+      logError('loadTokens', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTokens();
+  }, []);
 
   // Create modal
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-  // Edit modal
-  const [editToken, setEditToken] = useState<ProjectToken | null>(null);
 
   // Delete confirm
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
@@ -37,7 +58,24 @@ export const ProjectTokensPage: FC = () => {
   const openCreate = () => setIsCreateOpen(true);
   const closeCreate = () => setIsCreateOpen(false);
 
-  const handleCreateSubmit = (values: { projectId: string } & ProjectTokenFormOutput) => {
+  const handleCreateSubmit = async (values: ProjectTokenFormOutput) => {
+    setIsSubmitting(true);
+    try {
+      await TokenService.createToken({
+        project_id: values.projectId,
+      });
+      showToast({ message: 'Token created successfully', severity: 'success' });
+      await loadTokens(); // Reload data from API
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error creating token: ${errorMessage}`, severity: 'error' });
+      logError('createToken', err);
+    } finally {
+      setIsSubmitting(false);
+      closeCreate();
+    }
+
+    /*
     const newToken: ProjectToken = {
       value: generateTokenValue(48), // backend should generate & return once
       projectId: values.projectId,
@@ -48,32 +86,7 @@ export const ProjectTokensPage: FC = () => {
     };
 
     setTokens((prev) => [newToken, ...prev]);
-    closeCreate();
-    showToast({ message: 'Token created successfully.', severity: 'success' });
-  };
-
-  // EDIT
-  const openEdit = (t: ProjectToken) => setEditToken(t);
-  const closeEdit = () => setEditToken(null);
-
-  const handleEditSubmit = (values: { projectId: string } & ProjectTokenFormOutput) => {
-    if (!editToken) return;
-
-    setTokens((prev) =>
-      prev.map((t) =>
-        t.value === editToken.value && t.createdAt === editToken.createdAt
-          ? {
-              ...t,
-              projectId: values.projectId, // allow moving token to another project if desired
-              canWrite: values.canWrite,
-              // canRead is always true; keep createdAt/value/createdBy unchanged
-            }
-          : t,
-      ),
-    );
-
-    closeEdit();
-    showToast({ message: 'Token updated successfully.', severity: 'success' });
+    */
   };
 
   // DELETE
@@ -82,7 +95,22 @@ export const ProjectTokensPage: FC = () => {
     setDeleteConfirmationOpen(true);
   };
 
-  const confirmDeleteToken = () => {
+  const confirmDeleteToken = async () => {
+    if (!tokenToDelete) return;
+
+    try {
+      await TokenService.revokeToken(tokenToDelete.id);
+      showToast({ message: 'Token deleted successfully', severity: 'success' });
+      await loadTokens(); // Reload data from API
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error deleting token: ${errorMessage}`, severity: 'error' });
+      logError('deleteToken', err);
+    } finally {
+      setDeleteConfirmationOpen(false);
+      setTokenToDelete(null);
+    }
+    /*
     if (tokenToDelete) {
       setTokens((prev) =>
         prev.filter(
@@ -93,6 +121,7 @@ export const ProjectTokensPage: FC = () => {
       setTokenToDelete(null);
     }
     setDeleteConfirmationOpen(false);
+    */
   };
 
   const cancelDeleteToken = () => {
@@ -125,7 +154,6 @@ export const ProjectTokensPage: FC = () => {
             <ProjectTokenCard
               key={`${t.projectId}-${t.createdAt.toString()}-${idx}`}
               token={t}
-              onEdit={isAdmin ? openEdit : undefined} // <-- enable edit
               onDelete={isAdmin ? handleAskDeleteToken : undefined}
             />
           ))}
@@ -147,28 +175,11 @@ export const ProjectTokensPage: FC = () => {
       {/* Create modal */}
       <ProjectTokenModal
         open={isCreateOpen}
-        mode="create"
         projects={sampleProjects}
         initialValues={{}}
         onClose={closeCreate}
         onSubmit={handleCreateSubmit}
       />
-
-      {/* Edit modal */}
-      {editToken && (
-        <ProjectTokenModal
-          open={!!editToken}
-          mode="edit"
-          projects={sampleProjects}
-          initialValues={{
-            projectId: editToken.projectId,
-            canRead: true, // fixed
-            canWrite: editToken.canWrite,
-          }}
-          onClose={closeEdit}
-          onSubmit={handleEditSubmit}
-        />
-      )}
 
       <ConfirmationModal
         open={deleteConfirmationOpen}

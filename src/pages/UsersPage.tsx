@@ -1,7 +1,6 @@
-import { ModalMode } from '@/types';
-import { Add as AddIcon } from '@mui/icons-material';
-import { Box } from '@mui/material';
-import { FC, useState } from 'react';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { UserService } from '../api/userService';
 import { UserFormOutput } from '../components/forms/UserForm';
 import UsersList from '../components/lists/UsersList';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -9,24 +8,43 @@ import UserModal from '../components/modals/UserModal';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleUsers } from '../sampleData';
+import { ModalMode } from '../types';
+// import { sampleUsers } from '../sampleData'; // Fallback sample data
 import { User } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 export const UsersPage: FC = () => {
   const { isAdmin } = useAuth();
-  const [users, setUsers] = useState<User[]>(sampleUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  // const [users, setUsers] = useState<User[]>(sampleUsers); // Fallback to sample data
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<ModalMode>('create');
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const { showToast } = useToast();
 
-  const openCreateModal = () => {
-    setMode('create');
-    setEditingUser(null);
-    setIsModalOpen(true);
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await UserService.getUsers();
+      setUsers(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading users: ${errorMessage}`, severity: 'error' });
+      logError('loadUsers', err);
+      // Fallback to sample data if API fails
+      // setUsers(sampleUsers);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
   const openEditModal = (user: User) => {
     setMode('edit');
@@ -36,39 +54,70 @@ export const UsersPage: FC = () => {
 
   const closeModal = () => setIsModalOpen(false);
 
-  const handleSubmitUser = (values: UserFormOutput) => {
-    if (mode === 'create') {
-      const newUser: User = {
-        id: '0', // TODO: géré par le backend plus tard
-        username: values.username,
-        email: values.email,
-        isAdmin: values.isAdmin,
-      };
-      setUsers((prev) => [newUser, ...prev]);
-      showToast({ message: 'User created', severity: 'success' });
-    } else if (mode === 'edit' && editingUser) {
-      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...values } : u)));
-      showToast({ message: 'User updated', severity: 'success' });
+  const handleSubmitUser = async (values: UserFormOutput) => {
+    setIsSubmitting(true);
+    try {
+      if (mode === 'create') {
+        await UserService.createUser({
+          username: values.username,
+          isAdmin: values.isAdmin,
+        });
+        showToast({ message: 'User created successfully', severity: 'success' });
+
+        // Sample data fallback implementation (commented out):
+        // const newUser: User = {
+        //   id: String(Date.now()), // Temporary ID for sample data
+        //   username: values.username,
+        //   email: values.email,
+        //   firstName: values.firstName,
+        //   lastName: values.lastName,
+        //   isAdmin: values.isAdmin,
+        // };
+        // setUsers((prev) => [newUser, ...prev]);
+      } else if (mode === 'edit' && editingUser) {
+        await UserService.updateUser(editingUser.id, {
+          username: values.username,
+          isAdmin: values.isAdmin,
+        });
+        showToast({ message: 'User updated successfully', severity: 'success' });
+
+        // Sample data fallback implementation (commented out):
+        // setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? { ...u, ...values } : u)));
+      }
+      setIsModalOpen(false);
+      await loadUsers(); // Reload data from API
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error saving user: ${errorMessage}`, severity: 'error' });
+      logError('handleSubmitUser', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsModalOpen(false);
   };
 
-  const handleDeleteUser = (id: string) => {
-    const user = users.find((u) => u.id === id);
-    if (user) {
-      setUserToDelete(user);
-      setDeleteConfirmationOpen(true);
-    }
+  const handleDeleteUser = (user: User) => {
+    setUserToDelete(user);
+    setDeleteConfirmationOpen(true);
   };
 
-  const confirmDeleteUser = () => {
-    if (userToDelete) {
-      // TODO: appeler l'API
-      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
-      showToast({ message: 'User deleted successfully.', severity: 'success' });
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await UserService.deleteUser(userToDelete.id);
+      showToast({ message: 'User deleted successfully', severity: 'success' });
+      await loadUsers(); // Reload data from API
+
+      // Sample data fallback implementation (commented out):
+      // setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error deleting user: ${errorMessage}`, severity: 'error' });
+      logError('deleteUser', err);
+    } finally {
+      setDeleteConfirmationOpen(false);
       setUserToDelete(null);
     }
-    setDeleteConfirmationOpen(false);
   };
 
   const cancelDeleteUser = () => {
@@ -78,28 +127,31 @@ export const UsersPage: FC = () => {
 
   return (
     <Box>
-      <PageHeader
-        title="Users"
-        action={
-          isAdmin
-            ? {
-                label: 'New',
-                onClick: openCreateModal,
-                startIcon: <AddIcon />,
-                variant: 'contained',
-                color: 'primary',
-              }
-            : undefined
-        }
-      />
+      <PageHeader title="Users" />
 
-      <UsersList
-        users={users}
-        allowUpdate
-        allowDelete
-        onUpdate={openEditModal}
-        onDelete={handleDeleteUser}
-      />
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+          sx={{ mt: 4 }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : users.length > 0 ? (
+        <UsersList
+          users={users}
+          allowUpdate={isAdmin}
+          allowDelete={isAdmin}
+          onUpdate={openEditModal}
+          onDelete={handleDeleteUser}
+        />
+      ) : (
+        <Typography variant="body1" sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
+          No users found.
+        </Typography>
+      )}
 
       <UserModal
         open={isModalOpen}

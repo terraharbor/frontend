@@ -1,6 +1,7 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Stack, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { Alert, Box, CircularProgress, Stack } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
+import { TeamService } from '../api/teamService';
 import { PageHeader } from '../components/PageHeader';
 import TeamCard from '../components/cards/TeamCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
@@ -8,16 +9,40 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleTeams } from '../sampleData';
+// import { sampleTeams } from '../sampleData'; // Fallback sample data
 import { Team } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 export const TeamsPage: FC = () => {
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
-  const [teams, setTeams] = useState<Team[]>(sampleTeams);
+  const [teams, setTeams] = useState<Team[]>([]);
+  // const [teams, setTeams] = useState<Team[]>(sampleTeams); // Fallback to sample data
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null);
+
+  const loadTeams = async () => {
+    setLoading(true);
+    try {
+      const data = await TeamService.getTeams();
+      setTeams(data);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading teams: ${errorMessage}`, severity: 'error' });
+      logError('loadTeams', err);
+      // Fallback to sample data if API fails
+      // setTeams(sampleTeams);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTeams();
+  }, []);
 
   const handleOpenCreateModal = () => {
     setIsModalOpen(true);
@@ -27,16 +52,33 @@ export const TeamsPage: FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmitTeam = (values: TeamFormOutput) => {
-    const newTeam: Team = {
-      id: '0' /* TODO: A gérer avec backend */,
-      name: values.name,
-      description: values.description,
-      userIds: values.userIds,
-    };
+  const handleSubmitTeam = async (values: TeamFormOutput) => {
+    setIsSubmitting(true);
+    try {
+      await TeamService.createTeam({
+        name: values.name,
+        description: values.description,
+        userIds: values.userIds || [],
+      });
+      showToast({ message: 'Team created successfully', severity: 'success' });
+      setIsModalOpen(false);
+      await loadTeams(); // Reload data from API
 
-    setTeams((prev) => [newTeam, ...prev]);
-    setIsModalOpen(false);
+      // Sample data fallback implementation (commented out):
+      // const newTeam: Team = {
+      //   id: String(Date.now()), // Temporary ID for sample data
+      //   name: values.name,
+      //   description: values.description,
+      //   userIds: values.userIds || [],
+      // };
+      // setTeams((prev) => [newTeam, ...prev]);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error creating team: ${errorMessage}`, severity: 'error' });
+      logError('createTeam', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDeleteTeam = (team: Team) => {
@@ -44,13 +86,24 @@ export const TeamsPage: FC = () => {
     setDeleteConfirmationOpen(true);
   };
 
-  const confirmDeleteTeam = () => {
-    if (teamToDelete) {
-      setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
-      showToast({ message: 'Team deleted successfully.', severity: 'success' });
+  const confirmDeleteTeam = async () => {
+    if (!teamToDelete) return;
+
+    try {
+      await TeamService.deleteTeam(teamToDelete.id);
+      showToast({ message: 'Team deleted successfully', severity: 'success' });
+      await loadTeams(); // Reload data from API
+
+      // Sample data fallback implementation (commented out):
+      // setTeams((prev) => prev.filter((t) => t.id !== teamToDelete.id));
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error deleting team: ${errorMessage}`, severity: 'error' });
+      logError('deleteTeam', err);
+    } finally {
+      setDeleteConfirmationOpen(false);
       setTeamToDelete(null);
     }
-    setDeleteConfirmationOpen(false);
   };
 
   const cancelDeleteTeam = () => {
@@ -75,10 +128,25 @@ export const TeamsPage: FC = () => {
         }
       />
 
-      {teams.length > 0 ? (
+      {loading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="200px"
+          sx={{ mt: 4 }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : teams.length > 0 ? (
         <Stack spacing={1}>
-          {...teams.map((team) => (
-            <TeamCard key={team.id} team={team} onDelete={handleDeleteTeam} displayActions />
+          {teams.map((team) => (
+            <TeamCard
+              key={team.id}
+              team={team}
+              onDelete={handleDeleteTeam}
+              displayActions={isAdmin}
+            />
           ))}
         </Stack>
       ) : (
@@ -89,9 +157,7 @@ export const TeamsPage: FC = () => {
           minHeight="200px"
           sx={{ mt: 4 }}
         >
-          <Typography variant="h6" color="text.secondary" textAlign="center">
-            No team
-          </Typography>
+          <Alert severity="info">No teams found. Create your first team!</Alert>
         </Box>
       )}
 

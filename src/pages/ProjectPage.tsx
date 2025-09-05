@@ -3,9 +3,21 @@ import EditIcon from '@mui/icons-material/Edit';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Alert, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import { FC, useMemo, useState } from 'react';
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ProjectService } from '../api/projectService';
+import { StateService } from '../api/stateService';
+import { TeamService } from '../api/teamService';
+import { UserService } from '../api/userService';
 import StateFileCard from '../components/cards/StateFileCard';
 import TeamCard from '../components/cards/TeamCard';
 import { ProjectFormOutput } from '../components/forms/ProjectForm';
@@ -18,19 +30,29 @@ import TeamsPickerModal from '../components/modals/TeamsPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import {
-  sampleProjects,
-  sampleStateFileInfos,
-  sampleStateFilesTerraform,
-  sampleTeams,
-  sampleUsers,
-} from '../sampleData';
-import { Project, StateFileInfos, StateFileSnapshot, Team } from '../types/buisness';
+// Sample data fallbacks (commented out):
+// import {
+//   sampleProjects,
+//   sampleStateFileInfos,
+//   sampleStateFilesTerraform,
+//   sampleTeams,
+//   sampleUsers,
+// } from '../sampleData';
+import { sampleStateFileInfos } from '../sampleData'; // Temporary for state files
+import { Project, StateFileInfos, StateFileSnapshot, Team, User } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 const ProjectPage: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user: currentUser } = useAuth();
   const { showToast } = useToast();
+
+  const [project, setProject] = useState<Project | undefined>();
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [teamToRemove, setTeamToRemove] = useState<Team | null>(null);
   const [viewerModalOpen, setViewerModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
@@ -43,43 +65,232 @@ const ProjectPage: FC = () => {
   const [stateFileToDelete, setStateFileToDelete] = useState<StateFileSnapshot | null>(null);
   const [stateFileToRestore, setStateFileToRestore] = useState<StateFileSnapshot | null>(null);
 
-  const initialProject: Project | undefined = useMemo(
-    () => sampleProjects.find((p) => p.id === id),
-    [id],
-  );
-  const [project, setProject] = useState<Project | undefined>(initialProject);
+  // For now, using sample state files until StateService is properly implemented
+  const [stateData, setStateData] = useState<{
+    currentState: StateFileSnapshot | undefined;
+    previousStates: StateFileSnapshot[];
+  }>({ currentState: undefined, previousStates: [] });
+  const [lockStatus, setLockStatus] = useState<{
+    status: 'locked' | 'unlocked';
+    locker?: string;
+    timestamp?: string;
+  }>({ status: 'unlocked' });
 
-  const teams = useMemo<Team[]>(
-    () => (project ? sampleTeams.filter((t) => project.teamIds.includes(t.id)) : []),
-    [project],
-  );
+  // Sample data implementation (commented out):
+  // const initialProject: Project | undefined = useMemo(
+  //   () => sampleProjects.find((p) => p.id === id),
+  //   [id],
+  // );
+  // const [project, setProject] = useState<Project | undefined>(initialProject);
+  // const teams = useMemo<Team[]>(
+  //   () => (project ? sampleTeams.filter((t) => project.teamIds.includes(t.id)) : []),
+  //   [project],
+  // );
+  // const { currentState, previousStates } = useMemo(() => {
+  //   if (!project) return { currentState: undefined, previousStates: [] as StateFileSnapshot[] };
+  //   const states = sampleStateFilesTerraform
+  //     .filter((s) => s.projectId === project.id)
+  //     .sort((a, b) => b.version - a.version);
+  //   const [current, ...previous] = states;
+  //   return { currentState: current, previousStates: previous };
+  // }, [project]);
 
-  const { currentState, previousStates } = useMemo(() => {
-    if (!project) return { currentState: undefined, previousStates: [] as StateFileSnapshot[] };
+  const loadLockStatus = async (projectId: string) => {
+    try {
+      const status = await StateService.getStateStatus(projectId, 'main');
+      setLockStatus(status);
+      console.log('Lock status loaded:', status);
+    } catch (error) {
+      console.error('Failed to load lock status:', error);
+      setLockStatus({ status: 'unlocked' });
+    }
+  };
 
-    const states = sampleStateFilesTerraform
-      .filter((s) => s.projectId === project.id)
-      .sort((a, b) => b.version - a.version);
+  const loadRealStateFiles = async (projectId: string) => {
+    try {
+      console.log('Loading real state files for project:', projectId);
 
-    const [current, ...previous] = states;
-    return { currentState: current, previousStates: previous };
-  }, [project]);
+      // For now, assume all state files are named "main"
+      const stateName = 'main';
 
-  const currentStateCreatedByUser = useMemo(
-    () => (currentState ? sampleUsers.find((u) => currentState?.createdBy === u.id) : undefined),
-    [currentState],
-  );
+      // Get all versions of the state file directly
+      const versions = await StateService.getStates(projectId, stateName);
+      console.log('State versions received:', versions);
 
+      if (versions && Array.isArray(versions) && versions.length > 0) {
+        // Convert to StateFileSnapshot format with safe null handling
+        const snapshots: StateFileSnapshot[] = versions.map((version) => {
+          // Handle null values safely
+          const createdBy = version['created by'] || '-';
+          const uploadDate = version['upload date'];
+
+          // Safe date parsing
+          let createdAt: Date;
+          try {
+            if (uploadDate && uploadDate !== null) {
+              createdAt = new Date(uploadDate);
+              // Check if date is valid
+              if (isNaN(createdAt.getTime())) {
+                createdAt = new Date();
+              }
+            } else {
+              createdAt = new Date();
+            }
+          } catch (dateError) {
+            console.warn('Error parsing date:', dateError);
+            createdAt = new Date();
+          }
+
+          return {
+            id: `${projectId}-${stateName}-${version.version}`,
+            projectId: projectId,
+            version: parseInt(version.version) || 1,
+            content: '', // Will be loaded when needed
+            createdAt: createdAt,
+            createdBy: createdBy,
+          };
+        });
+
+        // Sort by version descending (latest first)
+        snapshots.sort((a, b) => b.version - a.version);
+
+        console.log('Created snapshots:', snapshots);
+
+        // Load content for ALL versions immediately (current + previous)
+        const snapshotsWithContent = await Promise.all(
+          snapshots.map(async (snapshot) => {
+            try {
+              const content = await loadStateContent(snapshot);
+              return { ...snapshot, content };
+            } catch (error) {
+              console.error(`Failed to load content for version ${snapshot.version}:`, error);
+              return snapshot; // Return without content if failed
+            }
+          }),
+        );
+
+        console.log('All version content loaded on initial load');
+
+        setStateData({
+          currentState: snapshotsWithContent[0],
+          previousStates: snapshotsWithContent.slice(1),
+        });
+      } else {
+        console.log('No versions found or invalid response');
+        // No versions found
+        setStateData({
+          currentState: undefined,
+          previousStates: [],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load state files:', error);
+      // Fallback to empty state
+      setStateData({
+        currentState: undefined,
+        previousStates: [],
+      });
+    }
+  };
+
+  const loadProjectData = async () => {
+    if (!id) return;
+
+    console.log('Starting to load project data for ID:', id);
+    setLoading(true);
+    try {
+      console.log('Fetching project, teams, and users data...');
+      const [projectData, allTeamsData, usersData] = await Promise.all([
+        ProjectService.getProject(id),
+        TeamService.getTeams(),
+        UserService.getUsers(),
+      ]);
+
+      console.log('Project data received:', projectData);
+      console.log('Teams data received:', allTeamsData);
+      console.log('Users data received:', usersData);
+
+      // Handle case where backend returns array instead of single object
+      const project = Array.isArray(projectData) ? projectData[0] : projectData;
+      console.log('Processed project:', project);
+      console.log('Project name:', project?.name);
+      console.log('Project teamIds:', project?.teamIds);
+
+      setProject(project);
+      setAllTeams(allTeamsData);
+      setUsers(usersData);
+
+      const projectTeams = allTeamsData.filter(
+        (team) =>
+          project?.teamIds && Array.isArray(project.teamIds) && project.teamIds.includes(team.id),
+      );
+      setTeams(projectTeams);
+
+      console.log('About to load real state files...');
+      // Load real state files from backend - don't let this break the page
+      try {
+        await loadRealStateFiles(id);
+        console.log('State files loaded successfully');
+      } catch (stateError) {
+        console.error('Failed to load state files, continuing without them:', stateError);
+        // Set empty state so page still loads
+        setStateData({
+          currentState: undefined,
+          previousStates: [],
+        });
+      }
+
+      // Load lock status
+      await loadLockStatus(id);
+
+      // Sample data fallback implementation (commented out):
+      // const initialProject = sampleProjects.find((p) => p.id === id);
+      // setProject(initialProject);
+      // setTeams(sampleTeams.filter((t) => initialProject?.teamIds.includes(t.id) || false));
+      // setAllTeams(sampleTeams);
+      // setUsers(sampleUsers);
+    } catch (err) {
+      console.error('Error in loadProjectData:', err);
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading project: ${errorMessage}`, severity: 'error' });
+      logError('loadProjectData', err);
+    } finally {
+      console.log('loadProjectData finished, setting loading to false');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProjectData();
+  }, [id]);
+
+  const currentStateCreatedByUser = users.find((u) => stateData.currentState?.createdBy === u.id);
+
+  // Using real lock status now instead of sample data
   const stateFileInfos: StateFileInfos = sampleStateFileInfos[0];
 
-  const locked = stateFileInfos.status === 'locked';
+  const loadStateContent = async (snapshot: StateFileSnapshot): Promise<string> => {
+    try {
+      if (!id) return '{}';
 
-  const stateFileLockedByUser = useMemo(
-    () => (stateFileInfos ? sampleUsers.find((u) => stateFileInfos.lockedBy === u.id) : undefined),
-    [stateFileInfos],
-  );
+      // Extract state name from snapshot id (format: projectId-stateName-version)
+      const parts = snapshot.id.split('-');
+      const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
 
-  const handleOpenViewer = (s: StateFileSnapshot) => {
+      const stateJson = await StateService.getStateAsJson(id, stateName, snapshot.version);
+      return JSON.stringify(stateJson, null, 2);
+    } catch (error) {
+      console.error('Failed to load state content:', error);
+      return JSON.stringify({ error: 'Failed to load state content' }, null, 2);
+    }
+  };
+
+  const handleOpenViewer = async (s: StateFileSnapshot) => {
+    // Load content if not already loaded
+    if (!s.content) {
+      const content = await loadStateContent(s);
+      s.content = content;
+    }
     setSelectedSnapshot(s);
     setViewerModalOpen(true);
   };
@@ -105,10 +316,17 @@ const ProjectPage: FC = () => {
   const openProjectEditModal = () => setProjectEditModalOpen(true);
   const closeProjectEditModal = () => setProjectEditModalOpen(false);
 
-  const handleSaveTeams = (selectedTeamIds: string[]) => {
-    setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
-    showToast({ message: 'Teams updated', severity: 'success' });
+  const handleSaveTeams = async (selectedTeamIds: string[]) => {
+    if (!project) return;
+
+    await handleSaveProject({
+      name: project.name,
+      description: project.description,
+      teamIds: selectedTeamIds,
+    });
+
     closeTeamsModal();
+    loadProjectData();
   };
 
   const handleRemoveTeam = (team: Team) => {
@@ -116,22 +334,35 @@ const ProjectPage: FC = () => {
     setRemoveTeamConfirmationOpen(true);
   };
 
-  const handleSaveProject = (values: ProjectFormOutput) => {
-    setProject((prev) => {
-      if (!prev) return prev;
-      return { ...prev, name: values.name, description: values.description };
-    });
+  const handleSaveProject = async (values: ProjectFormOutput) => {
+    if (!project) return;
 
-    showToast({ message: 'Project updated successfully.', severity: 'success' });
-    closeProjectEditModal();
+    try {
+      await ProjectService.updateProject(project.id, {
+        name: values.name,
+        description: values.description,
+        teamIds: values.teamIds,
+      });
+
+      showToast({ message: 'Project updated successfully', severity: 'success' });
+      closeProjectEditModal();
+
+      // Sample data fallback implementation (commented out):
+      // setProject((prev) => {
+      //   if (!prev) return prev;
+      //   return { ...prev, name: values.name, description: values.description };
+      // });
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error updating project: ${errorMessage}`, severity: 'error' });
+      logError('handleSaveProject', err);
+    }
   };
 
-  const handleLockOrUnlock = () => {
-    if (locked) {
-      // Unlock -> TODO API call
-    } else {
-      // Lock -> TODO API call
-    }
+  const locked = lockStatus.status === 'locked';
+
+  const handleLockOrUnlock = async () => {
+    await handleLockToggle();
   };
 
   const handleDeleteStateFileSnapshot = (stateFileSnapshot: StateFileSnapshot) => {
@@ -144,17 +375,170 @@ const ProjectPage: FC = () => {
     setRestoreConfirmationOpen(true);
   };
 
-  const confirmDeleteStateFile = () => {
-    if (stateFileToDelete) {
-      console.log('Delete v' + stateFileToDelete.version);
-      // TODO: Call API
+  const loadContentForAllVersions = async () => {
+    if (!id) return;
+
+    try {
+      // Use the callback form of setState to get the current state
+      setStateData((currentStateData) => {
+        // Async function to load content for all versions
+        const loadAllContent = async () => {
+          try {
+            let updatedCurrentState = currentStateData.currentState;
+
+            // Load content for current state if not already loaded
+            if (updatedCurrentState && !updatedCurrentState.content) {
+              const content = await loadStateContent(updatedCurrentState);
+              updatedCurrentState = { ...updatedCurrentState, content };
+            }
+
+            // Load content for all previous versions
+            const updatedPreviousStates = await Promise.all(
+              currentStateData.previousStates.map(async (state) => {
+                if (!state.content) {
+                  try {
+                    const content = await loadStateContent(state);
+                    return { ...state, content };
+                  } catch (error) {
+                    console.error(`Failed to load content for version ${state.version}:`, error);
+                    return state; // Return without content if failed
+                  }
+                }
+                return state;
+              }),
+            );
+
+            // Update state with all loaded content
+            setStateData({
+              currentState: updatedCurrentState,
+              previousStates: updatedPreviousStates,
+            });
+
+            console.log('All version content reloaded successfully');
+          } catch (error) {
+            console.error('Failed to reload content for all versions:', error);
+          }
+        };
+
+        // Execute the async loading
+        loadAllContent();
+
+        // Return current state unchanged for now
+        return currentStateData;
+      });
+    } catch (error) {
+      console.error('Failed to reload content for all versions:', error);
+    }
+  };
+
+  const confirmRestoreStateFileSnapshot = async () => {
+    if (!stateFileToRestore || !id) return;
+
+    try {
+      // Load the content of the version we want to restore if not already loaded
+      let contentToRestore = stateFileToRestore.content;
+      if (!contentToRestore) {
+        contentToRestore = await loadStateContent(stateFileToRestore);
+      }
+
+      // Parse the content to get the version number and increment it
+      let stateJson;
+      try {
+        stateJson = JSON.parse(contentToRestore);
+      } catch (error) {
+        console.error('Failed to parse state content:', error);
+        showToast({ message: 'Failed to parse state content', severity: 'error' });
+        return;
+      }
+
+      // Create new version number (find the highest version and add 1)
+      const allVersions = [stateData.currentState, ...stateData.previousStates]
+        .filter((s) => s !== undefined)
+        .map((s) => s!.version);
+      const newVersion = Math.max(...allVersions, 0) + 1;
+
+      // Update the version in the state content
+      stateJson.version = newVersion;
+      const updatedContent = JSON.stringify(stateJson, null, 2);
+
+      // POST the restored content as a new version
+      await StateService.putState(id, 'main', updatedContent);
+
       showToast({
-        message: `Version ${stateFileToDelete.version} deleted successfully.`,
+        message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`,
         severity: 'success',
       });
+
+      // Reload the state files to show the new version
+      await loadRealStateFiles(id);
+
+      // Load content for all versions (including the new restored version)
+      await loadContentForAllVersions();
+    } catch (error) {
+      console.error('Failed to restore state version:', error);
+      const errorMessage = getErrorMessage(error);
+      showToast({ message: `Failed to restore version: ${errorMessage}`, severity: 'error' });
+    } finally {
+      setRestoreConfirmationOpen(false);
+      setStateFileToRestore(null);
+    }
+  };
+
+  const handleLockToggle = async () => {
+    if (!id) return;
+
+    try {
+      if (lockStatus.status === 'locked') {
+        // Unlock the state
+        await StateService.unlockState(id, 'main', {});
+        showToast({ message: 'State unlocked successfully', severity: 'success' });
+      } else {
+        // Lock the state
+        await StateService.lockState(id, 'main', { ID: Date.now().toString() });
+        showToast({ message: 'State locked successfully', severity: 'success' });
+      }
+
+      // Reload lock status
+      await loadLockStatus(id);
+    } catch (error) {
+      console.error('Failed to toggle lock:', error);
+      const errorMessage = getErrorMessage(error);
+      showToast({
+        message: `Failed to ${lockStatus.status === 'locked' ? 'unlock' : 'lock'} state: ${errorMessage}`,
+        severity: 'error',
+      });
+    }
+  };
+
+  const confirmDeleteStateFile = async () => {
+    if (!stateFileToDelete || !id) return;
+
+    try {
+      // Extract state name from snapshot id (format: projectId-stateName-version)
+      const parts = stateFileToDelete.id.split('-');
+      const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
+
+      // Delete the specific version using the backend API
+      await StateService.deleteState(id, stateName, stateFileToDelete.version);
+
+      showToast({
+        message: `Version ${stateFileToDelete.version} deleted successfully`,
+        severity: 'success',
+      });
+
+      // Reload the state files to refresh the UI after deletion
+      await loadRealStateFiles(id);
+
+      // Note: loadRealStateFiles already loads content for the current state
+      // We don't need to call loadContentForAllVersions here as it would use stale data
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error deleting state file: ${errorMessage}`, severity: 'error' });
+      logError('confirmDeleteStateFile', err);
+    } finally {
+      setDeleteConfirmationOpen(false);
       setStateFileToDelete(null);
     }
-    setDeleteConfirmationOpen(false);
   };
 
   const confirmRestoreStateFile = () => {
@@ -180,17 +564,32 @@ const ProjectPage: FC = () => {
     setRestoreConfirmationOpen(false);
   };
 
-  const confirmRemoveTeam = () => {
-    if (teamToRemove) {
-      setProject((prev) => {
-        if (!prev) return prev;
-        if (!prev.teamIds.includes(teamToRemove.id)) return prev;
-        return { ...prev, teamIds: prev.teamIds.filter((id) => id !== teamToRemove.id) };
-      });
-      showToast({ message: 'Team removed successfully.', severity: 'success' });
+  const confirmRemoveTeam = async () => {
+    if (!teamToRemove || !project) return;
+
+    try {
+      const updatedTeamIds = project.teamIds.filter((id) => id !== teamToRemove.id);
+      await ProjectService.updateProject(project.id, { teamIds: updatedTeamIds });
+
+      setProject((prev) => (prev ? { ...prev, teamIds: updatedTeamIds } : prev));
+      setTeams((prev) => prev.filter((t) => t.id !== teamToRemove.id));
+
+      showToast({ message: 'Team removed from project successfully', severity: 'success' });
+
+      // Sample data fallback implementation (commented out):
+      // setProject((prev) => {
+      //   if (!prev) return prev;
+      //   if (!prev.teamIds.includes(teamToRemove.id)) return prev;
+      //   return { ...prev, teamIds: prev.teamIds.filter((id) => id !== teamToRemove.id) };
+      // });
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error removing team: ${errorMessage}`, severity: 'error' });
+      logError('confirmRemoveTeam', err);
+    } finally {
+      setRemoveTeamConfirmationOpen(false);
       setTeamToRemove(null);
     }
-    setRemoveTeamConfirmationOpen(false);
   };
 
   const cancelRemoveTeam = () => {
@@ -198,9 +597,30 @@ const ProjectPage: FC = () => {
     setRemoveTeamConfirmationOpen(false);
   };
 
+  console.log(
+    'ProjectPage render - loading:',
+    loading,
+    'project:',
+    project,
+    'stateData:',
+    stateData,
+  );
+
+  if (loading) {
+    console.log('Showing loading spinner');
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   if (!project) {
+    console.log('No project found, showing error');
     return <Alert severity="error">No project found with the id: "{id}".</Alert>;
   }
+
+  console.log('Rendering project page for:', project.name);
 
   return (
     <>
@@ -239,33 +659,11 @@ const ProjectPage: FC = () => {
 
               {teams && teams.length > 0 ? (
                 <Stack spacing={1}>
-                  {...teams.map((team) => (
-                    <TeamCard
-                      key={team.id}
-                      team={team}
-                      onDelete={handleRemoveTeam}
-                      displayActions
-                    />
-                  ))}
+                  {...teams.map((team) => <TeamCard key={team.id} team={team} displayActions />)}
                 </Stack>
               ) : (
                 <Alert severity="info">No team</Alert>
               )}
-            </Stack>
-
-            <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Activities</Typography>
-              <Stack
-                height="100%"
-                sx={{
-                  bgcolor: 'neutral.white',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 2,
-                }}
-              >
-                A compléter
-              </Stack>
             </Stack>
           </Stack>
 
@@ -273,8 +671,8 @@ const ProjectPage: FC = () => {
             <Stack spacing={1} sx={{ flex: 1 }}>
               <Typography>Previous versions</Typography>
               <Stack spacing={1} sx={{ maxHeight: '60vh' }}>
-                {previousStates.length > 0 ? (
-                  previousStates.map((s) => (
+                {stateData.previousStates.length > 0 ? (
+                  stateData.previousStates.map((s) => (
                     <StateFileCard
                       stateFile={s}
                       onCompare={handleOpenCompare}
@@ -292,7 +690,7 @@ const ProjectPage: FC = () => {
             <Stack spacing={1} sx={{ flex: 1 }}>
               <Typography>State File Terraform</Typography>
 
-              {currentState ? (
+              {stateData.currentState ? (
                 <Stack
                   sx={{
                     bgcolor: 'neutral.white',
@@ -307,8 +705,8 @@ const ProjectPage: FC = () => {
                       sx={{ justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <Typography variant="caption" color="text.secondary">
-                        Actual • v{currentState.version} •{' '}
-                        {new Date(currentState.createdAt).toLocaleString()} • by{' '}
+                        Actual • v{stateData.currentState.version} •{' '}
+                        {new Date(stateData.currentState.createdAt).toLocaleString()} • by{' '}
                         {currentStateCreatedByUser && currentStateCreatedByUser.username}
                       </Typography>
 
@@ -324,7 +722,7 @@ const ProjectPage: FC = () => {
                         </IconButton>
                         <IconButton
                           size="small"
-                          onClick={() => handleOpenViewer(currentState)}
+                          onClick={() => handleOpenViewer(stateData.currentState!)}
                           sx={{ p: 0 }}
                         >
                           <Tooltip title="Open">
@@ -335,7 +733,7 @@ const ProjectPage: FC = () => {
                         {isAdmin && (
                           <IconButton
                             size="small"
-                            onClick={() => handleDeleteStateFileSnapshot(currentState)}
+                            onClick={() => handleDeleteStateFileSnapshot(stateData.currentState!)}
                             sx={{ p: 0 }}
                           >
                             <Tooltip title="Delete">
@@ -362,11 +760,11 @@ const ProjectPage: FC = () => {
                         <Typography
                           variant="caption"
                           sx={{ ml: 2 }}
-                        >{`Locked by ${stateFileLockedByUser?.username} the ${new Date(stateFileInfos.lockedAt!).toLocaleString()}`}</Typography>
+                        >{`Locked by ${lockStatus.locker || 'unknown'} ${lockStatus.timestamp ? `at ${lockStatus.timestamp}` : ''}`}</Typography>
                       </Stack>
                     )}
 
-                    <JsonViewer value={currentState.content} />
+                    <JsonViewer value={stateData.currentState.content || '{}'} />
                   </Stack>
                 </Stack>
               ) : (
@@ -383,20 +781,20 @@ const ProjectPage: FC = () => {
         snapshot={selectedSnapshot}
       />
 
-      {currentState && (
+      {stateData.currentState && compareModalOpen && (
         <StateFileCompareModal
           open={compareModalOpen}
           onClose={handleCloseCompare}
-          current={currentState}
-          previousSnapshots={previousStates}
+          current={stateData.currentState}
+          previousSnapshots={stateData.previousStates}
           initialCompareId={selectedSnapshot?.id}
         />
       )}
 
       <TeamsPickerModal
         open={teamsModalOpen}
-        teams={sampleTeams}
-        selectedTeamIds={project.teamIds}
+        teams={allTeams}
+        selectedTeamIds={project.teamIds || []}
         onClose={() => setTeamsModalOpen(false)}
         onSubmit={handleSaveTeams}
       />
@@ -428,13 +826,16 @@ const ProjectPage: FC = () => {
         title="Restore Version"
         message={
           stateFileToRestore
-            ? `Are you sure you want to restore version ${stateFileToRestore.version}? This will replace the current version.`
-            : 'Are you sure you want to restore this version? This will replace the current version.'
+            ? `Are you sure you want to restore version ${stateFileToRestore.version}? This will create a new version with the content from version ${stateFileToRestore.version}.`
+            : 'Are you sure you want to restore this version? This will create a new version with the restored content.'
         }
         confirmLabel="Restore"
         confirmColor="warning"
-        onConfirm={confirmRestoreStateFile}
-        onCancel={cancelRestoreStateFile}
+        onConfirm={confirmRestoreStateFileSnapshot}
+        onCancel={() => {
+          setRestoreConfirmationOpen(false);
+          setStateFileToRestore(null);
+        }}
       />
 
       <ConfirmationModal

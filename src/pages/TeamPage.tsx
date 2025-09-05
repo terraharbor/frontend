@@ -1,41 +1,77 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Alert, IconButton, Stack, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import { FC, useMemo, useState } from 'react';
+import { Alert, Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ProjectCard from '../components/cards/ProjectCard';
+import { TeamService } from '../api/teamService';
+import { UserService } from '../api/userService';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import UsersList from '../components/lists/UsersList';
-import ConfirmationModal from '../components/modals/ConfirmationModal';
 import TeamModal from '../components/modals/TeamModal';
 import UsersPickerModal from '../components/modals/UsersPickerModal';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData';
-import { Project, Team, User } from '../types/buisness';
+// import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData'; // Fallback sample data
+import { Team, User } from '../types/buisness';
+import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 const TeamPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
+  const [team, setTeam] = useState<Team | undefined>();
+  const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [membersModalOpen, setMembersModalOpen] = useState(false);
   const [teamEditModalOpen, setTeamEditModalOpen] = useState(false);
-  const [removeUserConfirmationOpen, setRemoveUserConfirmationOpen] = useState(false);
-  const [userToRemove, setUserToRemove] = useState<string | null>(null);
 
-  const initialTeam: Team | undefined = useMemo(() => sampleTeams.find((t) => t.id === id), [id]);
-  const [team, setTeam] = useState<Team | undefined>(initialTeam);
+  // Sample data implementation (commented out):
+  // const initialTeam: Team | undefined = useMemo(() => sampleTeams.find((t) => t.id === id), [id]);
+  // const [team, setTeam] = useState<Team | undefined>(initialTeam);
+  // const projects = useMemo<Project[]>(
+  //   () => (team ? sampleProjects.filter((p) => p.teamIds.includes(team.id)) : []),
+  //   [team],
+  // );
+  // const users = useMemo<User[]>(
+  //   () => (team ? sampleUsers.filter((u) => team.userIds.includes(u.id)) : []),
+  //   [team],
+  // );
 
-  const projects = useMemo<Project[]>(
-    () => (team ? sampleProjects.filter((p) => p.teamIds.includes(team.id)) : []),
-    [team],
-  );
+  const loadTeamData = async () => {
+    if (!id) return;
 
-  const users = useMemo<User[]>(
-    () => (team ? sampleUsers.filter((u) => team.userIds.includes(u.id)) : []),
-    [team],
-  );
+    setLoading(true);
+    try {
+      const [teamData, teamMembers, allUsersData] = await Promise.all([
+        TeamService.getTeam(id),
+
+        TeamService.getTeamMembers(id),
+        UserService.getUsers(),
+      ]);
+
+      setTeam(teamData);
+      setUsers(teamMembers);
+      setAllUsers(allUsersData);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error loading team: ${errorMessage}`, severity: 'error' });
+      logError('loadTeamData', err);
+      // Fallback to sample data if API fails
+      // const initialTeam = sampleTeams.find((t) => t.id === id);
+      // setTeam(initialTeam);
+      // setProjects(sampleProjects.filter((p) => p.teamIds.includes(id || '')));
+      // setUsers(sampleUsers.filter((u) => initialTeam?.userIds.includes(u.id) || false));
+      // setAllUsers(sampleUsers);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTeamData();
+  }, [id]);
 
   const openMembersModal = () => setMembersModalOpen(true);
   const closeMembersModal = () => setMembersModalOpen(false);
@@ -43,43 +79,53 @@ const TeamPage: FC = () => {
   const openTeamEditModal = () => setTeamEditModalOpen(true);
   const closeTeamEditModal = () => setTeamEditModalOpen(false);
 
-  const handleSaveMembers = (selectedUserIds: string[]) => {
-    setTeam((prev) => (prev ? { ...prev, userIds: selectedUserIds } : prev));
-    setMembersModalOpen(false);
-  };
+  const handleSaveMembers = async (selectedUserIds: string[]) => {
+    if (!team) return;
 
-  const handleRemoveUser = (userId: string) => {
-    setUserToRemove(userId);
-    setRemoveUserConfirmationOpen(true);
-  };
-
-  const confirmRemoveUser = () => {
-    if (userToRemove) {
-      setTeam((prev) => {
-        if (!prev) return prev;
-        if (!prev.userIds.includes(userToRemove)) return prev;
-        return { ...prev, userIds: prev.userIds.filter((id) => id !== userToRemove) };
-      });
-      showToast({ message: 'User removed successfully.', severity: 'success' });
-      setUserToRemove(null);
-    }
-    setRemoveUserConfirmationOpen(false);
-  };
-
-  const cancelRemoveUser = () => {
-    setUserToRemove(null);
-    setRemoveUserConfirmationOpen(false);
-  };
-
-  const handleSaveTeam = (values: TeamFormOutput) => {
-    setTeam((prev) => {
-      if (!prev) return prev;
-      return { ...prev, name: values.name, description: values.description };
+    await handleSaveTeam({
+      name: team.name,
+      description: team.description,
+      userIds: selectedUserIds,
     });
-
-    showToast({ message: 'Team updated successfully.', severity: 'success' });
-    closeTeamEditModal();
+    closeMembersModal();
+    loadTeamData();
   };
+
+  const handleSaveTeam = async (values: TeamFormOutput) => {
+    if (!team) return;
+
+    try {
+      await TeamService.updateTeam(team.id, {
+        name: values.name,
+        description: values.description,
+        userIds: values.userIds || [],
+      });
+
+      setTeam((prev) =>
+        prev ? { ...prev, name: values.name, description: values.description } : prev,
+      );
+      showToast({ message: 'Team updated successfully', severity: 'success' });
+      closeTeamEditModal();
+
+      // Sample data fallback implementation (commented out):
+      // setTeam((prev) => {
+      //   if (!prev) return prev;
+      //   return { ...prev, name: values.name, description: values.description };
+      // });
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error updating team: ${errorMessage}`, severity: 'error' });
+      logError('handleSaveTeam', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!team) {
     return <Alert severity="error">No team found with the id: "{id}".</Alert>;
@@ -119,30 +165,15 @@ const TeamPage: FC = () => {
               )}
             </Stack>
 
-            <UsersList users={users} allowDelete onDelete={handleRemoveUser} />
-          </Stack>
-
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Typography>Projects</Typography>
-            {projects && projects.length > 0 ? (
-              <Grid container spacing={1}>
-                {projects.map((project) => (
-                  <Grid key={project.id} size={{ xs: 12, sm: 12, md: 12, lg: 6 }}>
-                    <ProjectCard project={project} />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Alert severity="info">No project</Alert>
-            )}
+            <UsersList users={users} />
           </Stack>
         </Stack>
       </Stack>
 
       <UsersPickerModal
         open={membersModalOpen}
-        users={sampleUsers}
-        selectedUserIds={team.userIds}
+        users={allUsers}
+        selectedUserIds={users.map((u) => u.id)}
         onClose={closeMembersModal}
         onSubmit={handleSaveMembers}
       />
@@ -153,16 +184,6 @@ const TeamPage: FC = () => {
         initialValues={{ name: team.name, description: team.description }}
         onClose={closeTeamEditModal}
         onSubmit={handleSaveTeam}
-      />
-
-      <ConfirmationModal
-        open={removeUserConfirmationOpen}
-        title="Remove User"
-        message="Are you sure you want to remove this user from the team?"
-        confirmLabel="Remove"
-        confirmColor="error"
-        onConfirm={confirmRemoveUser}
-        onCancel={cancelRemoveUser}
       />
     </>
   );

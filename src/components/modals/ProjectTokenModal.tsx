@@ -1,6 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { FC } from 'react';
-import { ModalMode } from '../../types';
 import { Project } from '../../types/buisness';
 import ProjectTokenForm, {
   ProjectTokenFormInput,
@@ -9,7 +8,6 @@ import ProjectTokenForm, {
 
 type ProjectTokenModalProps = {
   open: boolean;
-  mode: ModalMode;
   projects: Project[];
   initialValues?: Partial<ProjectTokenFormInput>;
   onClose: () => void;
@@ -19,16 +17,12 @@ type ProjectTokenModalProps = {
 
 const ProjectTokenModal: FC<ProjectTokenModalProps> = ({
   open,
-  mode,
   projects,
   initialValues,
   onClose,
   onSubmit,
   loading = false,
 }) => {
-  const title = mode === 'create' ? 'Create a project token' : 'Edit the project token';
-  const cta = mode === 'create' ? 'Create' : 'Save';
-
   const handleProtectedClose = () => {
     if (loading) return;
     onClose();
@@ -42,7 +36,7 @@ const ProjectTokenModal: FC<ProjectTokenModalProps> = ({
       fullWidth
       disableEscapeKeyDown={!!loading}
     >
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle>Create a project token</DialogTitle>
       <DialogContent>
         <ProjectTokenForm
           projects={projects}
@@ -56,7 +50,7 @@ const ProjectTokenModal: FC<ProjectTokenModalProps> = ({
           Cancel
         </Button>
         <Button type="submit" form="project-token-form" variant="contained" disabled={loading}>
-          {cta}
+          Create
         </Button>
       </DialogActions>
     </Dialog>

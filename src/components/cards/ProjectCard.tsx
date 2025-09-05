@@ -21,6 +21,8 @@ export const ProjectCard: FC<ProjectCardProps> = ({
   const navigate = useNavigate();
   const metadata = [];
 
+  console.log('Project', project);
+
   metadata.push(`${project.teamIds.length} ${project.teamIds.length === 1 ? 'team' : 'teams'}`);
 
   if (project.lastUpdated) {

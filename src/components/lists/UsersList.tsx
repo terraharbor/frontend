@@ -11,7 +11,7 @@ type UsersListProps = {
   allowUpdate?: boolean;
   allowDelete?: boolean;
   onUpdate?: (user: User) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (user: User) => void;
 };
 
 const UsersList: FC<UsersListProps> = ({
@@ -26,7 +26,6 @@ const UsersList: FC<UsersListProps> = ({
   const baseColumns: GridColDef<User>[] = [
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'username', headerName: 'Username', flex: 1 },
-    { field: 'email', headerName: 'E-mail', flex: 1 },
     { field: 'isAdmin', headerName: 'Admin', flex: 1 },
   ];
 
@@ -50,7 +49,7 @@ const UsersList: FC<UsersListProps> = ({
         {allowDelete && (
           <IconButton
             color="error"
-            onClick={() => onDelete?.(params.row.id)}
+            onClick={() => onDelete?.(params.row)}
             title="Supprimer l'utilisateur"
           >
             <DeleteIcon />

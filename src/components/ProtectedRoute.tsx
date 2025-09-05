@@ -1,6 +1,6 @@
+import { Box, CircularProgress, Typography } from '@mui/material';
 import React, { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import { useAuth } from './providers/useAuth';
 
 interface ProtectedRouteProps {
@@ -38,7 +38,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (!isAuthenticated) {
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
-
 
   // Render the protected content
   return <>{children}</>;

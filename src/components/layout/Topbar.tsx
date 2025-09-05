@@ -47,7 +47,6 @@ const UserMenu: FC = () => {
             </Avatar>
             <Stack>
               <Typography fontWeight="bold">{user?.username}</Typography>
-              <Typography variant="body2">{user?.email}</Typography>
             </Stack>
           </Stack>
 
