@@ -7,9 +7,8 @@ import { sampleProjects } from '../../sampleData';
 import { Project } from '../../types/buisness';
 import ProjectPickerModal from '../modals/ProjectPickerModal';
 
-// 🔁 project_id au lieu de projectId
 const schema = z.object({
-  project_id: z.string().trim().min(1, 'Project is required'),
+  project_id: z.coerce.string().trim().min(1, 'Project is required'),
 });
 
 export type ProjectTokenFormInput = z.input<typeof schema>;
@@ -36,22 +35,22 @@ const ProjectTokenForm: FC<Props> = ({
     formState: { errors },
   } = useForm<ProjectTokenFormInput, unknown, ProjectTokenFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { project_id: '', ...defaultValues }, // 🔁
+    defaultValues: { project_id: '', ...defaultValues },
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const project_id = watch('project_id'); // 🔁
+  const project_id = watch('project_id');
 
   const selectedProject = useMemo(
-    () => projects.find((p) => p.id === project_id), // 🔁
+    () => projects.find((p) => String(p.id) === String(project_id)),
     [projects, project_id],
   );
 
   const openPicker = () => setPickerOpen(true);
   const closePicker = () => setPickerOpen(false);
 
-  const handlePickProject = (pid: string) => {
-    setValue('project_id', pid, { shouldValidate: true, shouldDirty: true }); // 🔁
+  const handlePickProject = (pid: string | number) => {
+    setValue('project_id', String(pid), { shouldValidate: true, shouldDirty: true });
     setPickerOpen(false);
   };
 
@@ -64,13 +63,14 @@ const ProjectTokenForm: FC<Props> = ({
         noValidate
         sx={{ pt: 1 }}
       >
-        {/* Enregistrer le champ côté RHF */}
-        <input type="hidden" {...register('project_id')} /> {/* 🔁 */}
+        {/* Champ caché enregistré par RHF */}
+        <input type="hidden" {...register('project_id')} />
+
         <Stack spacing={1.5}>
           <Stack direction="row" spacing={1}>
             <TextField
               label="Project"
-              value={selectedProject ? selectedProject.id : ''}
+              value={selectedProject ? String(selectedProject.id) : ''}
               placeholder="Select a project"
               fullWidth
               variant="outlined"
@@ -99,7 +99,7 @@ const ProjectTokenForm: FC<Props> = ({
       <ProjectPickerModal
         open={pickerOpen}
         projects={projects}
-        selectedProjectId={project_id} // 🔁
+        selectedProjectId={project_id}
         onClose={closePicker}
         onSubmit={handlePickProject}
       />
