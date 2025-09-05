@@ -376,7 +376,7 @@ const ProjectPage: FC = () => {
       const updatedProject = await ProjectService.updateProject(project.id, {
         name: values.name,
         description: values.description,
-        teamIds: values.teamIds,
+        teamIds: values.teamIds || [],
       });
 
       // Update local state immediately

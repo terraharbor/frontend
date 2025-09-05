@@ -46,10 +46,7 @@ const TeamsPickerModal: FC<TeamsPickerModalProps> = ({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return teams;
-    return teams.filter(
-      (t) =>
-        t.name.toLowerCase().includes(q) || (t.description?.toLowerCase().includes(q) ?? false),
-    );
+    return teams.filter((t) => t.name.toLowerCase().includes(q));
   }, [teams, query]);
 
   const toggle = (id: string) => {
@@ -95,7 +92,7 @@ const TeamsPickerModal: FC<TeamsPickerModalProps> = ({
                   <ListItemIcon>
                     <Checkbox edge="start" checked={checked} tabIndex={-1} disableRipple />
                   </ListItemIcon>
-                  <ListItemText id={`team-${t.id}`} primary={t.name} secondary={t.description} />
+                  <ListItemText id={`team-${t.id}`} primary={t.name} />
                 </ListItemButton>
               </ListItem>
             );
