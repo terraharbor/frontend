@@ -1,6 +1,7 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Alert, Box, Stack, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
+import { ProjectService } from '../api/projectService';
 import { TokenService } from '../api/tokenService';
 import { PageHeader } from '../components/PageHeader';
 import ProjectTokenCard from '../components/cards/ProjectTokenCard';
@@ -9,8 +10,7 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectTokenModal from '../components/modals/ProjectTokenModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects } from '../sampleData';
-import { ProjectToken } from '../types/buisness';
+import { Project, ProjectToken } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 /*
@@ -25,15 +25,18 @@ export const ProjectTokensPage: FC = () => {
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [tokens, setTokens] = useState<ProjectToken[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadTokens = async () => {
     setLoading(true);
     try {
-      const data = await TokenService.getTokens();
-      console.log(data);
-      setTokens(data);
+      const tokensData = await TokenService.getProjectTokens();
+      const projectsData = await ProjectService.getProjects();
+
+      setTokens(tokensData);
+      setProjects(projectsData);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error loading tokens: ${errorMessage}`, severity: 'error' });
@@ -59,13 +62,14 @@ export const ProjectTokensPage: FC = () => {
   const closeCreate = () => setIsCreateOpen(false);
 
   const handleCreateSubmit = async (values: ProjectTokenFormOutput) => {
+    console.log('Submit', values);
     setIsSubmitting(true);
     try {
-      await TokenService.createToken({
-        project_id: values.projectId,
+      await TokenService.createProjectToken({
+        project_id: values.project_id, // 🔁
       });
       showToast({ message: 'Token created successfully', severity: 'success' });
-      await loadTokens(); // Reload data from API
+      await loadTokens();
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error creating token: ${errorMessage}`, severity: 'error' });
@@ -74,19 +78,6 @@ export const ProjectTokensPage: FC = () => {
       setIsSubmitting(false);
       closeCreate();
     }
-
-    /*
-    const newToken: ProjectToken = {
-      value: generateTokenValue(48), // backend should generate & return once
-      projectId: values.projectId,
-      canRead: true, // always true
-      canWrite: values.canWrite,
-      createdAt: new Date(),
-      createdBy: user?.id ?? '1',
-    };
-
-    setTokens((prev) => [newToken, ...prev]);
-    */
   };
 
   // DELETE
@@ -99,7 +90,7 @@ export const ProjectTokensPage: FC = () => {
     if (!tokenToDelete) return;
 
     try {
-      await TokenService.revokeToken(tokenToDelete.id);
+      await TokenService.deleteProjectToken(tokenToDelete.token);
       showToast({ message: 'Token deleted successfully', severity: 'success' });
       await loadTokens(); // Reload data from API
     } catch (err) {
@@ -150,9 +141,9 @@ export const ProjectTokensPage: FC = () => {
 
       {tokens.length > 0 ? (
         <Stack spacing={1}>
-          {tokens.map((t, idx) => (
+          {tokens.map((t) => (
             <ProjectTokenCard
-              key={`${t.projectId}-${t.createdAt.toString()}-${idx}`}
+              key={t.token}
               token={t}
               onDelete={isAdmin ? handleAskDeleteToken : undefined}
             />
@@ -175,7 +166,7 @@ export const ProjectTokensPage: FC = () => {
       {/* Create modal */}
       <ProjectTokenModal
         open={isCreateOpen}
-        projects={sampleProjects}
+        projects={projects}
         initialValues={{}}
         onClose={closeCreate}
         onSubmit={handleCreateSubmit}
@@ -184,14 +175,7 @@ export const ProjectTokensPage: FC = () => {
       <ConfirmationModal
         open={deleteConfirmationOpen}
         title="Delete token"
-        message={
-          tokenToDelete
-            ? `Are you sure you want to delete this token for project "${
-                sampleProjects.find((p) => p.id === tokenToDelete.projectId)?.name ??
-                tokenToDelete.projectId
-              }"? This action is irreversible.`
-            : 'Are you sure you want to delete this token? This action is irreversible.'
-        }
+        message={'Are you sure you want to delete this token? This action is irreversible.'}
         confirmLabel="Delete"
         confirmColor="error"
         onConfirm={confirmDeleteToken}

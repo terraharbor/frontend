@@ -84,10 +84,11 @@ const ProjectPickerModal: FC<ProjectPickerModalProps> = ({
 
         <List dense sx={{ maxHeight: 420, overflow: 'auto', borderRadius: 1 }}>
           {filtered.map((p) => {
-            const checked = selected === p.id;
+            const pid = String(p.id);
+            const checked = selected === pid;
             return (
-              <ListItem key={p.id} disablePadding>
-                <ListItemButton onClick={() => setSelected(p.id)} dense selected={checked}>
+              <ListItem key={pid} disablePadding>
+                <ListItemButton onClick={() => setSelected(pid)} dense selected={checked}>
                   <ListItemIcon>
                     <Radio edge="start" checked={checked} />
                   </ListItemIcon>

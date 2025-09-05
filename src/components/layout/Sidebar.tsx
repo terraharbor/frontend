@@ -1,5 +1,4 @@
 import {
-  FactCheck as AuditIcon,
   Dashboard as DashboardIcon,
   Folder as ProjectsIcon,
   Groups as TeamsIcon,
@@ -29,7 +28,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Teams', to: '/teams', icon: <TeamsIcon /> },
   { label: 'Users', to: '/users', icon: <UsersIcon /> },
   { label: 'Tokens', to: '/tokens', icon: <TokensIcon />, adminOnly: true },
-  { label: 'Audit (logs)', to: '/audit', icon: <AuditIcon />, adminOnly: true },
 ];
 
 const Sidebar: FC = () => {
