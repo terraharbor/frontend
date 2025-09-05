@@ -25,7 +25,7 @@ type NavItem = { label: string; to: string; icon: JSX.Element; adminOnly?: boole
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', to: '/', icon: <DashboardIcon /> },
-  { label: 'Projects', to: '/projects', icon: <ProjectsIcon /> },
+  { label: 'Projects', to: '/projects', icon: <ProjectsIcon />, adminOnly: true },
   { label: 'Teams', to: '/teams', icon: <TeamsIcon /> },
   { label: 'Users', to: '/users', icon: <UsersIcon /> },
   { label: 'Tokens', to: '/tokens', icon: <TokensIcon />, adminOnly: true },
