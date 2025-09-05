@@ -391,24 +391,120 @@ const ProjectPage: FC = () => {
     setRestoreConfirmationOpen(true);
   };
 
-  const confirmDeleteStateFile = async () => {
-    if (!stateFileToDelete) return;
+  const loadContentForAllVersions = async () => {
+    if (!id || !stateData.currentState) return;
 
     try {
-      // TODO: Implement StateService.deleteSnapshot when available
-      // await StateService.deleteState(project?.id, 'main', stateFileToDelete.version);
+      // Load content for current state if not already loaded
+      if (stateData.currentState && !stateData.currentState.content) {
+        const content = await loadStateContent(stateData.currentState);
+        stateData.currentState.content = content;
+      }
+
+      // Load content for all previous versions
+      const updatedPreviousStates = await Promise.all(
+        stateData.previousStates.map(async (state) => {
+          if (!state.content) {
+            try {
+              const content = await loadStateContent(state);
+              return { ...state, content };
+            } catch (error) {
+              console.error(`Failed to load content for version ${state.version}:`, error);
+              return state; // Return without content if failed
+            }
+          }
+          return state;
+        })
+      );
+
+      // Update state with all loaded content
+      setStateData(prev => ({
+        currentState: prev.currentState,
+        previousStates: updatedPreviousStates,
+      }));
+
+      console.log('All version content reloaded successfully');
+    } catch (error) {
+      console.error('Failed to reload content for all versions:', error);
+    }
+  };
+
+  const confirmRestoreStateFileSnapshot = async () => {
+    if (!stateFileToRestore || !id) return;
+
+    try {
+      // Load the content of the version we want to restore if not already loaded
+      let contentToRestore = stateFileToRestore.content;
+      if (!contentToRestore) {
+        contentToRestore = await loadStateContent(stateFileToRestore);
+      }
+
+      // Parse the content to get the version number and increment it
+      let stateJson;
+      try {
+        stateJson = JSON.parse(contentToRestore);
+      } catch (error) {
+        console.error('Failed to parse state content:', error);
+        showToast({ message: 'Failed to parse state content', severity: 'error' });
+        return;
+      }
+
+      // Create new version number (find the highest version and add 1)
+      const allVersions = [stateData.currentState, ...stateData.previousStates]
+        .filter(s => s !== undefined)
+        .map(s => s!.version);
+      const newVersion = Math.max(...allVersions, 0) + 1;
+
+      // Update the version in the state content
+      stateJson.version = newVersion;
+      const updatedContent = JSON.stringify(stateJson, null, 2);
+
+      // POST the restored content as a new version
+      await StateService.putState(id, 'main', updatedContent);
+
+      showToast({ 
+        message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`, 
+        severity: 'success' 
+      });
+
+      // Reload the state files to show the new version
+      await loadRealStateFiles(id);
+      
+      // Note: loadRealStateFiles already loads content for the current state
+      // We don't call loadContentForAllVersions here as it would use stale data
+
+    } catch (error) {
+      console.error('Failed to restore state version:', error);
+      const errorMessage = getErrorMessage(error);
+      showToast({ message: `Failed to restore version: ${errorMessage}`, severity: 'error' });
+    } finally {
+      setRestoreConfirmationOpen(false);
+      setStateFileToRestore(null);
+    }
+  };
+
+  const confirmDeleteStateFile = async () => {
+    if (!stateFileToDelete || !id) return;
+
+    try {
+      // Extract state name from snapshot id (format: projectId-stateName-version)
+      const parts = stateFileToDelete.id.split('-');
+      const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
+      
+      // Delete the specific version using the backend API
+      await StateService.deleteState(id, stateName, stateFileToDelete.version);
+
       showToast({
         message: `Version ${stateFileToDelete.version} deleted successfully`,
         severity: 'success',
       });
 
-      setStateData((prev) => ({
-        currentState:
-          prev.currentState?.id === stateFileToDelete.id
-            ? prev.previousStates[0]
-            : prev.currentState,
-        previousStates: prev.previousStates.filter((s) => s.id !== stateFileToDelete.id),
-      }));
+      // Reload the state files to refresh the UI after deletion
+      await loadRealStateFiles(id);
+      
+      // Note: loadRealStateFiles already loads content for the current state
+      // We don't need to call loadContentForAllVersions here as it would use stale data
+
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error deleting state file: ${errorMessage}`, severity: 'error' });
@@ -719,13 +815,16 @@ const ProjectPage: FC = () => {
         title="Restore Version"
         message={
           stateFileToRestore
-            ? `Are you sure you want to restore version ${stateFileToRestore.version}? This will replace the current version.`
-            : 'Are you sure you want to restore this version? This will replace the current version.'
+            ? `Are you sure you want to restore version ${stateFileToRestore.version}? This will create a new version with the content from version ${stateFileToRestore.version}.`
+            : 'Are you sure you want to restore this version? This will create a new version with the restored content.'
         }
         confirmLabel="Restore"
         confirmColor="warning"
-        onConfirm={confirmRestoreStateFile}
-        onCancel={cancelRestoreStateFile}
+        onConfirm={confirmRestoreStateFileSnapshot}
+        onCancel={() => {
+          setRestoreConfirmationOpen(false);
+          setStateFileToRestore(null);
+        }}
       />
 
       <ConfirmationModal
