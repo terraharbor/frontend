@@ -1,31 +1,30 @@
-import { 
+import {
   Add as AddIcon,
-  Login, 
-  Logout, 
-  Upload, 
-  Download, 
-  Lock, 
-  LockOpen, 
   Delete,
-  Refresh
+  Download,
+  ExpandMore,
+  Lock,
+  LockOpen,
+  Login,
+  Logout,
+  Upload,
 } from '@mui/icons-material';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Button,
   Card,
   CardContent,
+  Chip,
   Divider,
+  Paper,
   Stack,
   TextField,
   Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  Paper,
 } from '@mui/material';
-import { ExpandMore } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import { FC, useState } from 'react';
 import { getAuthToken } from '../api/client';
@@ -62,7 +61,7 @@ const TestPage: FC = () => {
     version: 1,
     lockInfo: '{"ID": "test-lock-123", "user": "test-user"}',
   });
-  
+
   const [stateContent, setStateContent] = useState('');
   const [testResults, setTestResults] = useState<Record<string, any>>({});
 
@@ -144,33 +143,37 @@ const TestPage: FC = () => {
     }
 
     try {
-      const testStateContent = JSON.stringify({
-        version: stateTestData.version,
-        terraform_version: "1.0.0",
-        serial: 1,
-        lineage: "test-lineage",
-        outputs: {},
-        resources: []
-      }, null, 2);
+      const testStateContent = JSON.stringify(
+        {
+          version: stateTestData.version,
+          terraform_version: '1.0.0',
+          serial: 1,
+          lineage: 'test-lineage',
+          outputs: {},
+          resources: [],
+        },
+        null,
+        2,
+      );
 
       await StateService.putState(
-        stateTestData.project, 
-        stateTestData.stateName, 
-        testStateContent, 
-        stateTestData.version
+        stateTestData.project,
+        stateTestData.stateName,
+        testStateContent,
+        stateTestData.version,
       );
-      
-      setTestResults(prev => ({
+
+      setTestResults((prev) => ({
         ...prev,
-        uploadState: { success: true, timestamp: new Date().toISOString() }
+        uploadState: { success: true, timestamp: new Date().toISOString() },
       }));
       showToast({ message: 'State uploaded successfully', severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
-        uploadState: { success: false, error: errorMessage, timestamp: new Date().toISOString() }
+        uploadState: { success: false, error: errorMessage, timestamp: new Date().toISOString() },
       }));
       showToast({ message: `Upload failed (${status}): ${errorMessage}`, severity: 'error' });
     }
@@ -184,25 +187,25 @@ const TestPage: FC = () => {
 
     try {
       const stateBlob = await StateService.getState(
-        stateTestData.project, 
-        stateTestData.stateName, 
-        stateTestData.version
+        stateTestData.project,
+        stateTestData.stateName,
+        stateTestData.version,
       );
-      
+
       const text = await stateBlob.text();
       setStateContent(text);
-      
-      setTestResults(prev => ({
+
+      setTestResults((prev) => ({
         ...prev,
-        downloadState: { success: true, timestamp: new Date().toISOString() }
+        downloadState: { success: true, timestamp: new Date().toISOString() },
       }));
       showToast({ message: 'State downloaded successfully', severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
-        downloadState: { success: false, error: errorMessage, timestamp: new Date().toISOString() }
+        downloadState: { success: false, error: errorMessage, timestamp: new Date().toISOString() },
       }));
       showToast({ message: `Download failed (${status}): ${errorMessage}`, severity: 'error' });
     }
@@ -216,22 +219,22 @@ const TestPage: FC = () => {
 
     try {
       await StateService.lockState(
-        stateTestData.project, 
-        stateTestData.stateName, 
-        JSON.parse(stateTestData.lockInfo)
+        stateTestData.project,
+        stateTestData.stateName,
+        JSON.parse(stateTestData.lockInfo),
       );
-      
-      setTestResults(prev => ({
+
+      setTestResults((prev) => ({
         ...prev,
-        lockState: { success: true, timestamp: new Date().toISOString() }
+        lockState: { success: true, timestamp: new Date().toISOString() },
       }));
       showToast({ message: 'State locked successfully', severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
-        lockState: { success: false, error: errorMessage, timestamp: new Date().toISOString() }
+        lockState: { success: false, error: errorMessage, timestamp: new Date().toISOString() },
       }));
       showToast({ message: `Lock failed (${status}): ${errorMessage}`, severity: 'error' });
     }
@@ -245,22 +248,22 @@ const TestPage: FC = () => {
 
     try {
       await StateService.unlockState(
-        stateTestData.project, 
-        stateTestData.stateName, 
-        JSON.parse(stateTestData.lockInfo)
+        stateTestData.project,
+        stateTestData.stateName,
+        JSON.parse(stateTestData.lockInfo),
       );
-      
-      setTestResults(prev => ({
+
+      setTestResults((prev) => ({
         ...prev,
-        unlockState: { success: true, timestamp: new Date().toISOString() }
+        unlockState: { success: true, timestamp: new Date().toISOString() },
       }));
       showToast({ message: 'State unlocked successfully', severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
-        unlockState: { success: false, error: errorMessage, timestamp: new Date().toISOString() }
+        unlockState: { success: false, error: errorMessage, timestamp: new Date().toISOString() },
       }));
       showToast({ message: `Unlock failed (${status}): ${errorMessage}`, severity: 'error' });
     }
@@ -274,22 +277,22 @@ const TestPage: FC = () => {
 
     try {
       await StateService.deleteState(
-        stateTestData.project, 
-        stateTestData.stateName, 
-        stateTestData.version
+        stateTestData.project,
+        stateTestData.stateName,
+        stateTestData.version,
       );
-      
-      setTestResults(prev => ({
+
+      setTestResults((prev) => ({
         ...prev,
-        deleteState: { success: true, timestamp: new Date().toISOString() }
+        deleteState: { success: true, timestamp: new Date().toISOString() },
       }));
       showToast({ message: 'State deleted successfully', severity: 'success' });
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'Unknown error';
       const status = error.response?.status || 'No status';
-      setTestResults(prev => ({
+      setTestResults((prev) => ({
         ...prev,
-        deleteState: { success: false, error: errorMessage, timestamp: new Date().toISOString() }
+        deleteState: { success: false, error: errorMessage, timestamp: new Date().toISOString() },
       }));
       showToast({ message: `Delete failed (${status}): ${errorMessage}`, severity: 'error' });
     }
@@ -523,7 +526,7 @@ const TestPage: FC = () => {
 
       {/* State Management Testing */}
       <PageHeader title="State Management Testing" />
-      
+
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography variant="h6">Terraform State Operations</Typography>
@@ -532,31 +535,41 @@ const TestPage: FC = () => {
           <Stack spacing={3}>
             {/* State Test Configuration */}
             <Paper sx={{ p: 2 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>Configuration</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                Configuration
+              </Typography>
               <Stack spacing={2}>
                 <TextField
                   label="Project"
                   value={stateTestData.project}
-                  onChange={(e) => setStateTestData(prev => ({ ...prev, project: e.target.value }))}
+                  onChange={(e) =>
+                    setStateTestData((prev) => ({ ...prev, project: e.target.value }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="State Name"
                   value={stateTestData.stateName}
-                  onChange={(e) => setStateTestData(prev => ({ ...prev, stateName: e.target.value }))}
+                  onChange={(e) =>
+                    setStateTestData((prev) => ({ ...prev, stateName: e.target.value }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="Version"
                   type="number"
                   value={stateTestData.version}
-                  onChange={(e) => setStateTestData(prev => ({ ...prev, version: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setStateTestData((prev) => ({ ...prev, version: parseInt(e.target.value) }))
+                  }
                   size="small"
                 />
                 <TextField
                   label="Lock Info (JSON)"
                   value={stateTestData.lockInfo}
-                  onChange={(e) => setStateTestData(prev => ({ ...prev, lockInfo: e.target.value }))}
+                  onChange={(e) =>
+                    setStateTestData((prev) => ({ ...prev, lockInfo: e.target.value }))
+                  }
                   multiline
                   rows={2}
                   size="small"
@@ -566,7 +579,9 @@ const TestPage: FC = () => {
 
             {/* State Operations */}
             <Paper sx={{ p: 2 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>Operations</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                Operations
+              </Typography>
               <Stack direction="row" spacing={2} flexWrap="wrap">
                 <Button
                   startIcon={<Upload />}
@@ -614,7 +629,9 @@ const TestPage: FC = () => {
 
             {/* Test Results */}
             <Paper sx={{ p: 2 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2 }}>Test Results</Typography>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                Test Results
+              </Typography>
               <Stack spacing={1}>
                 {Object.entries(testResults).map(([operation, result]) => (
                   <Box key={operation} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -642,7 +659,9 @@ const TestPage: FC = () => {
             {/* Downloaded State Content */}
             {stateContent && (
               <Paper sx={{ p: 2 }}>
-                <Typography variant="subtitle1" sx={{ mb: 2 }}>Downloaded State Content</Typography>
+                <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                  Downloaded State Content
+                </Typography>
                 <TextField
                   multiline
                   rows={10}

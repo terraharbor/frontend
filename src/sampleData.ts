@@ -201,6 +201,7 @@ export const sampleStateFileInfos: StateFileInfos[] = [
 
 export const sampleProjectTokens: ProjectToken[] = [
   {
+    id: '1',
     value: 'jnjndewonkwn-820993-ndjnjedn',
     projectId: '3',
     createdAt: new Date('2025-08-14T10:02:00Z'),
@@ -209,6 +210,7 @@ export const sampleProjectTokens: ProjectToken[] = [
     canWrite: true,
   },
   {
+    id: '2',
     value: 'hjidehbdnkwn-820993-ndjnjedn',
     projectId: '2',
     createdAt: new Date('2025-08-14T10:02:00Z'),

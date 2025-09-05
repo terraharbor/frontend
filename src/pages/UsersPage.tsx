@@ -1,4 +1,3 @@
-import { Add as AddIcon } from '@mui/icons-material';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 import { UserService } from '../api/userService';
@@ -47,12 +46,6 @@ export const UsersPage: FC = () => {
     loadUsers();
   }, []);
 
-  const openCreateModal = () => {
-    setMode('create');
-    setEditingUser(null);
-    setIsModalOpen(true);
-  };
-
   const openEditModal = (user: User) => {
     setMode('edit');
     setEditingUser(user);
@@ -84,6 +77,7 @@ export const UsersPage: FC = () => {
       } else if (mode === 'edit' && editingUser) {
         await UserService.updateUser(editingUser.id, {
           username: values.username,
+          isAdmin: values.isAdmin,
         });
         showToast({ message: 'User updated successfully', severity: 'success' });
 
@@ -101,9 +95,9 @@ export const UsersPage: FC = () => {
     }
   };
 
-  const handleDeleteUser = async (user: User) => {
+  const handleDeleteUser = (user: User) => {
     setUserToDelete(user);
-    await confirmDeleteUser;
+    setDeleteConfirmationOpen(true);
   };
 
   const confirmDeleteUser = async () => {
@@ -133,20 +127,7 @@ export const UsersPage: FC = () => {
 
   return (
     <Box>
-      <PageHeader
-        title="Users"
-        action={
-          isAdmin
-            ? {
-                label: 'New',
-                onClick: openCreateModal,
-                startIcon: <AddIcon />,
-                variant: 'contained',
-                color: 'primary',
-              }
-            : undefined
-        }
-      />
+      <PageHeader title="Users" />
 
       {loading ? (
         <Box

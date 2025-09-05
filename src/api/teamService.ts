@@ -27,7 +27,7 @@ export class TeamService {
   }
 
   static async getTeamMembers(teamId: string): Promise<User[]> {
-    const response = await apiClient.get(`/teams/${teamId}/members`);
+    const response = await apiClient.get(`/teams/${teamId}/users`);
     return response.data;
   }
 

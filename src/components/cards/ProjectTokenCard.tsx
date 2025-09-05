@@ -1,5 +1,4 @@
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Box, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
@@ -11,10 +10,9 @@ import { ProjectToken } from '../../types/buisness';
 type ProjectTokenCardProps = {
   token: ProjectToken;
   onDelete?: (token: ProjectToken) => void;
-  onEdit?: (token: ProjectToken) => void;
 };
 
-const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete, onEdit }) => {
+const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
 
@@ -96,14 +94,6 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete, onEdit }
       </Stack>
 
       <Stack direction="row" spacing={1} alignItems="center">
-        {onEdit && (
-          <Tooltip title="Edit token">
-            <IconButton size="small" onClick={() => onEdit(token)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
-
         {onDelete && (
           <Tooltip title="Delete token">
             <IconButton size="small" color="error" onClick={() => onDelete(token)}>

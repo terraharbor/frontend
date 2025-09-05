@@ -1,5 +1,5 @@
-import { apiClient } from './client';
 import { AuditLog } from '../types/buisness';
+import { apiClient } from './client';
 
 export interface AuditFilters {
   user_id?: string;
@@ -15,7 +15,7 @@ export interface AuditFilters {
 export class AuditService {
   static async getAuditLogs(filters?: AuditFilters): Promise<AuditLog[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -24,7 +24,9 @@ export class AuditService {
       });
     }
 
-    const response = await apiClient.get(`/audit${params.toString() ? `?${params.toString()}` : ''}`);
+    const response = await apiClient.get(
+      `/audit${params.toString() ? `?${params.toString()}` : ''}`,
+    );
     return response.data;
   }
 
@@ -33,9 +35,12 @@ export class AuditService {
     return response.data;
   }
 
-  static async getUserAuditLogs(userId: string, filters?: Omit<AuditFilters, 'user_id'>): Promise<AuditLog[]> {
+  static async getUserAuditLogs(
+    userId: string,
+    filters?: Omit<AuditFilters, 'user_id'>,
+  ): Promise<AuditLog[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -44,13 +49,19 @@ export class AuditService {
       });
     }
 
-    const response = await apiClient.get(`/users/${userId}/audit${params.toString() ? `?${params.toString()}` : ''}`);
+    const response = await apiClient.get(
+      `/users/${userId}/audit${params.toString() ? `?${params.toString()}` : ''}`,
+    );
     return response.data;
   }
 
-  static async getResourceAuditLogs(resourceType: string, resourceId: string, filters?: Omit<AuditFilters, 'resource_type' | 'resource_id'>): Promise<AuditLog[]> {
+  static async getResourceAuditLogs(
+    resourceType: string,
+    resourceId: string,
+    filters?: Omit<AuditFilters, 'resource_type' | 'resource_id'>,
+  ): Promise<AuditLog[]> {
     const params = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -59,7 +70,9 @@ export class AuditService {
       });
     }
 
-    const response = await apiClient.get(`/audit/${resourceType}/${resourceId}${params.toString() ? `?${params.toString()}` : ''}`);
+    const response = await apiClient.get(
+      `/audit/${resourceType}/${resourceId}${params.toString() ? `?${params.toString()}` : ''}`,
+    );
     return response.data;
   }
 

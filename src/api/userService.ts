@@ -1,9 +1,10 @@
-import { Team, User } from '../types/buisness';
+import { Project, Team, User } from '../types/buisness';
 import { apiClient } from './client';
 
 export class UserService {
   static async getUsers(): Promise<User[]> {
     const response = await apiClient.get('/users');
+    console.log(response);
     return response.data;
   }
 
@@ -18,7 +19,7 @@ export class UserService {
   }
 
   static async updateUser(id: string, user: Partial<User>): Promise<User> {
-    const response = await apiClient.put(`/users/${id}`, user);
+    const response = await apiClient.patch(`/users/${id}`, user);
     return response.data;
   }
 
@@ -28,6 +29,11 @@ export class UserService {
 
   static async getUserTeams(userId: string): Promise<Team[]> {
     const response = await apiClient.get(`/users/${userId}/teams`);
+    return response.data;
+  }
+
+  static async getUserProjects(userId: string): Promise<Project[]> {
+    const response = await apiClient.get(`/users/${userId}/projects`);
     return response.data;
   }
 

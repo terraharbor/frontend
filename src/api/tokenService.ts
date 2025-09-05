@@ -17,7 +17,7 @@ export class TokenService {
     return response.data;
   }
 
-  static async createToken(tokenData: { user_id: string; ttl?: string }): Promise<AuthToken> {
+  static async createToken(tokenData: { project_id: string }): Promise<ProjectToken> {
     const response = await apiClient.post('/tokens', tokenData);
     return response.data;
   }
