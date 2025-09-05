@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.31](https://github.com/terraharbor/frontend/compare/v0.1.30...v0.1.31) (2025-09-05)
+
+
+### Features
+
+* terraform config modal ([f0761f8](https://github.com/terraharbor/frontend/commit/f0761f84385190e2fab0ecc6241a88f09c9b9f8b))
+* terraform congig modal ([998d34e](https://github.com/terraharbor/frontend/commit/998d34eb8f22f28ff02b3af450871fbdc1cd73f1))
+
+
+### Miscellaneous Chores
+
+* merge pull request [#116](https://github.com/terraharbor/frontend/issues/116) from terraharbor/feat/terraform-init ([f0761f8](https://github.com/terraharbor/frontend/commit/f0761f84385190e2fab0ecc6241a88f09c9b9f8b))
+
 ## [0.1.30](https://github.com/terraharbor/frontend/compare/v0.1.29...v0.1.30) (2025-09-05)
 
 
