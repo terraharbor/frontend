@@ -90,33 +90,134 @@ const ProjectPage: FC = () => {
   //   return { currentState: current, previousStates: previous };
   // }, [project]);
 
+  const loadRealStateFiles = async (projectId: string) => {
+    try {
+      console.log('Loading real state files for project:', projectId);
+      
+      // For now, assume all state files are named "main"
+      const stateName = 'main';
+      
+      // Get all versions of the state file directly
+      const versions = await StateService.getStates(projectId, stateName);
+      console.log('State versions received:', versions);
+      
+      if (versions && Array.isArray(versions) && versions.length > 0) {
+        // Convert to StateFileSnapshot format with safe null handling
+        const snapshots: StateFileSnapshot[] = versions.map((version) => {
+          // Handle null values safely
+          const createdBy = version['created by'] || '-';
+          const uploadDate = version['upload date'];
+          
+          // Safe date parsing
+          let createdAt: Date;
+          try {
+            if (uploadDate && uploadDate !== null) {
+              createdAt = new Date(uploadDate);
+              // Check if date is valid
+              if (isNaN(createdAt.getTime())) {
+                createdAt = new Date();
+              }
+            } else {
+              createdAt = new Date();
+            }
+          } catch (dateError) {
+            console.warn('Error parsing date:', dateError);
+            createdAt = new Date();
+          }
+          
+          return {
+            id: `${projectId}-${stateName}-${version.version}`,
+            projectId: projectId,
+            version: parseInt(version.version) || 1,
+            content: '', // Will be loaded when needed
+            createdAt: createdAt,
+            createdBy: createdBy
+          };
+        });
+        
+        // Sort by version descending (latest first)
+        snapshots.sort((a, b) => b.version - a.version);
+        
+        console.log('Created snapshots:', snapshots);
+        
+                  // Load content for the current state immediately
+          const currentSnapshot = snapshots[0];
+          if (currentSnapshot) {
+            try {
+              const content = await loadStateContent(currentSnapshot);
+              currentSnapshot.content = content;
+            } catch (error) {
+              console.error('Failed to load content for current state:', error);
+            }
+          }
+
+          setStateData({
+            currentState: currentSnapshot,
+            previousStates: snapshots.slice(1),
+          });
+      } else {
+        console.log('No versions found or invalid response');
+        // No versions found
+        setStateData({
+          currentState: undefined,
+          previousStates: [],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load state files:', error);
+      // Fallback to empty state
+      setStateData({
+        currentState: undefined,
+        previousStates: [],
+      });
+    }
+  };
+
   const loadProjectData = async () => {
     if (!id) return;
 
+    console.log('Starting to load project data for ID:', id);
     setLoading(true);
     try {
+      console.log('Fetching project, teams, and users data...');
       const [projectData, allTeamsData, usersData] = await Promise.all([
         ProjectService.getProject(id),
         TeamService.getTeams(),
         UserService.getUsers(),
       ]);
 
-      setProject(projectData);
+      console.log('Project data received:', projectData);
+      console.log('Teams data received:', allTeamsData);
+      console.log('Users data received:', usersData);
+
+      // Handle case where backend returns array instead of single object
+      const project = Array.isArray(projectData) ? projectData[0] : projectData;
+      console.log('Processed project:', project);
+      console.log('Project name:', project?.name);
+      console.log('Project teamIds:', project?.teamIds);
+
+      setProject(project);
       setAllTeams(allTeamsData);
       setUsers(usersData);
 
-      const projectTeams = allTeamsData.filter((team) => projectData.teamIds.includes(team.id));
+      const projectTeams = allTeamsData.filter((team) => 
+        project?.teamIds && Array.isArray(project.teamIds) && project.teamIds.includes(team.id)
+      );
       setTeams(projectTeams);
 
-      // Load state files (using sample data for now)
-      const states = sampleStateFilesTerraform
-        .filter((s) => s.projectId === id)
-        .sort((a, b) => b.version - a.version);
-
-      setStateData({
-        currentState: states[0],
-        previousStates: states.slice(1),
-      });
+      console.log('About to load real state files...');
+      // Load real state files from backend - don't let this break the page
+      try {
+        await loadRealStateFiles(id);
+        console.log('State files loaded successfully');
+      } catch (stateError) {
+        console.error('Failed to load state files, continuing without them:', stateError);
+        // Set empty state so page still loads
+        setStateData({
+          currentState: undefined,
+          previousStates: [],
+        });
+      }
 
       // Sample data fallback implementation (commented out):
       // const initialProject = sampleProjects.find((p) => p.id === id);
@@ -125,10 +226,12 @@ const ProjectPage: FC = () => {
       // setAllTeams(sampleTeams);
       // setUsers(sampleUsers);
     } catch (err) {
+      console.error('Error in loadProjectData:', err);
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error loading project: ${errorMessage}`, severity: 'error' });
       logError('loadProjectData', err);
     } finally {
+      console.log('loadProjectData finished, setting loading to false');
       setLoading(false);
     }
   };
@@ -147,7 +250,28 @@ const ProjectPage: FC = () => {
     ? users.find((u) => stateFileInfos.lockedBy === u.id)
     : undefined;
 
-  const handleOpenViewer = (s: StateFileSnapshot) => {
+  const loadStateContent = async (snapshot: StateFileSnapshot): Promise<string> => {
+    try {
+      if (!id) return '{}';
+      
+      // Extract state name from snapshot id (format: projectId-stateName-version)
+      const parts = snapshot.id.split('-');
+      const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
+      
+      const stateJson = await StateService.getStateAsJson(id, stateName, snapshot.version);
+      return JSON.stringify(stateJson, null, 2);
+    } catch (error) {
+      console.error('Failed to load state content:', error);
+      return JSON.stringify({ error: 'Failed to load state content' }, null, 2);
+    }
+  };
+
+  const handleOpenViewer = async (s: StateFileSnapshot) => {
+    // Load content if not already loaded
+    if (!s.content) {
+      const content = await loadStateContent(s);
+      s.content = content;
+    }
     setSelectedSnapshot(s);
     setViewerModalOpen(true);
   };
@@ -351,7 +475,10 @@ const ProjectPage: FC = () => {
     setRemoveTeamConfirmationOpen(false);
   };
 
+  console.log('ProjectPage render - loading:', loading, 'project:', project, 'stateData:', stateData);
+
   if (loading) {
+    console.log('Showing loading spinner');
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress />
@@ -360,10 +487,11 @@ const ProjectPage: FC = () => {
   }
 
   if (!project) {
+    console.log('No project found, showing error');
     return <Alert severity="error">No project found with the id: "{id}".</Alert>;
   }
 
-  console.log('TEST', project);
+  console.log('Rendering project page for:', project.name);
 
   return (
     <>
@@ -529,7 +657,7 @@ const ProjectPage: FC = () => {
                       </Stack>
                     )}
 
-                    <JsonViewer value={stateData.currentState.content} />
+                    <JsonViewer value={stateData.currentState.content || '{}'} />
                   </Stack>
                 </Stack>
               ) : (
@@ -546,7 +674,7 @@ const ProjectPage: FC = () => {
         snapshot={selectedSnapshot}
       />
 
-      {stateData.currentState && (
+      {stateData.currentState && compareModalOpen && (
         <StateFileCompareModal
           open={compareModalOpen}
           onClose={handleCloseCompare}

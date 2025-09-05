@@ -62,4 +62,25 @@ export class StateService {
       data: lockInfo,
     });
   }
+
+  static async checkStateExists(project: string, stateName: string): Promise<boolean> {
+    try {
+      const versions = await this.getStates(project, stateName);
+      return Array.isArray(versions) && versions.length > 0;
+    } catch (error) {
+      console.log('State does not exist:', error);
+      return false;
+    }
+  }
+
+  static async getStateAsJson(project: string, stateName: string, version?: number): Promise<any> {
+    try {
+      const blob = await this.getState(project, stateName, version);
+      const text = await blob.text();
+      return JSON.parse(text);
+    } catch (error) {
+      console.error('Failed to get state as JSON:', error);
+      throw error;
+    }
+  }
 }
