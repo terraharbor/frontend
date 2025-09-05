@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://backend.internal:8000';
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -35,9 +35,9 @@ apiClient.interceptors.request.use(
       url: config.url,
       method: config.method,
       baseURL: config.baseURL,
-      hasToken: !!token
+      hasToken: !!token,
     });
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -46,7 +46,7 @@ apiClient.interceptors.request.use(
   (error) => {
     console.error('Request Error:', error);
     return Promise.reject(error);
-  }
+  },
 );
 
 apiClient.interceptors.response.use(
@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
     console.log('API Response:', {
       url: response.config.url,
       status: response.status,
-      data: response.data
+      data: response.data,
     });
     return response;
   },
@@ -65,15 +65,15 @@ apiClient.interceptors.response.use(
       statusText: error.response?.statusText,
       data: error.response?.data,
       message: error.message,
-      code: error.code
+      code: error.code,
     });
-    
+
     if (error.response?.status === 401) {
       setAuthToken(null);
       console.warn('Unauthorized access - token cleared');
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;
