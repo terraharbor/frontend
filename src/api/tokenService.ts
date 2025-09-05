@@ -36,6 +36,7 @@ export class TokenService {
   }
 
   // Project token
+
   static async getProjectTokens(): Promise<ProjectToken[]> {
     const response = await apiClient.get(`/tokens`);
     return response.data;

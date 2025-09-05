@@ -1,6 +1,7 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Alert, Box, Stack, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
+import { ProjectService } from '../api/projectService';
 import { TokenService } from '../api/tokenService';
 import { PageHeader } from '../components/PageHeader';
 import ProjectTokenCard from '../components/cards/ProjectTokenCard';
@@ -9,8 +10,7 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import ProjectTokenModal from '../components/modals/ProjectTokenModal';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
-import { sampleProjects } from '../sampleData';
-import { ProjectToken } from '../types/buisness';
+import { Project, ProjectToken } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 /*
@@ -25,15 +25,18 @@ export const ProjectTokensPage: FC = () => {
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [tokens, setTokens] = useState<ProjectToken[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadTokens = async () => {
     setLoading(true);
     try {
-      const data = await TokenService.getProjectTokens();
-      console.log(data);
-      setTokens(data);
+      const tokensData = await TokenService.getProjectTokens();
+      const projectsData = await ProjectService.getProjects();
+
+      setTokens(tokensData);
+      setProjects(projectsData);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error loading tokens: ${errorMessage}`, severity: 'error' });
@@ -59,6 +62,7 @@ export const ProjectTokensPage: FC = () => {
   const closeCreate = () => setIsCreateOpen(false);
 
   const handleCreateSubmit = async (values: ProjectTokenFormOutput) => {
+    console.log('Submit');
     setIsSubmitting(true);
     try {
       await TokenService.createProjectToken({
@@ -175,7 +179,7 @@ export const ProjectTokensPage: FC = () => {
       {/* Create modal */}
       <ProjectTokenModal
         open={isCreateOpen}
-        projects={sampleProjects}
+        projects={projects}
         initialValues={{}}
         onClose={closeCreate}
         onSubmit={handleCreateSubmit}

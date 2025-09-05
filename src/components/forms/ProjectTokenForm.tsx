@@ -8,9 +8,7 @@ import { Project } from '../../types/buisness';
 import ProjectPickerModal from '../modals/ProjectPickerModal';
 
 const schema = z.object({
-  projectId: z.string().trim().min(1, 'Project is required'),
-  canRead: z.literal(true),
-  canWrite: z.boolean().default(false),
+  project_id: z.string().trim().min(1, 'Project is required'),
 });
 
 export type ProjectTokenFormInput = z.input<typeof schema>;
@@ -36,15 +34,13 @@ const ProjectTokenForm: FC<Props> = ({
   >({
     resolver: zodResolver(schema),
     defaultValues: {
-      projectId: '',
-      canRead: true,
-      canWrite: false,
+      project_id: '',
       ...defaultValues,
     },
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const projectId = watch('projectId');
+  const projectId = watch('project_id');
 
   const selectedProject = useMemo(
     () => projects.find((p) => p.id === projectId),
@@ -55,7 +51,7 @@ const ProjectTokenForm: FC<Props> = ({
   const closePicker = () => setPickerOpen(false);
 
   const handlePickProject = (pid: string) => {
-    setValue('projectId', pid, { shouldValidate: true, shouldDirty: true });
+    setValue('project_id', pid, { shouldValidate: true, shouldDirty: true });
     setPickerOpen(false);
   };
 
@@ -72,7 +68,7 @@ const ProjectTokenForm: FC<Props> = ({
           <Stack direction="row" spacing={1}>
             <TextField
               label="Project"
-              value={selectedProject ? selectedProject.name : ''}
+              value={selectedProject ? selectedProject.id : ''}
               placeholder="Select a project"
               fullWidth
               variant="outlined"
