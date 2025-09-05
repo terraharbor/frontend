@@ -156,25 +156,25 @@ const ProjectPage: FC = () => {
 
         console.log('Created snapshots:', snapshots);
 
-                 // Load content for ALL versions immediately (current + previous)
-         const snapshotsWithContent = await Promise.all(
-           snapshots.map(async (snapshot) => {
-             try {
-               const content = await loadStateContent(snapshot);
-               return { ...snapshot, content };
-             } catch (error) {
-               console.error(`Failed to load content for version ${snapshot.version}:`, error);
-               return snapshot; // Return without content if failed
-             }
-           })
-         );
+        // Load content for ALL versions immediately (current + previous)
+        const snapshotsWithContent = await Promise.all(
+          snapshots.map(async (snapshot) => {
+            try {
+              const content = await loadStateContent(snapshot);
+              return { ...snapshot, content };
+            } catch (error) {
+              console.error(`Failed to load content for version ${snapshot.version}:`, error);
+              return snapshot; // Return without content if failed
+            }
+          }),
+        );
 
-         console.log('All version content loaded on initial load');
+        console.log('All version content loaded on initial load');
 
-         setStateData({
-           currentState: snapshotsWithContent[0],
-           previousStates: snapshotsWithContent.slice(1),
-         });
+        setStateData({
+          currentState: snapshotsWithContent[0],
+          previousStates: snapshotsWithContent.slice(1),
+        });
       } else {
         console.log('No versions found or invalid response');
         // No versions found
@@ -385,7 +385,7 @@ const ProjectPage: FC = () => {
         const loadAllContent = async () => {
           try {
             let updatedCurrentState = currentStateData.currentState;
-            
+
             // Load content for current state if not already loaded
             if (updatedCurrentState && !updatedCurrentState.content) {
               const content = await loadStateContent(updatedCurrentState);
@@ -422,7 +422,7 @@ const ProjectPage: FC = () => {
 
         // Execute the async loading
         loadAllContent();
-        
+
         // Return current state unchanged for now
         return currentStateData;
       });
@@ -471,7 +471,7 @@ const ProjectPage: FC = () => {
 
       // Reload the state files to show the new version
       await loadRealStateFiles(id);
-      
+
       // Load content for all versions (including the new restored version)
       await loadContentForAllVersions();
     } catch (error) {
