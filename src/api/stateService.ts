@@ -24,12 +24,42 @@ export class StateService {
     project: string,
     stateName: string,
     stateData: Blob | string,
-    version?: number,
+    serial?: number,
+    lockId?: string,
   ): Promise<void> {
-    const versionParam = version ? `?version=${version}` : '';
-    await apiClient.post(`/state/${project}/${stateName}${versionParam}`, stateData, {
+    // Convert stateData to string if it's a Blob
+    let dataToSend: string;
+    if (stateData instanceof Blob) {
+      dataToSend = await stateData.text();
+    } else {
+      dataToSend = stateData;
+    }
+
+    // Parse the JSON to extract or add serial number
+    let stateJson: any;
+    try {
+      stateJson = JSON.parse(dataToSend);
+    } catch (error) {
+      throw new Error('Invalid JSON state data');
+    }
+
+    // Ensure serial number is present
+    if (serial !== undefined) {
+      stateJson.serial = serial;
+    } else if (!stateJson.serial) {
+      throw new Error('Serial number is required');
+    }
+
+    const params = new URLSearchParams();
+    if (lockId) {
+      params.append('ID', lockId);
+    }
+
+    const url = `/state/${project}/${stateName}${params.toString() ? `?${params.toString()}` : ''}`;
+    
+    await apiClient.post(url, JSON.stringify(stateJson), {
       headers: {
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': 'application/json',
       },
     });
   }
@@ -73,9 +103,9 @@ export class StateService {
     }
   }
 
-  static async getStateAsJson(project: string, stateName: string, version?: number): Promise<any> {
+  static async getStateAsJson(project: string, stateName: string, serial?: number): Promise<any> {
     try {
-      const blob = await this.getState(project, stateName, version);
+      const blob = await this.getState(project, stateName, serial);
       const text = await blob.text();
       return JSON.parse(text);
     } catch (error) {
@@ -87,5 +117,19 @@ export class StateService {
   static async getStateStatus(project: string, stateName: string): Promise<any> {
     const response = await apiClient.get(`/state/${project}/${stateName}/status`);
     return response.data;
+  }
+
+  static async getProjectStateNames(project: string): Promise<string[]> {
+    try {
+      const response = await apiClient.get(`/state/${project}`);
+      // Extract state names from file paths like "/data/4/main/latest.tfstate"
+      return response.data.map((item: any) => {
+        const pathParts = item.path.split('/');
+        return pathParts[pathParts.length - 2]; // State name is second to last part
+      });
+    } catch (error) {
+      console.error('Failed to get project state names:', error);
+      return ['main']; // Fallback to default
+    }
   }
 }
