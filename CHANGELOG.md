@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.29](https://github.com/terraharbor/frontend/compare/v0.1.28...v0.1.29) (2025-09-05)
+
+
+### Documentation
+
+* **readme:** improve badges with hyperlinks ([c510a39](https://github.com/terraharbor/frontend/commit/c510a39f6660d0b44bfc06e0e56d3b8f03a838a8))
+
 ## [0.1.28](https://github.com/terraharbor/frontend/compare/v0.1.27...v0.1.28) (2025-09-05)
 
 
