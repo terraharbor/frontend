@@ -39,7 +39,8 @@ const ProjectTokenForm: FC<Props> = ({
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const project_id = watch('project_id');
+  const rawProjectId = watch('project_id') as string | undefined;
+  const project_id = rawProjectId ?? '';
 
   const selectedProject = useMemo(
     () => projects.find((p) => String(p.id) === String(project_id)),
@@ -99,7 +100,7 @@ const ProjectTokenForm: FC<Props> = ({
       <ProjectPickerModal
         open={pickerOpen}
         projects={projects}
-        selectedProjectId={project_id}
+        selectedProjectId={project_id || undefined}
         onClose={closePicker}
         onSubmit={handlePickProject}
       />
