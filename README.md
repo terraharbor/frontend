@@ -4,7 +4,9 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/github/v/release/terraharbor/frontend?sort=semver&style=for-the-badge&label=Version&color=%2325c2a0&link=https%3A%2F%2Fgithub.com%2Fterraharbor%2Ffrontend%2Freleases) ![License](https://img.shields.io/github/license/terraharbor/frontend?style=for-the-badge&logo=gplv3&label=License) ![Build](https://img.shields.io/github/actions/workflow/status/terraharbor/frontend/docker-build.yaml?event=push&style=for-the-badge&logo=docker&label=Build&link=https%3A%2F%2Fgithub.com%2Fterraharbor%2Ffrontend%2Factions%2Fworkflows%2Fdocker-build.yaml%3Fquery%3Devent%253Apush)
+<a href="https://github.com/terraharbor/frontend/releases"><img alt="Release" src="https://img.shields.io/github/v/release/terraharbor/frontend?sort=semver&style=for-the-badge&label=Release"></a>
+<a href="https://github.com/terraharbor/frontend?tab=GPL-3.0-1-ov-file#readme"><img alt="License" src="https://img.shields.io/github/license/terraharbor/frontend?style=for-the-badge&logo=gplv3&label=License"></a>
+<a href="https://github.com/terraharbor/frontend/actions/workflows/docker-build.yaml?query=event%3Apush"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/terraharbor/frontend/docker-build.yaml?event=push&style=for-the-badge&logo=docker&label=Build"></a>
 
 </div>
 
