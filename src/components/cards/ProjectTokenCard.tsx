@@ -17,8 +17,8 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
 
   const project = useMemo(
-    () => sampleProjects.find((p) => p.id === token.projectId),
-    [token.projectId],
+    () => sampleProjects.find((p) => p.id === token.project_id),
+    [token.project_id],
   );
 
   const openProject = () => {
@@ -26,9 +26,9 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
   };
 
   const masked = useMemo(() => {
-    const v = token.value ?? '';
+    const v = token.token ?? '';
     return '•'.repeat(v.length);
-  }, [token.value]);
+  }, [token.token]);
 
   return (
     <Stack
@@ -78,7 +78,7 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
               minWidth: 240,
             }}
           >
-            {expanded ? token.value : masked}
+            {expanded ? token.token : masked}
           </Box>
 
           <Tooltip title={expanded ? 'Hide token' : 'Show token'}>

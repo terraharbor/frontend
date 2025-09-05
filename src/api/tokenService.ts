@@ -34,4 +34,20 @@ export class TokenService {
     const response = await apiClient.post(`/tokens/${tokenId}/refresh`);
     return response.data;
   }
+
+  // Project token
+  static async getProjectTokens(): Promise<ProjectToken[]> {
+    const response = await apiClient.get(`/tokens`);
+    return response.data;
+  }
+
+  static async createProjectToken(token: Omit<ProjectToken, 'token'>): Promise<ProjectToken> {
+    const response = await apiClient.post(`/tokens`, token);
+    return response.data;
+  }
+
+  static async deleteProjectToken(token: string): Promise<void> {
+    const response = await apiClient.delete(`/tokens/${token}`);
+    return response.data;
+  }
 }

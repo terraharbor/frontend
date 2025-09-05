@@ -1,15 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { sampleProjects } from '../../sampleData';
 import { Project } from '../../types/buisness';
@@ -37,7 +29,7 @@ const ProjectTokenForm: FC<Props> = ({
   onSubmit,
   disabled,
 }) => {
-  const { control, handleSubmit, setValue, watch } = useForm<
+  const { handleSubmit, setValue, watch } = useForm<
     ProjectTokenFormInput,
     unknown,
     ProjectTokenFormOutput
@@ -99,26 +91,8 @@ const ProjectTokenForm: FC<Props> = ({
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
-            This token will always have <strong>read</strong> access.
+            This token will always have <strong>read</strong> and <strong>write</strong> access.
           </Typography>
-
-          <Controller
-            name="canWrite"
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    {...field}
-                    checked={!!field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                }
-                label="Can write"
-                disabled={disabled}
-              />
-            )}
-          />
         </Stack>
       </Box>
 

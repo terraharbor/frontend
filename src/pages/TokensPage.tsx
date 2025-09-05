@@ -31,7 +31,7 @@ export const ProjectTokensPage: FC = () => {
   const loadTokens = async () => {
     setLoading(true);
     try {
-      const data = await TokenService.getTokens();
+      const data = await TokenService.getProjectTokens();
       console.log(data);
       setTokens(data);
     } catch (err) {
@@ -61,7 +61,7 @@ export const ProjectTokensPage: FC = () => {
   const handleCreateSubmit = async (values: ProjectTokenFormOutput) => {
     setIsSubmitting(true);
     try {
-      await TokenService.createToken({
+      await TokenService.createProjectToken({
         project_id: values.projectId,
       });
       showToast({ message: 'Token created successfully', severity: 'success' });
@@ -99,7 +99,7 @@ export const ProjectTokensPage: FC = () => {
     if (!tokenToDelete) return;
 
     try {
-      await TokenService.revokeToken(tokenToDelete.id);
+      await TokenService.deleteProjectToken(tokenToDelete.token);
       showToast({ message: 'Token deleted successfully', severity: 'success' });
       await loadTokens(); // Reload data from API
     } catch (err) {
@@ -150,9 +150,9 @@ export const ProjectTokensPage: FC = () => {
 
       {tokens.length > 0 ? (
         <Stack spacing={1}>
-          {tokens.map((t, idx) => (
+          {tokens.map((t) => (
             <ProjectTokenCard
-              key={`${t.projectId}-${t.createdAt.toString()}-${idx}`}
+              key={t.token}
               token={t}
               onDelete={isAdmin ? handleAskDeleteToken : undefined}
             />
@@ -184,14 +184,7 @@ export const ProjectTokensPage: FC = () => {
       <ConfirmationModal
         open={deleteConfirmationOpen}
         title="Delete token"
-        message={
-          tokenToDelete
-            ? `Are you sure you want to delete this token for project "${
-                sampleProjects.find((p) => p.id === tokenToDelete.projectId)?.name ??
-                tokenToDelete.projectId
-              }"? This action is irreversible.`
-            : 'Are you sure you want to delete this token? This action is irreversible.'
-        }
+        message={'Are you sure you want to delete this token? This action is irreversible.'}
         confirmLabel="Delete"
         confirmColor="error"
         onConfirm={confirmDeleteToken}
