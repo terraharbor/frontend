@@ -70,6 +70,11 @@ const ProjectPage: FC = () => {
     currentState: StateFileSnapshot | undefined;
     previousStates: StateFileSnapshot[];
   }>({ currentState: undefined, previousStates: [] });
+  const [lockStatus, setLockStatus] = useState<{
+    status: 'locked' | 'unlocked';
+    locker?: string;
+    timestamp?: string;
+  }>({ status: 'unlocked' });
 
   // Sample data implementation (commented out):
   // const initialProject: Project | undefined = useMemo(
@@ -89,6 +94,17 @@ const ProjectPage: FC = () => {
   //   const [current, ...previous] = states;
   //   return { currentState: current, previousStates: previous };
   // }, [project]);
+
+  const loadLockStatus = async (projectId: string) => {
+    try {
+      const status = await StateService.getStateStatus(projectId, 'main');
+      setLockStatus(status);
+      console.log('Lock status loaded:', status);
+    } catch (error) {
+      console.error('Failed to load lock status:', error);
+      setLockStatus({ status: 'unlocked' });
+    }
+  };
 
   const loadRealStateFiles = async (projectId: string) => {
     try {
@@ -220,6 +236,9 @@ const ProjectPage: FC = () => {
         });
       }
 
+      // Load lock status
+      await loadLockStatus(id);
+
       // Sample data fallback implementation (commented out):
       // const initialProject = sampleProjects.find((p) => p.id === id);
       // setProject(initialProject);
@@ -243,13 +262,8 @@ const ProjectPage: FC = () => {
 
   const currentStateCreatedByUser = users.find((u) => stateData.currentState?.createdBy === u.id);
 
+  // Using real lock status now instead of sample data
   const stateFileInfos: StateFileInfos = sampleStateFileInfos[0];
-
-  const locked = stateFileInfos.status === 'locked';
-
-  const stateFileLockedByUser = stateFileInfos
-    ? users.find((u) => stateFileInfos.lockedBy === u.id)
-    : undefined;
 
   const loadStateContent = async (snapshot: StateFileSnapshot): Promise<string> => {
     try {
@@ -353,33 +367,10 @@ const ProjectPage: FC = () => {
     }
   };
 
+  const locked = lockStatus.status === 'locked';
+
   const handleLockOrUnlock = async () => {
-    if (!project) return;
-
-    const stateName = 'main'; // Default state name
-
-    const lockInfo = {
-      ID: `lock-${Date.now()}`,
-      user: currentUser?.username || 'unknown-user',
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      if (locked) {
-        // Unlock state
-        await StateService.unlockState(project.id, stateName, lockInfo);
-        showToast({ message: 'State unlocked successfully', severity: 'success' });
-      } else {
-        // Lock state
-        await StateService.lockState(project.id, stateName, lockInfo);
-        showToast({ message: 'State locked successfully', severity: 'success' });
-      }
-    } catch (err) {
-      const errorMessage = getErrorMessage(err);
-      const action = locked ? 'unlock' : 'lock';
-      showToast({ message: `Error ${action}ing state: ${errorMessage}`, severity: 'error' });
-      logError(`handleLockOrUnlock-${action}`, err);
-    }
+    await handleLockToggle();
   };
 
   const handleDeleteStateFileSnapshot = (stateFileSnapshot: StateFileSnapshot) => {
@@ -480,6 +471,29 @@ const ProjectPage: FC = () => {
     } finally {
       setRestoreConfirmationOpen(false);
       setStateFileToRestore(null);
+    }
+  };
+
+  const handleLockToggle = async () => {
+    if (!id) return;
+
+    try {
+      if (lockStatus.status === 'locked') {
+        // Unlock the state
+        await StateService.unlockState(id, 'main', {});
+        showToast({ message: 'State unlocked successfully', severity: 'success' });
+      } else {
+        // Lock the state
+        await StateService.lockState(id, 'main', { ID: Date.now().toString() });
+        showToast({ message: 'State locked successfully', severity: 'success' });
+      }
+      
+      // Reload lock status
+      await loadLockStatus(id);
+    } catch (error) {
+      console.error('Failed to toggle lock:', error);
+      const errorMessage = getErrorMessage(error);
+      showToast({ message: `Failed to ${lockStatus.status === 'locked' ? 'unlock' : 'lock'} state: ${errorMessage}`, severity: 'error' });
     }
   };
 
@@ -740,7 +754,7 @@ const ProjectPage: FC = () => {
                         <Typography
                           variant="caption"
                           sx={{ ml: 2 }}
-                        >{`Locked by ${stateFileLockedByUser?.username} the ${new Date(stateFileInfos.lockedAt!).toLocaleString()}`}</Typography>
+                        >{`Locked by ${lockStatus.locker || 'unknown'} ${lockStatus.timestamp ? `at ${lockStatus.timestamp}` : ''}`}</Typography>
                       </Stack>
                     )}
 

@@ -83,4 +83,9 @@ export class StateService {
       throw error;
     }
   }
+
+  static async getStateStatus(project: string, stateName: string): Promise<any> {
+    const response = await apiClient.get(`/state/${project}/${stateName}/status`);
+    return response.data;
+  }
 }
