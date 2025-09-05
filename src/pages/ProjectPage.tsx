@@ -1,11 +1,13 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Stack,
@@ -38,6 +40,7 @@ import { useToast } from '../components/providers/useToast';
 //   sampleTeams,
 //   sampleUsers,
 // } from '../sampleData';
+import TerraformModal from '../components/modals/TerraformModal';
 import { sampleStateFileInfos } from '../sampleData'; // Temporary for state files
 import { Project, StateFileInfos, StateFileSnapshot, Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
@@ -58,6 +61,7 @@ const ProjectPage: FC = () => {
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [teamsModalOpen, setTeamsModalOpen] = useState(false);
   const [projectEditModalOpen, setProjectEditModalOpen] = useState(false);
+  const [terraformModalOpen, setTerraformModalOpen] = useState(false);
   const [selectedSnapshot, setSelectedSnapshot] = useState<StateFileSnapshot | null>(null);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
@@ -65,6 +69,14 @@ const ProjectPage: FC = () => {
   const [stateFileToDelete, setStateFileToDelete] = useState<StateFileSnapshot | null>(null);
   const [stateFileToRestore, setStateFileToRestore] = useState<StateFileSnapshot | null>(null);
   const [discoveredStateName, setDiscoveredStateName] = useState<string>('main');
+
+  const openTerraformModal = () => {
+    setTerraformModalOpen(true);
+  };
+
+  const closeTerraformModal = () => {
+    setTerraformModalOpen(false);
+  };
 
   // For now, using sample state files until StateService is properly implemented
   const [stateData, setStateData] = useState<{
@@ -727,7 +739,16 @@ const ProjectPage: FC = () => {
             </Stack>
 
             <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>State File Terraform</Typography>
+              <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography>State File Terraform</Typography>
+                <Button
+                  variant="outlined"
+                  onClick={openTerraformModal}
+                  startIcon={<FileCopyIcon />}
+                >
+                  Terraform config
+                </Button>
+              </Stack>
 
               {stateData.currentState ? (
                 <Stack
@@ -886,6 +907,15 @@ const ProjectPage: FC = () => {
         onConfirm={confirmRemoveTeam}
         onCancel={cancelRemoveTeam}
       />
+
+      {project && currentUser && (
+        <TerraformModal
+          open={terraformModalOpen}
+          project={project}
+          user={currentUser}
+          onClose={closeTerraformModal}
+        />
+      )}
     </>
   );
 };
