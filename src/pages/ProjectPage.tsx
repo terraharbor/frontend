@@ -462,7 +462,9 @@ const ProjectPage: FC = () => {
       const updatedContent = JSON.stringify(stateJson, null, 2);
 
       // POST the restored content as a new version
-      await StateService.putState(id, 'main', updatedContent);
+      // Increment serial number for the new version
+      const newSerial = stateJson.serial ? stateJson.serial + 1 : 1;
+      await StateService.putState(id, 'main', updatedContent, newSerial);
 
       showToast({
         message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`,

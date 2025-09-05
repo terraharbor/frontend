@@ -24,12 +24,42 @@ export class StateService {
     project: string,
     stateName: string,
     stateData: Blob | string,
-    version?: number,
+    serial?: number,
+    lockId?: string,
   ): Promise<void> {
-    const versionParam = version ? `?version=${version}` : '';
-    await apiClient.post(`/state/${project}/${stateName}${versionParam}`, stateData, {
+    // Convert stateData to string if it's a Blob
+    let dataToSend: string;
+    if (stateData instanceof Blob) {
+      dataToSend = await stateData.text();
+    } else {
+      dataToSend = stateData;
+    }
+
+    // Parse the JSON to extract or add serial number
+    let stateJson: any;
+    try {
+      stateJson = JSON.parse(dataToSend);
+    } catch (error) {
+      throw new Error('Invalid JSON state data');
+    }
+
+    // Ensure serial number is present
+    if (serial !== undefined) {
+      stateJson.serial = serial;
+    } else if (!stateJson.serial) {
+      throw new Error('Serial number is required');
+    }
+
+    const params = new URLSearchParams();
+    if (lockId) {
+      params.append('ID', lockId);
+    }
+
+    const url = `/state/${project}/${stateName}${params.toString() ? `?${params.toString()}` : ''}`;
+    
+    await apiClient.post(url, JSON.stringify(stateJson), {
       headers: {
-        'Content-Type': 'application/octet-stream',
+        'Content-Type': 'application/json',
       },
     });
   }
