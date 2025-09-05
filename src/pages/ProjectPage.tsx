@@ -156,21 +156,25 @@ const ProjectPage: FC = () => {
 
         console.log('Created snapshots:', snapshots);
 
-        // Load content for the current state immediately
-        const currentSnapshot = snapshots[0];
-        if (currentSnapshot) {
-          try {
-            const content = await loadStateContent(currentSnapshot);
-            currentSnapshot.content = content;
-          } catch (error) {
-            console.error('Failed to load content for current state:', error);
-          }
-        }
+                 // Load content for ALL versions immediately (current + previous)
+         const snapshotsWithContent = await Promise.all(
+           snapshots.map(async (snapshot) => {
+             try {
+               const content = await loadStateContent(snapshot);
+               return { ...snapshot, content };
+             } catch (error) {
+               console.error(`Failed to load content for version ${snapshot.version}:`, error);
+               return snapshot; // Return without content if failed
+             }
+           })
+         );
 
-        setStateData({
-          currentState: currentSnapshot,
-          previousStates: snapshots.slice(1),
-        });
+         console.log('All version content loaded on initial load');
+
+         setStateData({
+           currentState: snapshotsWithContent[0],
+           previousStates: snapshotsWithContent.slice(1),
+         });
       } else {
         console.log('No versions found or invalid response');
         // No versions found
@@ -384,38 +388,56 @@ const ProjectPage: FC = () => {
   };
 
   const loadContentForAllVersions = async () => {
-    if (!id || !stateData.currentState) return;
+    if (!id) return;
 
     try {
-      // Load content for current state if not already loaded
-      if (stateData.currentState && !stateData.currentState.content) {
-        const content = await loadStateContent(stateData.currentState);
-        stateData.currentState.content = content;
-      }
-
-      // Load content for all previous versions
-      const updatedPreviousStates = await Promise.all(
-        stateData.previousStates.map(async (state) => {
-          if (!state.content) {
-            try {
-              const content = await loadStateContent(state);
-              return { ...state, content };
-            } catch (error) {
-              console.error(`Failed to load content for version ${state.version}:`, error);
-              return state; // Return without content if failed
+      // Use the callback form of setState to get the current state
+      setStateData((currentStateData) => {
+        // Async function to load content for all versions
+        const loadAllContent = async () => {
+          try {
+            let updatedCurrentState = currentStateData.currentState;
+            
+            // Load content for current state if not already loaded
+            if (updatedCurrentState && !updatedCurrentState.content) {
+              const content = await loadStateContent(updatedCurrentState);
+              updatedCurrentState = { ...updatedCurrentState, content };
             }
+
+            // Load content for all previous versions
+            const updatedPreviousStates = await Promise.all(
+              currentStateData.previousStates.map(async (state) => {
+                if (!state.content) {
+                  try {
+                    const content = await loadStateContent(state);
+                    return { ...state, content };
+                  } catch (error) {
+                    console.error(`Failed to load content for version ${state.version}:`, error);
+                    return state; // Return without content if failed
+                  }
+                }
+                return state;
+              }),
+            );
+
+            // Update state with all loaded content
+            setStateData({
+              currentState: updatedCurrentState,
+              previousStates: updatedPreviousStates,
+            });
+
+            console.log('All version content reloaded successfully');
+          } catch (error) {
+            console.error('Failed to reload content for all versions:', error);
           }
-          return state;
-        }),
-      );
+        };
 
-      // Update state with all loaded content
-      setStateData((prev) => ({
-        currentState: prev.currentState,
-        previousStates: updatedPreviousStates,
-      }));
-
-      console.log('All version content reloaded successfully');
+        // Execute the async loading
+        loadAllContent();
+        
+        // Return current state unchanged for now
+        return currentStateData;
+      });
     } catch (error) {
       console.error('Failed to reload content for all versions:', error);
     }
@@ -461,9 +483,9 @@ const ProjectPage: FC = () => {
 
       // Reload the state files to show the new version
       await loadRealStateFiles(id);
-
-      // Note: loadRealStateFiles already loads content for the current state
-      // We don't call loadContentForAllVersions here as it would use stale data
+      
+      // Load content for all versions (including the new restored version)
+      await loadContentForAllVersions();
     } catch (error) {
       console.error('Failed to restore state version:', error);
       const errorMessage = getErrorMessage(error);
