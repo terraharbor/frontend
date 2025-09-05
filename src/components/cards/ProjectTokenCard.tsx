@@ -1,11 +1,11 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { Box, IconButton, Link, Stack, Tooltip, Typography } from '@mui/material';
-import { FC, useMemo, useState } from 'react';
+import { Box, IconButton, Link, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sampleProjects } from '../../sampleData';
-import { ProjectToken } from '../../types/buisness';
+import { ProjectService } from '../../api/projectService';
+import { Project, ProjectToken } from '../../types/buisness';
 
 type ProjectTokenCardProps = {
   token: ProjectToken;
@@ -15,11 +15,24 @@ type ProjectTokenCardProps = {
 const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const project = useMemo(
-    () => sampleProjects.find((p) => p.id === token.project_id),
-    [token.project_id],
-  );
+  const loadProject = async () => {
+    setLoading(true);
+    try {
+      const projectData = await ProjectService.getProject(token.project_id);
+      setProject(Array.isArray(projectData) ? projectData[0] : projectData);
+    } catch {
+      setProject(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProject();
+  }, [token.project_id]);
 
   const openProject = () => {
     if (project) navigate(`/projects/${project.id}`);
@@ -29,6 +42,10 @@ const ProjectTokenCard: FC<ProjectTokenCardProps> = ({ token, onDelete }) => {
     const v = token.token ?? '';
     return '•'.repeat(v.length);
   }, [token.token]);
+
+  if (loading) {
+    return <Skeleton height={100} />;
+  }
 
   return (
     <Stack
