@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.30](https://github.com/terraharbor/frontend/compare/v0.1.29...v0.1.30) (2025-09-05)
+
+
+### Features
+
+* merge pull request [#114](https://github.com/terraharbor/frontend/issues/114) from terraharbor/fix/back-compat ([eafacbe](https://github.com/terraharbor/frontend/commit/eafacbe2e8cdf1bc6a863072554546fe6acc7c46))
+
+
+### Bug Fixes
+
+* fix projectpage compat ([1018229](https://github.com/terraharbor/frontend/commit/10182294370ff055ad4199f64db12d26faeb2772))
+
 ## [0.1.29](https://github.com/terraharbor/frontend/compare/v0.1.28...v0.1.29) (2025-09-05)
 
 
