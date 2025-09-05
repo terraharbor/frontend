@@ -315,24 +315,14 @@ const ProjectPage: FC = () => {
   const handleSaveTeams = async (selectedTeamIds: string[]) => {
     if (!project) return;
 
-    try {
-      await ProjectService.updateProject(project.id, { teamIds: selectedTeamIds });
+    await handleSaveProject({
+      name: project.name,
+      description: project.description,
+      teamIds: selectedTeamIds,
+    });
 
-      setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
-
-      const updatedTeams = allTeams.filter((team) => selectedTeamIds.includes(team.id));
-      setTeams(updatedTeams);
-
-      showToast({ message: 'Project teams updated successfully', severity: 'success' });
-      closeTeamsModal();
-
-      // Sample data fallback implementation (commented out):
-      // setProject((prev) => (prev ? { ...prev, teamIds: selectedTeamIds } : prev));
-    } catch (err) {
-      const errorMessage = getErrorMessage(err);
-      showToast({ message: `Error updating teams: ${errorMessage}`, severity: 'error' });
-      logError('handleSaveTeams', err);
-    }
+    closeTeamsModal();
+    loadProjectData();
   };
 
   const handleRemoveTeam = (team: Team) => {
@@ -347,11 +337,9 @@ const ProjectPage: FC = () => {
       await ProjectService.updateProject(project.id, {
         name: values.name,
         description: values.description,
+        teamIds: values.teamIds,
       });
 
-      setProject((prev) =>
-        prev ? { ...prev, name: values.name, description: values.description } : prev,
-      );
       showToast({ message: 'Project updated successfully', severity: 'success' });
       closeProjectEditModal();
 
@@ -487,13 +475,16 @@ const ProjectPage: FC = () => {
         await StateService.lockState(id, 'main', { ID: Date.now().toString() });
         showToast({ message: 'State locked successfully', severity: 'success' });
       }
-      
+
       // Reload lock status
       await loadLockStatus(id);
     } catch (error) {
       console.error('Failed to toggle lock:', error);
       const errorMessage = getErrorMessage(error);
-      showToast({ message: `Failed to ${lockStatus.status === 'locked' ? 'unlock' : 'lock'} state: ${errorMessage}`, severity: 'error' });
+      showToast({
+        message: `Failed to ${lockStatus.status === 'locked' ? 'unlock' : 'lock'} state: ${errorMessage}`,
+        severity: 'error',
+      });
     }
   };
 
@@ -646,14 +637,7 @@ const ProjectPage: FC = () => {
 
               {teams && teams.length > 0 ? (
                 <Stack spacing={1}>
-                  {...teams.map((team) => (
-                    <TeamCard
-                      key={team.id}
-                      team={team}
-                      onDelete={handleRemoveTeam}
-                      displayActions
-                    />
-                  ))}
+                  {...teams.map((team) => <TeamCard key={team.id} team={team} displayActions />)}
                 </Stack>
               ) : (
                 <Alert severity="info">No team</Alert>

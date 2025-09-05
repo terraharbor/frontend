@@ -18,7 +18,7 @@ export class TeamService {
   }
 
   static async updateTeam(id: string, team: Partial<Team>): Promise<Team> {
-    const response = await apiClient.put(`/teams/${id}`, team);
+    const response = await apiClient.patch(`/teams/${id}`, team);
     return response.data;
   }
 
