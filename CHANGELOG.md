@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.32](https://github.com/terraharbor/frontend/compare/v0.1.31...v0.1.32) (2025-09-05)
+
+
+### Features
+
+* fix for build ([780df4a](https://github.com/terraharbor/frontend/commit/780df4a2ad2a50d481cb05b8d25c09279e299317))
+* handle tokens ([732f0ff](https://github.com/terraharbor/frontend/commit/732f0ff9842939ac71d88a9e7d70953939a28629))
+* handle tokens ([da963ff](https://github.com/terraharbor/frontend/commit/da963ff123280f86c9c3ad5987ac175b9a0d2c14))
+* merge pull request [#118](https://github.com/terraharbor/frontend/issues/118) from terraharbor/feat/wip-tokens ([732f0ff](https://github.com/terraharbor/frontend/commit/732f0ff9842939ac71d88a9e7d70953939a28629))
+* ProjectToken ([3745116](https://github.com/terraharbor/frontend/commit/3745116ce8db6643cf0ea7945f6b9465cc0f566f))
+* wip ([9552362](https://github.com/terraharbor/frontend/commit/9552362649f4b6a5ca3a51ca7aa3a9115e43a649))
+* wip ([9df6bf7](https://github.com/terraharbor/frontend/commit/9df6bf743f08bb6bdd1978a25affc221e1f83890))
+* wip ([e065e8b](https://github.com/terraharbor/frontend/commit/e065e8b8e8ea88175778109a6a9d63d1e7197863))
+* wip ([1b5f43e](https://github.com/terraharbor/frontend/commit/1b5f43e208877580799b329e6fe7af563ae0a1ce))
+
 ## [0.1.31](https://github.com/terraharbor/frontend/compare/v0.1.30...v0.1.31) (2025-09-05)
 
 
