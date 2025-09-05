@@ -38,7 +38,7 @@ import { useToast } from '../components/providers/useToast';
 //   sampleTeams,
 //   sampleUsers,
 // } from '../sampleData';
-import { sampleStateFileInfos, sampleStateFilesTerraform } from '../sampleData'; // Temporary for state files
+import { sampleStateFileInfos } from '../sampleData'; // Temporary for state files
 import { Project, StateFileInfos, StateFileSnapshot, Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
@@ -93,21 +93,21 @@ const ProjectPage: FC = () => {
   const loadRealStateFiles = async (projectId: string) => {
     try {
       console.log('Loading real state files for project:', projectId);
-      
+
       // For now, assume all state files are named "main"
       const stateName = 'main';
-      
+
       // Get all versions of the state file directly
       const versions = await StateService.getStates(projectId, stateName);
       console.log('State versions received:', versions);
-      
+
       if (versions && Array.isArray(versions) && versions.length > 0) {
         // Convert to StateFileSnapshot format with safe null handling
         const snapshots: StateFileSnapshot[] = versions.map((version) => {
           // Handle null values safely
           const createdBy = version['created by'] || '-';
           const uploadDate = version['upload date'];
-          
+
           // Safe date parsing
           let createdAt: Date;
           try {
@@ -124,37 +124,37 @@ const ProjectPage: FC = () => {
             console.warn('Error parsing date:', dateError);
             createdAt = new Date();
           }
-          
+
           return {
             id: `${projectId}-${stateName}-${version.version}`,
             projectId: projectId,
             version: parseInt(version.version) || 1,
             content: '', // Will be loaded when needed
             createdAt: createdAt,
-            createdBy: createdBy
+            createdBy: createdBy,
           };
         });
-        
+
         // Sort by version descending (latest first)
         snapshots.sort((a, b) => b.version - a.version);
-        
-        console.log('Created snapshots:', snapshots);
-        
-                  // Load content for the current state immediately
-          const currentSnapshot = snapshots[0];
-          if (currentSnapshot) {
-            try {
-              const content = await loadStateContent(currentSnapshot);
-              currentSnapshot.content = content;
-            } catch (error) {
-              console.error('Failed to load content for current state:', error);
-            }
-          }
 
-          setStateData({
-            currentState: currentSnapshot,
-            previousStates: snapshots.slice(1),
-          });
+        console.log('Created snapshots:', snapshots);
+
+        // Load content for the current state immediately
+        const currentSnapshot = snapshots[0];
+        if (currentSnapshot) {
+          try {
+            const content = await loadStateContent(currentSnapshot);
+            currentSnapshot.content = content;
+          } catch (error) {
+            console.error('Failed to load content for current state:', error);
+          }
+        }
+
+        setStateData({
+          currentState: currentSnapshot,
+          previousStates: snapshots.slice(1),
+        });
       } else {
         console.log('No versions found or invalid response');
         // No versions found
@@ -200,8 +200,9 @@ const ProjectPage: FC = () => {
       setAllTeams(allTeamsData);
       setUsers(usersData);
 
-      const projectTeams = allTeamsData.filter((team) => 
-        project?.teamIds && Array.isArray(project.teamIds) && project.teamIds.includes(team.id)
+      const projectTeams = allTeamsData.filter(
+        (team) =>
+          project?.teamIds && Array.isArray(project.teamIds) && project.teamIds.includes(team.id),
       );
       setTeams(projectTeams);
 
@@ -253,11 +254,11 @@ const ProjectPage: FC = () => {
   const loadStateContent = async (snapshot: StateFileSnapshot): Promise<string> => {
     try {
       if (!id) return '{}';
-      
+
       // Extract state name from snapshot id (format: projectId-stateName-version)
       const parts = snapshot.id.split('-');
       const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
-      
+
       const stateJson = await StateService.getStateAsJson(id, stateName, snapshot.version);
       return JSON.stringify(stateJson, null, 2);
     } catch (error) {
@@ -414,11 +415,11 @@ const ProjectPage: FC = () => {
             }
           }
           return state;
-        })
+        }),
       );
 
       // Update state with all loaded content
-      setStateData(prev => ({
+      setStateData((prev) => ({
         currentState: prev.currentState,
         previousStates: updatedPreviousStates,
       }));
@@ -451,8 +452,8 @@ const ProjectPage: FC = () => {
 
       // Create new version number (find the highest version and add 1)
       const allVersions = [stateData.currentState, ...stateData.previousStates]
-        .filter(s => s !== undefined)
-        .map(s => s!.version);
+        .filter((s) => s !== undefined)
+        .map((s) => s!.version);
       const newVersion = Math.max(...allVersions, 0) + 1;
 
       // Update the version in the state content
@@ -462,17 +463,16 @@ const ProjectPage: FC = () => {
       // POST the restored content as a new version
       await StateService.putState(id, 'main', updatedContent);
 
-      showToast({ 
-        message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`, 
-        severity: 'success' 
+      showToast({
+        message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`,
+        severity: 'success',
       });
 
       // Reload the state files to show the new version
       await loadRealStateFiles(id);
-      
+
       // Note: loadRealStateFiles already loads content for the current state
       // We don't call loadContentForAllVersions here as it would use stale data
-
     } catch (error) {
       console.error('Failed to restore state version:', error);
       const errorMessage = getErrorMessage(error);
@@ -490,7 +490,7 @@ const ProjectPage: FC = () => {
       // Extract state name from snapshot id (format: projectId-stateName-version)
       const parts = stateFileToDelete.id.split('-');
       const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
-      
+
       // Delete the specific version using the backend API
       await StateService.deleteState(id, stateName, stateFileToDelete.version);
 
@@ -501,10 +501,9 @@ const ProjectPage: FC = () => {
 
       // Reload the state files to refresh the UI after deletion
       await loadRealStateFiles(id);
-      
+
       // Note: loadRealStateFiles already loads content for the current state
       // We don't need to call loadContentForAllVersions here as it would use stale data
-
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error deleting state file: ${errorMessage}`, severity: 'error' });
@@ -571,7 +570,14 @@ const ProjectPage: FC = () => {
     setRemoveTeamConfirmationOpen(false);
   };
 
-  console.log('ProjectPage render - loading:', loading, 'project:', project, 'stateData:', stateData);
+  console.log(
+    'ProjectPage render - loading:',
+    loading,
+    'project:',
+    project,
+    'stateData:',
+    stateData,
+  );
 
   if (loading) {
     console.log('Showing loading spinner');
@@ -638,21 +644,6 @@ const ProjectPage: FC = () => {
               ) : (
                 <Alert severity="info">No team</Alert>
               )}
-            </Stack>
-
-            <Stack spacing={1} sx={{ flex: 1 }}>
-              <Typography>Activities</Typography>
-              <Stack
-                height="100%"
-                sx={{
-                  bgcolor: 'neutral.white',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 2,
-                }}
-              >
-                A compléter
-              </Stack>
             </Stack>
           </Stack>
 

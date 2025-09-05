@@ -84,21 +84,6 @@ const DashboardPage: FC = () => {
               )}
             </Stack>
           </Stack>
-
-          <Stack>
-            <Typography sx={{ mb: 1 }}>My activties</Typography>
-            <Stack
-              sx={{
-                height: 200,
-                bgcolor: 'neutral.white',
-                borderRadius: 2,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              A compléter
-            </Stack>
-          </Stack>
         </Stack>
       )}
     </Stack>
