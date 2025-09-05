@@ -1,11 +1,9 @@
 import EditIcon from '@mui/icons-material/Edit';
 import { Alert, Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { TeamService } from '../api/teamService';
 import { UserService } from '../api/userService';
-import ProjectCard from '../components/cards/ProjectCard';
 import { TeamFormOutput } from '../components/forms/TeamForm';
 import UsersList from '../components/lists/UsersList';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
@@ -15,7 +13,7 @@ import PageHeader from '../components/PageHeader';
 import { useAuth } from '../components/providers/useAuth';
 import { useToast } from '../components/providers/useToast';
 // import { sampleProjects, sampleTeams, sampleUsers } from '../sampleData'; // Fallback sample data
-import { Project, Team, User } from '../types/buisness';
+import { Team, User } from '../types/buisness';
 import { getErrorMessage, logError } from '../utils/simpleErrorHandler';
 
 const TeamPage: FC = () => {
@@ -23,7 +21,6 @@ const TeamPage: FC = () => {
   const { isAdmin } = useAuth();
   const { showToast } = useToast();
   const [team, setTeam] = useState<Team | undefined>();
-  const [projects, setProjects] = useState<Project[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,15 +47,14 @@ const TeamPage: FC = () => {
 
     setLoading(true);
     try {
-      const [teamData, teamProjects, teamMembers, allUsersData] = await Promise.all([
+      const [teamData, teamMembers, allUsersData] = await Promise.all([
         TeamService.getTeam(id),
-        TeamService.getTeamProjects(id),
+
         TeamService.getTeamMembers(id),
         UserService.getUsers(),
       ]);
 
       setTeam(teamData);
-      setProjects(teamProjects);
       setUsers(teamMembers);
       setAllUsers(allUsersData);
     } catch (err) {
@@ -226,21 +222,6 @@ const TeamPage: FC = () => {
             </Stack>
 
             <UsersList users={users} allowDelete onDelete={handleRemoveUser} />
-          </Stack>
-
-          <Stack spacing={2} sx={{ flex: 1 }}>
-            <Typography>Projects</Typography>
-            {projects && projects.length > 0 ? (
-              <Grid container spacing={1}>
-                {projects.map((project) => (
-                  <Grid key={project.id} size={{ xs: 12, sm: 12, md: 12, lg: 6 }}>
-                    <ProjectCard project={project} />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Alert severity="info">No project</Alert>
-            )}
           </Stack>
         </Stack>
       </Stack>
