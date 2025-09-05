@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.1.28](https://github.com/terraharbor/frontend/compare/v0.1.27...v0.1.28) (2025-09-05)
+
+
+### Features
+
+* .gitignore ([64eb01f](https://github.com/terraharbor/frontend/commit/64eb01feb12b610b797015df2be3685ec3382b22))
+* .gitignore ([67439b3](https://github.com/terraharbor/frontend/commit/67439b3a390aa043378f32c476f32ef2ae4b9494))
+* activities removed from dashboard and project ([cdd3d84](https://github.com/terraharbor/frontend/commit/cdd3d8403518714f21ab5f6feb85617873b34a9e))
+* display projects removed from team page ([75eca0d](https://github.com/terraharbor/frontend/commit/75eca0d0fa95f4fe845599c7794cfda3108db229))
+* merge pull request [#106](https://github.com/terraharbor/frontend/issues/106) from terraharbor/feat/wip-api ([7034dfe](https://github.com/terraharbor/frontend/commit/7034dfefa2e064e054d1fd7312b14102a503154b))
+* projectsPage only for admin ([b37a66b](https://github.com/terraharbor/frontend/commit/b37a66b4716330d43dbdacedca8f731773b00c33))
+* update team + project ([c6b3011](https://github.com/terraharbor/frontend/commit/c6b30115de06eea015b93711cf766fcafddac7bd))
+* update team + project ([262d4c6](https://github.com/terraharbor/frontend/commit/262d4c6a92199b1ca82e8dbac575a00e98195f36))
+* wip ([17fdf40](https://github.com/terraharbor/frontend/commit/17fdf402640b8a1c4f00dde93387d093c3072793))
+* wip ([316f5bb](https://github.com/terraharbor/frontend/commit/316f5bb773e1cfb1d4079346a02b06ab2e9cba5f))
+* wip ([a0fbbec](https://github.com/terraharbor/frontend/commit/a0fbbec775da93f4ebad2a431cf1e13a856f38e3))
+* wip api ([7034dfe](https://github.com/terraharbor/frontend/commit/7034dfefa2e064e054d1fd7312b14102a503154b))
+* wip services ([ee0ec31](https://github.com/terraharbor/frontend/commit/ee0ec310ead7eb6673f6be3baa1d7be2a5f2ccda))
+* wip tokens ([d470664](https://github.com/terraharbor/frontend/commit/d470664226ef5b846a7bf7b28075abd23f123765))
+
+
+### Bug Fixes
+
+* added fetching version content to fix comparison ([09f9c91](https://github.com/terraharbor/frontend/commit/09f9c91490b3b70a4054b71e125a75e991ab16e7))
+* fix projetpage api calls ([73432c5](https://github.com/terraharbor/frontend/commit/73432c51ffa67be0bad3f435f2ff8830d11a4be2))
+* fixed locking/unlocking and lock status ([0b6e6ca](https://github.com/terraharbor/frontend/commit/0b6e6ca0b85973f2bb1f4da570e0d6bed4ce3708))
+* fixed more conflict problems ([8ffa309](https://github.com/terraharbor/frontend/commit/8ffa3098a074ea3c089717c23865fe3b76deed1a))
+* fixed some conflicts that persisted ([455117b](https://github.com/terraharbor/frontend/commit/455117b6d511e8f1fd57a33d52642332b4021737))
+* functional restore/delete versions ([2f62b98](https://github.com/terraharbor/frontend/commit/2f62b98cbcdd3c9e892cc711b0f3e1529cb4d531))
+* update projectpage to use api instead of sample ([ce6a3b3](https://github.com/terraharbor/frontend/commit/ce6a3b317c5ec3f80d8a9003d9d87352a2a23aa2))
+
 ## [0.1.27](https://github.com/terraharbor/frontend/compare/v0.1.26...v0.1.27) (2025-09-04)
 
 
