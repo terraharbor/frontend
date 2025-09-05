@@ -1,4 +1,4 @@
-import { Team, User } from '../types/buisness';
+import { Project, Team, User } from '../types/buisness';
 import { apiClient } from './client';
 
 export class TeamService {
@@ -39,7 +39,7 @@ export class TeamService {
     await apiClient.delete(`/teams/${teamId}/users/${userId}`);
   }
 
-  static async getTeamProjects(teamId: string): Promise<any[]> {
+  static async getTeamProjects(teamId: string): Promise<Project[]> {
     const response = await apiClient.get(`/teams/${teamId}/projects`);
     return response.data;
   }

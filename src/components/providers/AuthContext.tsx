@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     getCurrentUser,
-    isAdmin: user?.isAdmin || true,
+    isAdmin: user?.isAdmin || false,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

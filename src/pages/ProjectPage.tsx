@@ -363,6 +363,8 @@ const ProjectPage: FC = () => {
     return <Alert severity="error">No project found with the id: "{id}".</Alert>;
   }
 
+  console.log('TEST', project);
+
   return (
     <>
       <Stack spacing={4}>
@@ -557,7 +559,7 @@ const ProjectPage: FC = () => {
       <TeamsPickerModal
         open={teamsModalOpen}
         teams={allTeams}
-        selectedTeamIds={project.teamIds}
+        selectedTeamIds={project.teamIds || []}
         onClose={() => setTeamsModalOpen(false)}
         onSubmit={handleSaveTeams}
       />
