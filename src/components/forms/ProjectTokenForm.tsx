@@ -7,6 +7,7 @@ import { sampleProjects } from '../../sampleData';
 import { Project } from '../../types/buisness';
 import ProjectPickerModal from '../modals/ProjectPickerModal';
 
+// 🔁 project_id au lieu de projectId
 const schema = z.object({
   project_id: z.string().trim().min(1, 'Project is required'),
 });
@@ -27,31 +28,30 @@ const ProjectTokenForm: FC<Props> = ({
   onSubmit,
   disabled,
 }) => {
-  const { handleSubmit, setValue, watch } = useForm<
-    ProjectTokenFormInput,
-    unknown,
-    ProjectTokenFormOutput
-  >({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<ProjectTokenFormInput, unknown, ProjectTokenFormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      project_id: '',
-      ...defaultValues,
-    },
+    defaultValues: { project_id: '', ...defaultValues }, // 🔁
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const projectId = watch('project_id');
+  const project_id = watch('project_id'); // 🔁
 
   const selectedProject = useMemo(
-    () => projects.find((p) => p.id === projectId),
-    [projects, projectId],
+    () => projects.find((p) => p.id === project_id), // 🔁
+    [projects, project_id],
   );
 
   const openPicker = () => setPickerOpen(true);
   const closePicker = () => setPickerOpen(false);
 
   const handlePickProject = (pid: string) => {
-    setValue('project_id', pid, { shouldValidate: true, shouldDirty: true });
+    setValue('project_id', pid, { shouldValidate: true, shouldDirty: true }); // 🔁
     setPickerOpen(false);
   };
 
@@ -64,6 +64,8 @@ const ProjectTokenForm: FC<Props> = ({
         noValidate
         sx={{ pt: 1 }}
       >
+        {/* Enregistrer le champ côté RHF */}
+        <input type="hidden" {...register('project_id')} /> {/* 🔁 */}
         <Stack spacing={1.5}>
           <Stack direction="row" spacing={1}>
             <TextField
@@ -75,6 +77,8 @@ const ProjectTokenForm: FC<Props> = ({
               margin="dense"
               InputProps={{ readOnly: true }}
               disabled={disabled}
+              error={!!errors.project_id}
+              helperText={errors.project_id?.message || ''}
             />
             <Button
               variant="outlined"
@@ -95,7 +99,7 @@ const ProjectTokenForm: FC<Props> = ({
       <ProjectPickerModal
         open={pickerOpen}
         projects={projects}
-        selectedProjectId={projectId}
+        selectedProjectId={project_id} // 🔁
         onClose={closePicker}
         onSubmit={handlePickProject}
       />

@@ -62,14 +62,14 @@ export const ProjectTokensPage: FC = () => {
   const closeCreate = () => setIsCreateOpen(false);
 
   const handleCreateSubmit = async (values: ProjectTokenFormOutput) => {
-    console.log('Submit');
+    console.log('Submit', values);
     setIsSubmitting(true);
     try {
       await TokenService.createProjectToken({
-        project_id: values.projectId,
+        project_id: values.project_id, // 🔁
       });
       showToast({ message: 'Token created successfully', severity: 'success' });
-      await loadTokens(); // Reload data from API
+      await loadTokens();
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error creating token: ${errorMessage}`, severity: 'error' });
@@ -78,19 +78,6 @@ export const ProjectTokensPage: FC = () => {
       setIsSubmitting(false);
       closeCreate();
     }
-
-    /*
-    const newToken: ProjectToken = {
-      value: generateTokenValue(48), // backend should generate & return once
-      projectId: values.projectId,
-      canRead: true, // always true
-      canWrite: values.canWrite,
-      createdAt: new Date(),
-      createdBy: user?.id ?? '1',
-    };
-
-    setTokens((prev) => [newToken, ...prev]);
-    */
   };
 
   // DELETE
