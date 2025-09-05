@@ -4,12 +4,12 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { FC, useMemo } from 'react';
-import { sampleUsers } from '../../sampleData';
-import { StateFileSnapshot } from '../../types/buisness';
+import { StateFileSnapshot, User } from '../../types/buisness';
 import { useAuth } from '../providers/useAuth';
 
 type StateFileCardProps = {
   stateFile: StateFileSnapshot;
+  users: User[];
   onCompare: (state: StateFileSnapshot) => void;
   onRestore: (state: StateFileSnapshot) => void;
   onView: (state: StateFileSnapshot) => void;
@@ -18,6 +18,7 @@ type StateFileCardProps = {
 
 const StateFileCard: FC<StateFileCardProps> = ({
   stateFile,
+  users,
   onCompare,
   onRestore,
   onView,
@@ -25,8 +26,8 @@ const StateFileCard: FC<StateFileCardProps> = ({
 }) => {
   const { isAdmin } = useAuth();
   const createdByUser = useMemo(
-    () => sampleUsers.find((u) => u.id === stateFile.createdBy),
-    [stateFile],
+    () => users.find((u) => u.username === stateFile.createdBy),
+    [stateFile, users],
   );
 
   return (

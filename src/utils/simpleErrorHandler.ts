@@ -10,7 +10,7 @@ export const getErrorMessage = (error: any): string => {
   
   // Check for specific HTTP status codes
   if (error.response?.status === 404) {
-    return 'Endpoint not found - this feature may not be implemented yet';
+    return 'Error 404';
   }
   
   if (error.response?.status === 401) {

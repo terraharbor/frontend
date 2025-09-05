@@ -103,9 +103,9 @@ export class StateService {
     }
   }
 
-  static async getStateAsJson(project: string, stateName: string, version?: number): Promise<any> {
+  static async getStateAsJson(project: string, stateName: string, serial?: number): Promise<any> {
     try {
-      const blob = await this.getState(project, stateName, version);
+      const blob = await this.getState(project, stateName, serial);
       const text = await blob.text();
       return JSON.parse(text);
     } catch (error) {
@@ -117,5 +117,19 @@ export class StateService {
   static async getStateStatus(project: string, stateName: string): Promise<any> {
     const response = await apiClient.get(`/state/${project}/${stateName}/status`);
     return response.data;
+  }
+
+  static async getProjectStateNames(project: string): Promise<string[]> {
+    try {
+      const response = await apiClient.get(`/state/${project}`);
+      // Extract state names from file paths like "/data/4/main/latest.tfstate"
+      return response.data.map((item: any) => {
+        const pathParts = item.path.split('/');
+        return pathParts[pathParts.length - 2]; // State name is second to last part
+      });
+    } catch (error) {
+      console.error('Failed to get project state names:', error);
+      return ['main']; // Fallback to default
+    }
   }
 }

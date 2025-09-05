@@ -20,8 +20,21 @@ export class ProjectService {
   }
 
   static async updateProject(id: string, project: Partial<Project>): Promise<Project> {
-    const response = await apiClient.patch(`/projects/${id}`, project);
-    return response.data;
+    // Backend requires name, description, and teamIds - ensure they're all present
+    const updateData = {
+      name: project.name || '',
+      description: project.description || '',
+      // Convert string IDs to integers for backend compatibility
+      teamIds: project.teamIds ? project.teamIds.map(id => parseInt(id)) : []
+    };
+    
+    const response = await apiClient.patch(`/projects/${id}`, updateData);
+    // Convert numeric ID to string to match frontend types
+    return {
+      ...response.data,
+      id: String(response.data.id),
+      teamIds: response.data.teamIds ? response.data.teamIds.map((id: any) => String(id)) : []
+    };
   }
 
   static async deleteProject(id: string): Promise<void> {

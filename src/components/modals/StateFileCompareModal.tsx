@@ -57,18 +57,27 @@ const StateFileCompareModal: FC<StateFileCompareModalProps> = ({
   );
 
   const leftStr = useMemo(
-    () => (leftSnapshot ? prettyOrRaw(leftSnapshot.content) : ''),
+    () => (leftSnapshot ? prettyOrRaw(leftSnapshot.content) : '{}'),
     [leftSnapshot],
   );
-  const rightStr = useMemo(() => prettyOrRaw(current.content), [current]);
+  const rightStr = useMemo(() => prettyOrRaw(current.content || '{}'), [current]);
 
   const file = useMemo(() => {
-    const f = generateDiffFile('before.json', leftStr, 'after.json', rightStr, 'json', 'json');
-    f.initTheme('light');
-    f.init();
-    f.buildSplitDiffLines();
-    f.onAllExpand('split');
-    return f;
+    try {
+      // Ensure both strings are valid before generating diff
+      if (!leftStr.trim()) return null;
+      if (!rightStr.trim()) return null;
+      
+      const f = generateDiffFile('before.json', leftStr, 'after.json', rightStr, 'json', 'json');
+      f.initTheme('light');
+      f.init();
+      f.buildSplitDiffLines();
+      f.onAllExpand('split');
+      return f;
+    } catch (error) {
+      console.error('Failed to generate diff:', error);
+      return null;
+    }
   }, [rightStr, leftStr]);
 
   return (
@@ -130,7 +139,13 @@ const StateFileCompareModal: FC<StateFileCompareModalProps> = ({
               overflow: 'auto',
             }}
           >
-            <DiffView diffFile={file} diffViewMode={DiffModeEnum.Split} diffViewHighlight />
+            {file ? (
+              <DiffView diffFile={file} diffViewMode={DiffModeEnum.Split} diffViewHighlight />
+            ) : (
+              <Typography sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
+                Unable to generate diff. One or both versions may have invalid content.
+              </Typography>
+            )}
           </Stack>
         </Stack>
       </DialogContent>

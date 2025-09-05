@@ -64,6 +64,7 @@ const ProjectPage: FC = () => {
   const [removeTeamConfirmationOpen, setRemoveTeamConfirmationOpen] = useState(false);
   const [stateFileToDelete, setStateFileToDelete] = useState<StateFileSnapshot | null>(null);
   const [stateFileToRestore, setStateFileToRestore] = useState<StateFileSnapshot | null>(null);
+  const [discoveredStateName, setDiscoveredStateName] = useState<string>('main');
 
   // For now, using sample state files until StateService is properly implemented
   const [stateData, setStateData] = useState<{
@@ -97,7 +98,7 @@ const ProjectPage: FC = () => {
 
   const loadLockStatus = async (projectId: string) => {
     try {
-      const status = await StateService.getStateStatus(projectId, 'main');
+      const status = await StateService.getStateStatus(projectId, discoveredStateName);
       setLockStatus(status);
       console.log('Lock status loaded:', status);
     } catch (error) {
@@ -110,8 +111,14 @@ const ProjectPage: FC = () => {
     try {
       console.log('Loading real state files for project:', projectId);
 
-      // For now, assume all state files are named "main"
-      const stateName = 'main';
+      // Discover available state names for this project
+      const stateNames = await StateService.getProjectStateNames(projectId);
+      console.log('Available state names:', stateNames);
+      
+      // Use the first available state name (usually "main")
+      const stateName = stateNames[0] || 'main';
+      setDiscoveredStateName(stateName);
+      console.log('Using state name:', stateName);
 
       // Get all versions of the state file directly
       const versions = await StateService.getStates(projectId, stateName);
@@ -264,7 +271,7 @@ const ProjectPage: FC = () => {
     loadProjectData();
   }, [id]);
 
-  const currentStateCreatedByUser = users.find((u) => stateData.currentState?.createdBy === u.id);
+  const currentStateCreatedByUser = users.find((u) => stateData.currentState?.createdBy === u.username);
 
   // Using real lock status now instead of sample data
   const stateFileInfos: StateFileInfos = sampleStateFileInfos[0];
@@ -277,6 +284,7 @@ const ProjectPage: FC = () => {
       const parts = snapshot.id.split('-');
       const stateName = parts.slice(1, -1).join('-'); // Handle state names with dashes
 
+      // snapshot.version contains the serial number from backend
       const stateJson = await StateService.getStateAsJson(id, stateName, snapshot.version);
       return JSON.stringify(stateJson, null, 2);
     } catch (error) {
@@ -319,14 +327,29 @@ const ProjectPage: FC = () => {
   const handleSaveTeams = async (selectedTeamIds: string[]) => {
     if (!project) return;
 
-    await handleSaveProject({
-      name: project.name,
-      description: project.description,
-      teamIds: selectedTeamIds,
-    });
+    try {
+      const updatedProject = await ProjectService.updateProject(project.id, {
+        name: project.name,
+        description: project.description,
+        teamIds: selectedTeamIds,
+      });
 
-    closeTeamsModal();
-    loadProjectData();
+      // Update local state immediately
+      setProject(updatedProject);
+      
+      // Update teams list
+      const projectTeams = allTeams.filter(team => 
+        selectedTeamIds.includes(team.id)
+      );
+      setTeams(projectTeams);
+
+      showToast({ message: 'Teams updated successfully', severity: 'success' });
+      closeTeamsModal();
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      showToast({ message: `Error updating teams: ${errorMessage}`, severity: 'error' });
+      logError('handleSaveTeams', err);
+    }
   };
 
   const handleRemoveTeam = (team: Team) => {
@@ -338,20 +361,25 @@ const ProjectPage: FC = () => {
     if (!project) return;
 
     try {
-      await ProjectService.updateProject(project.id, {
+      const updatedProject = await ProjectService.updateProject(project.id, {
         name: values.name,
         description: values.description,
         teamIds: values.teamIds,
       });
 
+      // Update local state immediately
+      setProject(updatedProject);
+      
+      // Update teams list based on new teamIds
+      if (values.teamIds) {
+        const projectTeams = allTeams.filter(team => 
+          values.teamIds!.includes(team.id)
+        );
+        setTeams(projectTeams);
+      }
+
       showToast({ message: 'Project updated successfully', severity: 'success' });
       closeProjectEditModal();
-
-      // Sample data fallback implementation (commented out):
-      // setProject((prev) => {
-      //   if (!prev) return prev;
-      //   return { ...prev, name: values.name, description: values.description };
-      // });
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       showToast({ message: `Error updating project: ${errorMessage}`, severity: 'error' });
@@ -441,7 +469,7 @@ const ProjectPage: FC = () => {
         contentToRestore = await loadStateContent(stateFileToRestore);
       }
 
-      // Parse the content to get the version number and increment it
+      // Parse the content to get the serial number and increment it
       let stateJson;
       try {
         stateJson = JSON.parse(contentToRestore);
@@ -451,23 +479,21 @@ const ProjectPage: FC = () => {
         return;
       }
 
-      // Create new version number (find the highest version and add 1)
-      const allVersions = [stateData.currentState, ...stateData.previousStates]
+      // Find the highest serial number and increment it
+      const allSerials = [stateData.currentState, ...stateData.previousStates]
         .filter((s) => s !== undefined)
-        .map((s) => s!.version);
-      const newVersion = Math.max(...allVersions, 0) + 1;
+        .map((s) => s!.version); // version field contains serial number
+      const newSerial = Math.max(...allSerials, 0) + 1;
 
-      // Update the version in the state content
-      stateJson.version = newVersion;
+      // Update the serial in the state content
+      stateJson.serial = newSerial;
       const updatedContent = JSON.stringify(stateJson, null, 2);
 
       // POST the restored content as a new version
-      // Increment serial number for the new version
-      const newSerial = stateJson.serial ? stateJson.serial + 1 : 1;
-      await StateService.putState(id, 'main', updatedContent, newSerial);
+      await StateService.putState(id, discoveredStateName, updatedContent, newSerial);
 
       showToast({
-        message: `Successfully restored version ${stateFileToRestore.version} as version ${newVersion}`,
+        message: `Successfully restored version ${stateFileToRestore.version} as serial ${newSerial}`,
         severity: 'success',
       });
 
@@ -492,11 +518,11 @@ const ProjectPage: FC = () => {
     try {
       if (lockStatus.status === 'locked') {
         // Unlock the state
-        await StateService.unlockState(id, 'main', {});
+        await StateService.unlockState(id, discoveredStateName, {});
         showToast({ message: 'State unlocked successfully', severity: 'success' });
       } else {
         // Lock the state
-        await StateService.lockState(id, 'main', { ID: Date.now().toString() });
+        await StateService.lockState(id, discoveredStateName, { ID: Date.now().toString() });
         showToast({ message: 'State locked successfully', severity: 'success' });
       }
 
@@ -529,7 +555,12 @@ const ProjectPage: FC = () => {
       });
 
       // Reload the state files to refresh the UI after deletion
-      await loadRealStateFiles(id);
+      try {
+        await loadRealStateFiles(id);
+      } catch (reloadError) {
+        console.error('Error reloading state files after delete:', reloadError);
+        // Don't throw the error, just log it
+      }
 
       // Note: loadRealStateFiles already loads content for the current state
       // We don't need to call loadContentForAllVersions here as it would use stale data
@@ -571,9 +602,14 @@ const ProjectPage: FC = () => {
 
     try {
       const updatedTeamIds = project.teamIds.filter((id) => id !== teamToRemove.id);
-      await ProjectService.updateProject(project.id, { teamIds: updatedTeamIds });
+      const updatedProject = await ProjectService.updateProject(project.id, {
+        name: project.name,
+        description: project.description,
+        teamIds: updatedTeamIds
+      });
 
-      setProject((prev) => (prev ? { ...prev, teamIds: updatedTeamIds } : prev));
+      // Update local state immediately
+      setProject(updatedProject);
       setTeams((prev) => prev.filter((t) => t.id !== teamToRemove.id));
 
       showToast({ message: 'Team removed from project successfully', severity: 'success' });
@@ -677,6 +713,7 @@ const ProjectPage: FC = () => {
                   stateData.previousStates.map((s) => (
                     <StateFileCard
                       stateFile={s}
+                      users={users}
                       onCompare={handleOpenCompare}
                       onRestore={handleRestoreStateFileSnapshot}
                       onView={handleOpenViewer}
@@ -796,7 +833,7 @@ const ProjectPage: FC = () => {
       <TeamsPickerModal
         open={teamsModalOpen}
         teams={allTeams}
-        selectedTeamIds={project.teamIds || []}
+        selectedTeamIds={teams.map(t => t.id)}
         onClose={() => setTeamsModalOpen(false)}
         onSubmit={handleSaveTeams}
       />
