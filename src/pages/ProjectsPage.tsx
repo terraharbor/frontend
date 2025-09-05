@@ -1,5 +1,5 @@
 import { Add as AddIcon } from '@mui/icons-material';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Alert, Box, CircularProgress, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { FC, useEffect, useState } from 'react';
 import { ProjectService } from '../api/projectService';
@@ -118,6 +118,8 @@ export const ProjectsPage: FC = () => {
     setProjectToDelete(null);
     setDeleteConfirmationOpen(false);
   };
+
+  if (!isAdmin) return <Alert severity="error">You are not allowed to access this page</Alert>;
 
   return (
     <Box>
